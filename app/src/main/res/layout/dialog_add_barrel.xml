@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Nom du fût -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nom du fût"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/edtBarrelName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Ex : Fût n°12"
+            android:inputType="textPersonName" />
+
+        <!-- Contenance -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Contenance (litres)"
+            android:layout_marginTop="12dp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/edtContenance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Ex : 225"
+            android:inputType="number" />
+
+        <!-- Marque -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Marque"
+            android:layout_marginTop="12dp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/edtMarque"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Ex : Seguin Moreau"
+            android:inputType="textPersonName" />
+
+        <!-- Type de bois -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Type de bois"
+            android:layout_marginTop="12dp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/edtTypeBois"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Ex : Chêne français"
+            android:inputType="textPersonName" />
+
+        <!-- Photo (optionnel, pour plus tard) -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Photo (optionnelle)"
+            android:layout_marginTop="12dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="La gestion de photo sera ajoutée ultérieurement"
+            android:textColor="#777777"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+</ScrollView>
