@@ -68,21 +68,5 @@
             android:layout_height="wrap_content"
             android:hint="Ex : Chêne français"
             android:inputType="textPersonName" />
-
-        <!-- Photo (optionnel, pour plus tard) -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Photo (optionnelle)"
-            android:layout_marginTop="12dp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="La gestion de photo sera ajoutée ultérieurement"
-            android:textColor="#777777"
-            android:textSize="12sp" />
-
     </LinearLayout>
 </ScrollView>

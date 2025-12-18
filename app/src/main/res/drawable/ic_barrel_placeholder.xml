@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Fond doux (bois clair) -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#F2EDE8"/>
+        </shape>
+    </item>
+
+    <!-- Icône tonneau centrée -->
+    <item
+        android:gravity="center">
+        <vector
+            android:width="96dp"
+            android:height="96dp"
+            android:viewportWidth="24"
+            android:viewportHeight="24">
+
+            <!-- Corps du tonneau -->
+            <path
+                android:fillColor="#8D6E63"
+                android:pathData="
+                    M6,3
+                    C4,6 4,18 6,21
+                    H18
+                    C20,18 20,6 18,3
+                    Z"/>
+
+            <!-- Cercles -->
+            <path
+                android:fillColor="#6D4C41"
+                android:pathData="M6,8 H18 V10 H6 Z"/>
+
+            <path
+                android:fillColor="#6D4C41"
+                android:pathData="M6,14 H18 V16 H6 Z"/>
+
+            <!-- Bordures -->
+            <path
+                android:fillColor="#5D4037"
+                android:pathData="M6,3 H7 V21 H6 Z"/>
+
+            <path
+                android:fillColor="#5D4037"
+                android:pathData="M17,3 H18 V21 H17 Z"/>
+        </vector>
+    </item>
+
+</layer-list>

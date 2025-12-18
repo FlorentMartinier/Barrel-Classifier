@@ -1,35 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:paddingVertical="8dp">
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:cardUseCompatPadding="true">
 
-    <LinearLayout
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
 
+        <!-- Nom historique -->
         <TextView
             android:id="@+id/txtNom"
-            android:textStyle="bold"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="Vin rouge"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
 
+        <!-- Bouton suppression -->
+        <ImageButton
+            android:id="@+id/btnDeleteHistorique"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Supprimer historique"
+            android:src="@drawable/ic_delete"
+            app:tint="@color/material_red_400"/>
+
+        <!-- Durée -->
         <TextView
-            android:id="@+id/txtDetails"
-            android:textSize="13sp"
+            android:id="@+id/txtDuration"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txtNom"
+            android:layout_marginTop="4dp"
+            android:drawableStart="@drawable/ic_timer"
+            android:drawablePadding="6dp"
+            android:text="2 mois et 1 semaine"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="14sp"/>
 
-    <ImageButton
-        android:id="@+id/btnDeleteHistorique"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_delete"
-        app:tint="@android:color/holo_red_dark" />
-</LinearLayout>
+        <!-- Dates -->
+        <TextView
+            android:id="@+id/txtDates"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txtDuration"
+            android:layout_marginTop="4dp"
+            android:text="Début : 01/12/2025 • Fin : en cours"
+            android:textColor="#777777"
+            android:textSize="13sp"/>
+
+    </RelativeLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -1,6 +1,7 @@
 package com.fmartinier.barrelclassifier.ui
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,6 +38,7 @@ class BarrelAdapter(
         val barrel = barrels[position]
 
         holder.txtNomBarrel.text = barrel.name
+        holder.txtBarrelDetails.text = "${barrel.brand} • ${barrel.woodType} • ${barrel.volume}L"
 
         // Chevron + animation
         holder.layoutToggleHistorique.setOnClickListener {
@@ -91,38 +93,23 @@ class BarrelAdapter(
 
     inner class BarrelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        /* ========================
-           Image & infos du fût
-           ======================== */
-
-        val imgBarrel: ImageView =
-            itemView.findViewById(R.id.imgFut)
-
         val txtNomBarrel: TextView =
-            itemView.findViewById(R.id.txtNomFut)
+            itemView.findViewById(R.id.txtBarrelName)
 
-        val txtInfosBarrel: TextView =
-            itemView.findViewById(R.id.txtInfos)
-
-        /* ========================
-           Actions fût
-           ======================== */
+        val txtBarrelDetails: TextView =
+            itemView.findViewById(R.id.txtBarrelDetails)
 
         // Bouton suppression fût (poubelle rouge)
         val btnDeleteBarrel: ImageButton =
-            itemView.findViewById(R.id.btnDeleteFut)
+            itemView.findViewById(R.id.btnDeleteBarrel)
 
         // Bouton ajout historique
-        val btnAddHistorique: Button =
+        val btnAddHistorique: TextView =
             itemView.findViewById(R.id.btnAddHistorique)
-
-        /* ========================
-           Historique déroulant
-           ======================== */
 
         // Zone cliquable "Historique + chevron"
         val layoutToggleHistorique: LinearLayout =
-            itemView.findViewById(R.id.layoutToggle)
+            itemView.findViewById(R.id.layoutToggleHistorique)
 
         // Chevron animé
         val imgChevron: ImageView =
@@ -131,10 +118,6 @@ class BarrelAdapter(
         // Conteneur des historiques
         val layoutHistorique: LinearLayout =
             itemView.findViewById(R.id.layoutHistorique)
-
-        /* ========================
-           État interne
-           ======================== */
 
         // Permet de savoir si l’historique est ouvert ou non
         var isExpanded: Boolean = false
@@ -147,39 +130,59 @@ class BarrelAdapter(
         holder.layoutHistorique.removeAllViews()
 
         if (barrel.histories.isEmpty()) {
-            val empty = TextView(context)
-            empty.text = "Aucun historique"
-            empty.setPadding(8, 8, 8, 8)
-            holder.layoutHistorique.addView(empty)
+            val emptyText = TextView(context)
+            emptyText.text = "Aucun historique"
+            emptyText.setTextColor(Color.GRAY)
+            emptyText.setPadding(16, 8, 16, 8)
+            holder.layoutHistorique.addView(emptyText)
             return
         }
 
-        for (historique in barrel.histories) {
+        for (history in barrel.histories) {
+
             val view = LayoutInflater.from(context)
                 .inflate(R.layout.item_historique, holder.layoutHistorique, false)
 
             val txtNom = view.findViewById<TextView>(R.id.txtNom)
-            val txtDetails = view.findViewById<TextView>(R.id.txtDetails)
+            val txtDuration = view.findViewById<TextView>(R.id.txtDuration)
+            val txtDates = view.findViewById<TextView>(R.id.txtDates)
             val btnDelete = view.findViewById<ImageButton>(R.id.btnDeleteHistorique)
 
-            txtNom.text = historique.name
+            // Nom
+            txtNom.text = history.name
 
-            val finTexte = historique.endDate?.let {
+            // Durée
+            txtDuration.text = calculateDuration(
+                history.beginDate,
+                history.endDate
+            )
+
+            // Dates
+            val dateDebut = formatDate(history.beginDate)
+            val dateFin = history.endDate?.let {
                 formatDate(it)
-            } ?: "en cours de vieillissement"
+            } ?: "en cours"
 
-            txtDetails.text =
-                "Début : ${formatDate(historique.beginDate)}\n" +
-                        "Fin : $finTexte\n" +
-                        "Durée : ${calculateDuration(historique.beginDate, historique.endDate)}"
+            txtDates.text = "Début : $dateDebut • Fin : $dateFin"
 
+            // Suppression
             btnDelete.setOnClickListener {
-                confirmDeleteHistorique(historique)
+                confirmDeleteHistorique(history)
             }
+
+            // Animation d'apparition
+            view.alpha = 0f
+            view.translationY = 20f
+            view.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(200)
+                .start()
 
             holder.layoutHistorique.addView(view)
         }
     }
+
 
     private fun confirmDeleteHistorique(historique: History) {
         AlertDialog.Builder(context)

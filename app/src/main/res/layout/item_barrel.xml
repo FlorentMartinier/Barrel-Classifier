@@ -1,95 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardElevation="4dp"
-    app:cardCornerRadius="12dp">
+    android:layout_margin="12dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="6dp"
+    app:cardUseCompatPadding="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Photo -->
-        <ImageView
-            android:id="@+id/imgFut"
+        <!-- Image / Placeholder -->
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="160dp"
-            android:scaleType="centerCrop"/>
-
-        <!-- Header du fût -->
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="12dp">
-
-            <TextView
-                android:id="@+id/txtNomFut"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <!-- Bouton supprimer fût -->
-            <ImageButton
-                android:id="@+id/btnDeleteFut"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_alignParentEnd="true"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_delete"
-                app:tint="@android:color/holo_red_dark" />
-        </RelativeLayout>
-
-        <!-- Infos -->
-        <TextView
-            android:id="@+id/txtInfos"
-            android:layout_marginHorizontal="12dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <!-- Ajouter historique -->
-        <Button
-            android:id="@+id/btnAddHistorique"
-            android:layout_margin="12dp"
-            android:text="Ajouter un historique"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <!-- Toggle historique -->
-        <LinearLayout
-            android:id="@+id/layoutToggle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="12dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:text="Historique"
-                android:textStyle="bold"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"/>
+            android:layout_height="160dp">
 
             <ImageView
-                android:id="@+id/imgChevron"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_chevron_down"/>
-        </LinearLayout>
+                android:id="@+id/imgBarrel"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_barrel_placeholder"/>
 
-        <!-- Conteneur historique -->
+            <!-- Bouton suppression fût -->
+            <ImageButton
+                android:id="@+id/btnDeleteBarrel"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="top|end"
+                android:layout_margin="12dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Supprimer le fût"
+                android:src="@drawable/ic_delete"
+                app:tint="@color/material_red_400"/>
+        </FrameLayout>
+
+        <!-- Contenu -->
         <LinearLayout
-            android:id="@+id/layoutHistorique"
-            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="12dp"/>
+            android:padding="16dp">
 
+            <!-- Nom du fût -->
+            <TextView
+                android:id="@+id/txtBarrelName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fût 1"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+            <!-- Infos secondaires -->
+            <TextView
+                android:id="@+id/txtBarrelDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Marque • Bois • 225 L"
+                android:textColor="#777777"
+                android:textSize="14sp"/>
+
+            <!-- Ajouter historique -->
+            <TextView
+                android:id="@+id/btnAddHistorique"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:drawableStart="@drawable/ic_add"
+                android:drawablePadding="8dp"
+                android:paddingVertical="8dp"
+                android:text="Ajouter un historique"
+                android:textColor="?attr/colorPrimary"
+                android:textStyle="bold"/>
+
+            <!-- Séparateur -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="#E0E0E0"/>
+
+            <!-- Header historique -->
+            <LinearLayout
+                android:id="@+id/layoutToggleHistorique"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/txtHistoriqueTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Historique"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <ImageView
+                    android:id="@+id/imgChevron"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_chevron_down"/>
+            </LinearLayout>
+
+            <!-- Liste des historiques -->
+            <LinearLayout
+                android:id="@+id/layoutHistorique"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
+                android:visibility="gone"/>
+
+        </LinearLayout>
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+
+</com.google.android.material.card.MaterialCardView>
