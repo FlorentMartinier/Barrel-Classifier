@@ -2,6 +2,8 @@ package com.fmartinier.barrelclassifier
 
 import android.os.Bundle
 import android.view.View
+import android.view.animation.AnimationUtils
+import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,6 +25,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dbHelper: DatabaseHelper
     private lateinit var barrelDao: BarrelDao
 
+    private lateinit var imgArrow: ImageView
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -32,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         barrelDao = BarrelDao(dbHelper)
 
         // Views
+        imgArrow = findViewById(R.id.imgArrow)
         recyclerView = findViewById(R.id.recyclerView)
         fabAddBarrel = findViewById(R.id.fabAddBarrel)
         emptyStateLayout = findViewById(R.id.layoutEmptyState)
@@ -71,9 +77,11 @@ class MainActivity : AppCompatActivity() {
         if (barrels.isEmpty()) {
             emptyStateLayout.visibility = View.VISIBLE
             recyclerView.visibility = View.GONE
+            startArrowAnimation()
         } else {
             emptyStateLayout.visibility = View.GONE
             recyclerView.visibility = View.VISIBLE
+            stopArrowAnimation()
         }
     }
 
@@ -96,5 +104,15 @@ class MainActivity : AppCompatActivity() {
         )
         dialog.show(supportFragmentManager, "AddHistoryDialog")
     }
+
+    private fun startArrowAnimation() {
+        val animation = AnimationUtils.loadAnimation(this, R.anim.arrow_bounce)
+        imgArrow.startAnimation(animation)
+    }
+
+    private fun stopArrowAnimation() {
+        imgArrow.clearAnimation()
+    }
+
 
 }
