@@ -10,9 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.dao.BarrelDao
+import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.ui.AddBarrelDialog
 import com.fmartinier.barrelclassifier.ui.AddHistoryDialog
 import com.fmartinier.barrelclassifier.ui.BarrelAdapter
+import com.fmartinier.barrelclassifier.ui.EditBarrelDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
@@ -51,6 +53,9 @@ class MainActivity : AppCompatActivity() {
             refresh = { loadBarrels() },
             onAddHistory = { barrelId ->
                 openAddHistoryDialog(barrelId)
+            },
+            onEditBarrel = { barrel ->
+                openEditBarrel(barrel)
             }
         )
 
@@ -103,6 +108,12 @@ class MainActivity : AppCompatActivity() {
             }
         )
         dialog.show(supportFragmentManager, "AddHistoryDialog")
+    }
+
+    private fun openEditBarrel(barrel: Barrel) {
+        EditBarrelDialog(barrel) {
+            loadBarrels()
+        }.show(supportFragmentManager, "EditBarrelDialog")
     }
 
     private fun startArrowAnimation() {

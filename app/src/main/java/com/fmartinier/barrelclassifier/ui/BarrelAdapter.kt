@@ -25,7 +25,8 @@ class BarrelAdapter(
     private val context: Context,
     private var barrels: List<Barrel>,
     private val refresh: () -> Unit,
-    private val onAddHistory: (Long) -> Unit
+    private val onAddHistory: (Long) -> Unit,
+    private val onEditBarrel: (Barrel) -> Unit
 ) : RecyclerView.Adapter<BarrelAdapter.BarrelViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BarrelViewHolder {
@@ -55,6 +56,10 @@ class BarrelAdapter(
         // Suppression fût
         holder.btnDeleteBarrel.setOnClickListener {
             confirmDeleteBarrel(barrel)
+        }
+
+        holder.btnEditBarrel.setOnClickListener {
+            onEditBarrel(barrel)
         }
 
         holder.btnAddHistorique.setOnClickListener {
@@ -99,7 +104,9 @@ class BarrelAdapter(
         val txtBarrelDetails: TextView =
             itemView.findViewById(R.id.txtBarrelDetails)
 
-        // Bouton suppression fût (poubelle rouge)
+        val btnEditBarrel: ImageButton =
+            itemView.findViewById(R.id.btnEditBarrel)
+
         val btnDeleteBarrel: ImageButton =
             itemView.findViewById(R.id.btnDeleteBarrel)
 

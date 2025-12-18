@@ -85,6 +85,25 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
         dbHelper.writableDatabase.delete(BARREL_TABLE_NAME, "$ID_COLUMN_NAME = ?", arrayOf(futId.toString()))
     }
 
+    fun update(barrel: Barrel) {
+        val db = dbHelper.writableDatabase
+
+        val values = ContentValues().apply {
+            put(NAME_COLUMN_NAME, barrel.name)
+            put(VOLUME_COLUMN_NAME, barrel.volume)
+            put(BRAND_COLUMN_NAME, barrel.brand)
+            put(WOOD_TYPE_COLUMN_NAME, barrel.woodType)
+        }
+
+        db.update(
+            BARREL_TABLE_NAME,
+            values,
+            "$ID_COLUMN_NAME = ?",
+            arrayOf(barrel.id.toString())
+        )
+    }
+
+
     private fun getHistoriesForBarrel(barrelId: Long): List<History> {
         val db = dbHelper.readableDatabase
         val list = mutableListOf<History>()
