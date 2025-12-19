@@ -1,6 +1,7 @@
 package com.fmartinier.barrelclassifier.ui
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -26,7 +27,8 @@ class BarrelAdapter(
     private var barrels: List<Barrel>,
     private val refresh: () -> Unit,
     private val onAddHistory: (Long) -> Unit,
-    private val onEditBarrel: (Barrel) -> Unit
+    private val onEditBarrel: (Barrel) -> Unit,
+    private val onEditPhoto: (Barrel) -> Unit
 ) : RecyclerView.Adapter<BarrelAdapter.BarrelViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BarrelViewHolder {
@@ -64,6 +66,20 @@ class BarrelAdapter(
 
         holder.btnAddHistorique.setOnClickListener {
             onAddHistory(barrel.id)
+        }
+
+        holder.photoOverlay.setOnClickListener {
+            onEditPhoto(barrel)
+        }
+
+        if (barrel.imagePath == null) {
+            holder.photoOverlay.visibility = View.VISIBLE
+            holder.imgBarrel.setImageResource(R.drawable.ic_barrel_placeholder)
+        } else {
+            holder.photoOverlay.visibility = View.GONE
+            holder.imgBarrel.setImageBitmap(
+                BitmapFactory.decodeFile(barrel.imagePath)
+            )
         }
 
         afficherHistoriques(holder, barrel)
@@ -122,12 +138,19 @@ class BarrelAdapter(
         val imgChevron: ImageView =
             itemView.findViewById(R.id.imgChevron)
 
+        val imgBarrel: ImageView =
+            itemView.findViewById(R.id.imgBarrel)
+
+        val photoOverlay: LinearLayout =
+            itemView.findViewById(R.id.photoOverlay)
+
         // Conteneur des historiques
         val layoutHistorique: LinearLayout =
             itemView.findViewById(R.id.layoutHistorique)
 
         // Permet de savoir si l’historique est ouvert ou non
         var isExpanded: Boolean = false
+
     }
 
     private fun afficherHistoriques(

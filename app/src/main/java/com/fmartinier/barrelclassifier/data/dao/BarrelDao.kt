@@ -103,6 +103,19 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
         )
     }
 
+    fun updateImage(barrelId: Long, imagePath: String) {
+        val db = dbHelper.writableDatabase
+        val values = ContentValues().apply {
+            put(IMAGE_PATH_COLUMN_NAME, imagePath)
+        }
+
+        db.update(
+            BARREL_TABLE_NAME,
+            values,
+            "$ID_COLUMN_NAME = ?",
+            arrayOf(barrelId.toString())
+        )
+    }
 
     private fun getHistoriesForBarrel(barrelId: Long): List<History> {
         val db = dbHelper.readableDatabase

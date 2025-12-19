@@ -16,9 +16,11 @@
 
         <!-- Image / Placeholder -->
         <FrameLayout
+            android:id="@+id/photoContainer"
             android:layout_width="match_parent"
-            android:layout_height="160dp">
+            android:layout_height="180dp">
 
+            <!-- Image -->
             <ImageView
                 android:id="@+id/imgBarrel"
                 android:layout_width="match_parent"
@@ -26,30 +28,56 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_barrel_placeholder"/>
 
+            <!-- Overlay ajout photo -->
+            <LinearLayout
+                android:id="@+id/photoOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="#66000000">
+
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_camera"
+                    app:tint="@android:color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ajouter une photo"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold"
+                    android:layout_marginTop="8dp"/>
+            </LinearLayout>
+
+            <!-- ✏️ Bouton édition -->
             <ImageButton
                 android:id="@+id/btnEditBarrel"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="top|start"
-                android:layout_margin="12dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Modifier le fût"
+                android:layout_margin="8dp"
+                android:background="@drawable/bg_icon_circle"
                 android:src="@drawable/ic_edit"
-                app:tint="?attr/colorPrimary"/>
+                android:contentDescription="Modifier"
+                app:tint="@android:color/white" />
 
-
-            <!-- Bouton suppression fût -->
+            <!-- 🗑️ Bouton suppression -->
             <ImageButton
                 android:id="@+id/btnDeleteBarrel"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="top|end"
-                android:layout_margin="12dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Supprimer le fût"
+                android:layout_margin="8dp"
+                android:background="@drawable/bg_icon_circle"
                 android:src="@drawable/ic_delete"
-                app:tint="@color/material_red_400"/>
+                android:contentDescription="Supprimer"
+                app:tint="@android:color/white" />
+
         </FrameLayout>
+
 
         <!-- Contenu -->
         <LinearLayout
