@@ -30,28 +30,6 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
         return db.insert(BARREL_TABLE_NAME, null, values)
     }
 
-    fun getAll(): List<Barrel> {
-        val list = mutableListOf<Barrel>()
-        val db = dbHelper.readableDatabase
-
-        val cursor = db.rawQuery("SELECT * FROM $BARREL_TABLE_NAME", null)
-        while (cursor.moveToNext()) {
-            list.add(
-                Barrel(
-                    id = cursor.getLong(0),
-                    name = cursor.getString(1),
-                    volume = cursor.getInt(2),
-                    brand = cursor.getString(3),
-                    woodType = cursor.getString(4),
-                    imagePath = cursor.getString(5),
-                    histories = listOf()
-                )
-            )
-        }
-        cursor.close()
-        return list
-    }
-
     fun getAllBarrelsWithHistorique(): List<Barrel> {
         val db = dbHelper.readableDatabase
         val barrels = mutableListOf<Barrel>()
@@ -122,7 +100,7 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
         val list = mutableListOf<History>()
 
         val cursor = db.rawQuery(
-            "SELECT * FROM $HISTORY_TABLE_NAME WHERE $BARREL_ID_COLUMN_NAME = ?",
+            "SELECT * FROM $HISTORY_TABLE_NAME WHERE $BARREL_ID_COLUMN_NAME = ? ORDER BY $BEGIN_DATE_COLUMN_NAME",
             arrayOf(barrelId.toString())
         )
 
