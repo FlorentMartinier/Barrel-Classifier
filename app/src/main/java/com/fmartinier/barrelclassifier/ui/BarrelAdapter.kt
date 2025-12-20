@@ -72,6 +72,10 @@ class BarrelAdapter(
             onEditPhoto(barrel)
         }
 
+        holder.imgBarrel.setOnClickListener {
+            onEditPhoto(barrel)
+        }
+
         if (barrel.imagePath == null) {
             holder.photoOverlay.visibility = View.VISIBLE
             holder.imgBarrel.setImageResource(R.drawable.ic_barrel_placeholder)
