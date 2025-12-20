@@ -20,26 +20,26 @@ class EditBarrelDialog(
         val view = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_add_barrel, null)
 
-        val edtNom = view.findViewById<EditText>(R.id.edtBarrelName)
-        val edtContenance = view.findViewById<EditText>(R.id.edtContenance)
-        val edtMarque = view.findViewById<EditText>(R.id.edtMarque)
-        val edtTypeBois = view.findViewById<EditText>(R.id.edtTypeBois)
+        val edtBarrelName = view.findViewById<EditText>(R.id.edtBarrelName)
+        val edtVolume = view.findViewById<EditText>(R.id.edtVolume)
+        val edtBrand = view.findViewById<EditText>(R.id.edtBrand)
+        val edtWoodType = view.findViewById<EditText>(R.id.edtWoodType)
 
         // Pré-remplissage
-        edtNom.setText(barrel.name)
-        edtContenance.setText(barrel.volume.toString())
-        edtMarque.setText(barrel.brand)
-        edtTypeBois.setText(barrel.woodType)
+        edtBarrelName.setText(barrel.name)
+        edtVolume.setText(barrel.volume.toString())
+        edtBrand.setText(barrel.brand)
+        edtWoodType.setText(barrel.woodType)
 
         return AlertDialog.Builder(requireContext())
             .setTitle(requireContext().resources.getString(R.string.modify_barrel))
             .setView(view)
             .setPositiveButton(requireContext().resources.getString(R.string.modify)) { _, _ ->
                 val updatedBarrel = barrel.copy(
-                    name = edtNom.text.toString(),
-                    volume = edtContenance.text.toString().toInt(),
-                    brand = edtMarque.text.toString(),
-                    woodType = edtTypeBois.text.toString()
+                    name = edtBarrelName.text.toString(),
+                    volume = edtVolume.text.toString().toInt(),
+                    brand = edtBrand.text.toString(),
+                    woodType = edtWoodType.text.toString()
                 )
 
                 val db = DatabaseHelper(requireContext())

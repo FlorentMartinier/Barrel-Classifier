@@ -16,7 +16,7 @@
 
         <!-- Nom historique -->
         <TextView
-            android:id="@+id/txtNom"
+            android:id="@+id/txtName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16sp"
@@ -24,7 +24,7 @@
 
         <!-- Bouton suppression -->
         <ImageButton
-            android:id="@+id/btnDeleteHistorique"
+            android:id="@+id/btnDeleteHistory"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_alignParentEnd="true"
@@ -38,7 +38,7 @@
             android:id="@+id/txtDuration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/txtNom"
+            android:layout_below="@id/txtName"
             android:layout_marginTop="4dp"
             android:drawablePadding="6dp"
             android:textColor="?attr/colorPrimary"

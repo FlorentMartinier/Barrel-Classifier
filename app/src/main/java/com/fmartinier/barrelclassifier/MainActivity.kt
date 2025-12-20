@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity() {
      * et met à jour l'UI
      */
     private fun loadBarrels() {
-        val barrels = barrelDao.getAllBarrelsWithHistorique()
+        val barrels = barrelDao.getAllBarrelsWithHistories()
 
         adapter.updateData(barrels)
 

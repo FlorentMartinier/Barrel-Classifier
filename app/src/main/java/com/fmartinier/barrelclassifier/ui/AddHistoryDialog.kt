@@ -28,21 +28,21 @@ class AddHistoryDialog(
         val view = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_add_history, null)
 
-        val edtNom = view.findViewById<TextInputEditText>(R.id.edtNom)
-        val edtDateDebut = view.findViewById<TextInputEditText>(R.id.edtDateDebut)
-        val edtDateFin = view.findViewById<TextInputEditText>(R.id.edtDateFin)
+        val edtName = view.findViewById<TextInputEditText>(R.id.edtName)
+        val edtBeginDate = view.findViewById<TextInputEditText>(R.id.edtBeginDate)
+        val edtEndDate = view.findViewById<TextInputEditText>(R.id.edtEndDate)
 
-        edtDateDebut.setOnClickListener {
+        edtBeginDate.setOnClickListener {
             openDatePicker {
                 dateDebut = it
-                edtDateDebut.setText(formatDate(it))
+                edtBeginDate.setText(formatDate(it))
             }
         }
 
-        edtDateFin.setOnClickListener {
+        edtEndDate.setOnClickListener {
             openDatePicker {
                 dateFin = it
-                edtDateFin.setText(formatDate(it))
+                edtEndDate.setText(formatDate(it))
             }
         }
 
@@ -52,15 +52,15 @@ class AddHistoryDialog(
             .setPositiveButton(requireContext().resources.getString(R.string.add)) { _, _ ->
                 if (dateDebut == null) return@setPositiveButton
 
-                val historique = History(
+                val history = History(
                     barrelId = barrelId,
-                    name = edtNom.text.toString(),
+                    name = edtName.text.toString(),
                     beginDate = dateDebut!!,
                     endDate = dateFin // peut être NULL
                 )
 
                 HistoryDao(DatabaseHelper(requireContext()))
-                    .insert(historique)
+                    .insert(history)
 
                 onHistoryAdded()
             }

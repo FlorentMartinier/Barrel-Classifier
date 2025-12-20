@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Barrel Classifier</string>
+    <string name="no_history">No History</string>
+    <string name="in_progress">In progress</string>
+    <string name="begin_and_end_date">Start: %1$s • End: %2$s</string>
+    <string name="remove_history">Delete history</string>
+    <string name="remove_history_validation">Do you really want to delete this history?</string>
+    <string name="remove">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="modify">Edit</string>
+    <string name="add">Add</string>
+    <string name="add_history">Add history</string>
+    <string name="add_barrel">Add barrel</string>
+    <string name="remove_barrel">Delete barrel</string>
+    <string name="modify_barrel">Edit barrel</string>
+    <string name="remove_barrel_validation">Do you really want to delete this barrel?\n\nAll associated histories will be permanently deleted.</string>
+    <string name="month_and_week">%1$s months and %2$s weeks</string>
+    <string name="no_barrel_saved">You have not saved any barrels yet</string>
+    <string name="barrel_name">Barrel name</string>
+    <string name="ex_barrel_name">e.g.: Barrel #12</string>
+    <string name="barrel_volume">Capacity (liters)</string>
+    <string name="ex_barrel_volume">e.g.: 2</string>
+    <string name="brand">Brand</string>
+    <string name="ex_brand">e.g.: Allary</string>
+    <string name="wood_type">Wood type</string>
+    <string name="ex_wood_type">e.g.: French oak</string>
+    <string name="history_name">History name</string>
+    <string name="begin_date">Start date</string>
+    <string name="optional_end_date">End date (optional)</string>
+    <string name="add_photo">Add photo</string>
+    <string name="history">History</string>
+</resources>

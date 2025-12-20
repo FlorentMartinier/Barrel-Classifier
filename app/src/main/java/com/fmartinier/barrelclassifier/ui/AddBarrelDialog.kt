@@ -19,26 +19,26 @@ class AddBarrelDialog(
         val view = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_add_barrel, null)
 
-        val edtNom = view.findViewById<EditText>(R.id.edtBarrelName)
-        val edtContenance = view.findViewById<EditText>(R.id.edtContenance)
-        val edtMarque = view.findViewById<EditText>(R.id.edtMarque)
-        val edtTypeBois = view.findViewById<EditText>(R.id.edtTypeBois)
+        val edtBarrelName = view.findViewById<EditText>(R.id.edtBarrelName)
+        val edtVolume = view.findViewById<EditText>(R.id.edtVolume)
+        val edtBrand = view.findViewById<EditText>(R.id.edtBrand)
+        val edtWoodType = view.findViewById<EditText>(R.id.edtWoodType)
 
         return AlertDialog.Builder(requireContext())
             .setTitle(requireContext().resources.getString(R.string.add_barrel))
             .setView(view)
             .setPositiveButton(requireContext().resources.getString(R.string.add)) { _, _ ->
-                val fut = Barrel(
-                    name = edtNom.text.toString(),
-                    volume = edtContenance.text.toString().toInt(),
-                    brand = edtMarque.text.toString(),
-                    woodType = edtTypeBois.text.toString(),
+                val barrel = Barrel(
+                    name = edtBarrelName.text.toString(),
+                    volume = edtVolume.text.toString().toInt(),
+                    brand = edtBrand.text.toString(),
+                    woodType = edtWoodType.text.toString(),
                     imagePath = null,
                     histories = listOf()
                 )
 
                 val db = DatabaseHelper(requireContext())
-                BarrelDao(db).insert(fut)
+                BarrelDao(db).insert(barrel)
 
                 onBarrelAdded()
             }

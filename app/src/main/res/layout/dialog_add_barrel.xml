@@ -32,7 +32,7 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/edtContenance"
+            android:id="@+id/edtVolume"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/ex_barrel_volume"
@@ -47,7 +47,7 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/edtMarque"
+            android:id="@+id/edtBrand"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/ex_brand"
@@ -62,7 +62,7 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/edtTypeBois"
+            android:id="@+id/edtWoodType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/ex_wood_type"

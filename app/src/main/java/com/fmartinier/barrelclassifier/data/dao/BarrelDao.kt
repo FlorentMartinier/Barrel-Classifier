@@ -30,7 +30,7 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
         return db.insert(BARREL_TABLE_NAME, null, values)
     }
 
-    fun getAllBarrelsWithHistorique(): List<Barrel> {
+    fun getAllBarrelsWithHistories(): List<Barrel> {
         val db = dbHelper.readableDatabase
         val barrels = mutableListOf<Barrel>()
 
@@ -58,9 +58,9 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
         return barrels
     }
 
-    fun deleteBarrel(futId: Long) {
-        dbHelper.writableDatabase.delete(HISTORY_TABLE_NAME, "$BARREL_ID_COLUMN_NAME = ?", arrayOf(futId.toString()))
-        dbHelper.writableDatabase.delete(BARREL_TABLE_NAME, "$ID_COLUMN_NAME = ?", arrayOf(futId.toString()))
+    fun deleteBarrel(barrelId: Long) {
+        dbHelper.writableDatabase.delete(HISTORY_TABLE_NAME, "$BARREL_ID_COLUMN_NAME = ?", arrayOf(barrelId.toString()))
+        dbHelper.writableDatabase.delete(BARREL_TABLE_NAME, "$ID_COLUMN_NAME = ?", arrayOf(barrelId.toString()))
     }
 
     fun update(barrel: Barrel) {

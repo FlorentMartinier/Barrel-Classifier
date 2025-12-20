@@ -12,7 +12,7 @@
         android:hint="@string/history_name">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edtNom"
+            android:id="@+id/edtName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -27,7 +27,7 @@
         app:endIconMode="custom">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edtDateDebut"
+            android:id="@+id/edtBeginDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clickable="true"
@@ -44,7 +44,7 @@
         app:endIconMode="custom">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edtDateFin"
+            android:id="@+id/edtEndDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clickable="true"

@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -40,13 +39,13 @@ class BarrelAdapter(
     override fun onBindViewHolder(holder: BarrelViewHolder, position: Int) {
         val barrel = barrels[position]
 
-        holder.txtNomBarrel.text = barrel.name
+        holder.txtBarrelName.text = barrel.name
         holder.txtBarrelDetails.text = "${barrel.brand} • ${barrel.woodType} • ${barrel.volume}L"
 
         // Chevron + animation
-        holder.layoutToggleHistorique.setOnClickListener {
+        holder.layoutToggleHistory.setOnClickListener {
             holder.isExpanded = !holder.isExpanded
-            holder.layoutHistorique.visibility =
+            holder.layoutHistory.visibility =
                 if (holder.isExpanded) View.VISIBLE else View.GONE
 
             holder.imgChevron.animate()
@@ -64,7 +63,7 @@ class BarrelAdapter(
             onEditBarrel(barrel)
         }
 
-        holder.btnAddHistorique.setOnClickListener {
+        holder.btnAddHistory.setOnClickListener {
             onAddHistory(barrel.id)
         }
 
@@ -86,7 +85,7 @@ class BarrelAdapter(
             )
         }
 
-        afficherHistoriques(holder, barrel)
+        displayHistories(holder, barrel)
     }
 
     override fun getItemCount() = barrels.size
@@ -115,7 +114,7 @@ class BarrelAdapter(
 
     inner class BarrelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        val txtNomBarrel: TextView =
+        val txtBarrelName: TextView =
             itemView.findViewById(R.id.txtBarrelName)
 
         val txtBarrelDetails: TextView =
@@ -128,12 +127,12 @@ class BarrelAdapter(
             itemView.findViewById(R.id.btnDeleteBarrel)
 
         // Bouton ajout historique
-        val btnAddHistorique: TextView =
-            itemView.findViewById(R.id.btnAddHistorique)
+        val btnAddHistory: TextView =
+            itemView.findViewById(R.id.btnAddHistory)
 
         // Zone cliquable "Historique + chevron"
-        val layoutToggleHistorique: LinearLayout =
-            itemView.findViewById(R.id.layoutToggleHistorique)
+        val layoutToggleHistory: LinearLayout =
+            itemView.findViewById(R.id.layoutToggleHistory)
 
         // Chevron animé
         val imgChevron: ImageView =
@@ -146,50 +145,47 @@ class BarrelAdapter(
             itemView.findViewById(R.id.photoOverlay)
 
         // Conteneur des historiques
-        val layoutHistorique: LinearLayout =
-            itemView.findViewById(R.id.layoutHistorique)
+        val layoutHistory: LinearLayout =
+            itemView.findViewById(R.id.layoutHistory)
 
         // Permet de savoir si l’historique est ouvert ou non
         var isExpanded: Boolean = false
 
     }
 
-    private fun afficherHistoriques(
+    private fun displayHistories(
         holder: BarrelViewHolder,
         barrel: Barrel
     ) {
-        holder.layoutHistorique.removeAllViews()
+        holder.layoutHistory.removeAllViews()
 
         if (barrel.histories.isEmpty()) {
             val emptyText = TextView(context)
             emptyText.text = context.resources.getString(R.string.no_history)
             emptyText.setTextColor(Color.GRAY)
             emptyText.setPadding(16, 8, 16, 8)
-            holder.layoutHistorique.addView(emptyText)
+            holder.layoutHistory.addView(emptyText)
             return
         }
 
         for (history in barrel.histories) {
 
             val view = LayoutInflater.from(context)
-                .inflate(R.layout.item_historique, holder.layoutHistorique, false)
+                .inflate(R.layout.item_history, holder.layoutHistory, false)
 
-            val txtNom = view.findViewById<TextView>(R.id.txtNom)
+            val txtName = view.findViewById<TextView>(R.id.txtName)
             val txtDuration = view.findViewById<TextView>(R.id.txtDuration)
             val txtDates = view.findViewById<TextView>(R.id.txtDates)
-            val btnDelete = view.findViewById<ImageButton>(R.id.btnDeleteHistorique)
+            val btnDelete = view.findViewById<ImageButton>(R.id.btnDeleteHistory)
 
-            // Nom
-            txtNom.text = history.name
+            txtName.text = history.name
 
-            // Durée
             txtDuration.text = calculateDuration(
                 context,
                 history.beginDate,
                 history.endDate
             )
 
-            // Dates
             val dateDebut = formatDate(history.beginDate)
             val dateFin = history.endDate?.let {
                 formatDate(it)
@@ -201,9 +197,8 @@ class BarrelAdapter(
                 dateFin
             )
 
-            // Suppression
             btnDelete.setOnClickListener {
-                confirmDeleteHistorique(history)
+                confirmDeleteHistory(history)
             }
 
             // Animation d'apparition
@@ -215,20 +210,20 @@ class BarrelAdapter(
                 .setDuration(200)
                 .start()
 
-            holder.layoutHistorique.addView(view)
+            holder.layoutHistory.addView(view)
         }
     }
 
 
-    private fun confirmDeleteHistorique(historique: History) {
+    private fun confirmDeleteHistory(history: History) {
         AlertDialog.Builder(context)
             .setTitle(context.resources.getString(R.string.remove_history))
             .setMessage(context.resources.getString(R.string.remove_history_validation))
             .setPositiveButton(context.resources.getString(R.string.remove)) { _, _ ->
                 val dbHelper = DatabaseHelper(context)
-                val historiqueDao = HistoryDao(dbHelper)
+                val historyDao = HistoryDao(dbHelper)
 
-                historiqueDao.deleteHistory(historique.id)
+                historyDao.deleteHistory(history.id)
 
                 // Recharge les données après suppression
                 refresh()
