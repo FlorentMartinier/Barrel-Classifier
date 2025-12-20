@@ -93,12 +93,9 @@ class BarrelAdapter(
 
     private fun confirmDeleteBarrel(barrel: Barrel) {
         AlertDialog.Builder(context)
-            .setTitle("Supprimer le fût")
-            .setMessage(
-                "Voulez-vous vraiment supprimer ce fût ?\n\n" +
-                        "Tous les historiques associés seront définitivement supprimés."
-            )
-            .setPositiveButton("Supprimer") { _, _ ->
+            .setTitle(context.resources.getString(R.string.remove_barrel))
+            .setMessage(context.resources.getString(R.string.remove_barrel_validation))
+            .setPositiveButton(context.resources.getString(R.string.remove)) { _, _ ->
                 val dbHelper = DatabaseHelper(context)
                 val barrelDao = BarrelDao(dbHelper)
 
@@ -107,7 +104,7 @@ class BarrelAdapter(
                 // Rafraîchit la liste après suppression
                 refresh()
             }
-            .setNegativeButton("Annuler", null)
+            .setNegativeButton(context.resources.getString(R.string.cancel), null)
             .show()
     }
 
@@ -165,7 +162,7 @@ class BarrelAdapter(
 
         if (barrel.histories.isEmpty()) {
             val emptyText = TextView(context)
-            emptyText.text = "Aucun historique"
+            emptyText.text = context.resources.getString(R.string.no_history)
             emptyText.setTextColor(Color.GRAY)
             emptyText.setPadding(16, 8, 16, 8)
             holder.layoutHistorique.addView(emptyText)
@@ -187,6 +184,7 @@ class BarrelAdapter(
 
             // Durée
             txtDuration.text = calculateDuration(
+                context,
                 history.beginDate,
                 history.endDate
             )
@@ -195,9 +193,13 @@ class BarrelAdapter(
             val dateDebut = formatDate(history.beginDate)
             val dateFin = history.endDate?.let {
                 formatDate(it)
-            } ?: "en cours"
+            } ?: context.resources.getString(R.string.in_progress)
 
-            txtDates.text = "Début : $dateDebut • Fin : $dateFin"
+            txtDates.text = context.resources.getString(
+                R.string.begin_and_end_date,
+                dateDebut,
+                dateFin
+            )
 
             // Suppression
             btnDelete.setOnClickListener {
@@ -220,9 +222,9 @@ class BarrelAdapter(
 
     private fun confirmDeleteHistorique(historique: History) {
         AlertDialog.Builder(context)
-            .setTitle("Supprimer l'historique")
-            .setMessage("Voulez-vous vraiment supprimer cet historique ?")
-            .setPositiveButton("Supprimer") { _, _ ->
+            .setTitle(context.resources.getString(R.string.remove_history))
+            .setMessage(context.resources.getString(R.string.remove_history_validation))
+            .setPositiveButton(context.resources.getString(R.string.remove)) { _, _ ->
                 val dbHelper = DatabaseHelper(context)
                 val historiqueDao = HistoryDao(dbHelper)
 
@@ -231,7 +233,7 @@ class BarrelAdapter(
                 // Recharge les données après suppression
                 refresh()
             }
-            .setNegativeButton("Annuler", null)
+            .setNegativeButton(context.resources.getString(R.string.cancel), null)
             .show()
     }
 }

@@ -32,9 +32,9 @@ class EditBarrelDialog(
         edtTypeBois.setText(barrel.woodType)
 
         return AlertDialog.Builder(requireContext())
-            .setTitle("Modifier le fût")
+            .setTitle(requireContext().resources.getString(R.string.modify_barrel))
             .setView(view)
-            .setPositiveButton("Modifier") { _, _ ->
+            .setPositiveButton(requireContext().resources.getString(R.string.modify)) { _, _ ->
                 val updatedBarrel = barrel.copy(
                     name = edtNom.text.toString(),
                     volume = edtContenance.text.toString().toInt(),
@@ -47,7 +47,7 @@ class EditBarrelDialog(
 
                 onBarrelUpdated()
             }
-            .setNegativeButton("Annuler", null)
+            .setNegativeButton(requireContext().resources.getString(R.string.cancel), null)
             .create()
     }
 }

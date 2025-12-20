@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -14,59 +13,59 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nom du fût"
+            android:text="@string/barrel_name"
             android:textStyle="bold" />
 
         <EditText
             android:id="@+id/edtBarrelName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Ex : Fût n°12"
+            android:hint="@string/ex_barrel_name"
             android:inputType="textPersonName" />
 
         <!-- Contenance -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Contenance (litres)"
             android:layout_marginTop="12dp"
+            android:text="@string/barrel_volume"
             android:textStyle="bold" />
 
         <EditText
             android:id="@+id/edtContenance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Ex : 225"
+            android:hint="@string/ex_barrel_volume"
             android:inputType="number" />
 
         <!-- Marque -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Marque"
             android:layout_marginTop="12dp"
+            android:text="@string/brand"
             android:textStyle="bold" />
 
         <EditText
             android:id="@+id/edtMarque"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Ex : Seguin Moreau"
+            android:hint="@string/ex_brand"
             android:inputType="textPersonName" />
 
         <!-- Type de bois -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Type de bois"
             android:layout_marginTop="12dp"
+            android:text="@string/wood_type"
             android:textStyle="bold" />
 
         <EditText
             android:id="@+id/edtTypeBois"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Ex : Chêne français"
+            android:hint="@string/ex_wood_type"
             android:inputType="textPersonName" />
     </LinearLayout>
 </ScrollView>

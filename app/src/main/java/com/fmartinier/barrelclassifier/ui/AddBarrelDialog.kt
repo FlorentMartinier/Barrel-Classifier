@@ -25,9 +25,9 @@ class AddBarrelDialog(
         val edtTypeBois = view.findViewById<EditText>(R.id.edtTypeBois)
 
         return AlertDialog.Builder(requireContext())
-            .setTitle("Ajouter un fût")
+            .setTitle(requireContext().resources.getString(R.string.add_barrel))
             .setView(view)
-            .setPositiveButton("Ajouter") { _, _ ->
+            .setPositiveButton(requireContext().resources.getString(R.string.add)) { _, _ ->
                 val fut = Barrel(
                     name = edtNom.text.toString(),
                     volume = edtContenance.text.toString().toInt(),
@@ -42,7 +42,7 @@ class AddBarrelDialog(
 
                 onBarrelAdded()
             }
-            .setNegativeButton("Annuler", null)
+            .setNegativeButton(requireContext().resources.getString(R.string.cancel), null)
             .create()
     }
 }

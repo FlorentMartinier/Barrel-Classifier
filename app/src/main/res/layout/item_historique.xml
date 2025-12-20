@@ -19,7 +19,6 @@
             android:id="@+id/txtNom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Vin rouge"
             android:textSize="16sp"
             android:textStyle="bold"/>
 
@@ -30,7 +29,7 @@
             android:layout_height="32dp"
             android:layout_alignParentEnd="true"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Supprimer historique"
+            android:contentDescription="@string/remove_history"
             android:src="@drawable/ic_delete"
             app:tint="@color/material_red_400"/>
 
@@ -41,11 +40,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/txtNom"
             android:layout_marginTop="4dp"
-            android:drawableStart="@drawable/ic_timer"
             android:drawablePadding="6dp"
-            android:text="2 mois et 1 semaine"
             android:textColor="?attr/colorPrimary"
-            android:textSize="14sp"/>
+            android:textSize="14sp"
+            app:drawableStartCompat="@drawable/ic_timer" />
 
         <!-- Dates -->
         <TextView
@@ -54,7 +52,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/txtDuration"
             android:layout_marginTop="4dp"
-            android:text="Début : 01/12/2025 • Fin : en cours"
             android:textColor="#777777"
             android:textSize="13sp"/>
 

@@ -1,5 +1,4 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -10,46 +9,46 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nom de l'historique">
+        android:hint="@string/history_name">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edtNom"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Date début -->
     <com.google.android.material.textfield.TextInputLayout
-        android:layout_marginTop="12dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Date de début"
-        app:endIconMode="custom"
-        app:endIconDrawable="@drawable/ic_calendar">
+        android:layout_marginTop="12dp"
+        android:hint="@string/begin_date"
+        app:endIconDrawable="@drawable/ic_calendar"
+        app:endIconMode="custom">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edtDateDebut"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusable="false"
-            android:clickable="true"/>
+            android:clickable="true"
+            android:focusable="true" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Date fin (optionnelle) -->
     <com.google.android.material.textfield.TextInputLayout
-        android:layout_marginTop="12dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Date de fin (optionnelle)"
-        app:endIconMode="custom"
-        app:endIconDrawable="@drawable/ic_calendar">
+        android:layout_marginTop="12dp"
+        android:hint="@string/optional_end_date"
+        app:endIconDrawable="@drawable/ic_calendar"
+        app:endIconMode="custom">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edtDateFin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusable="false"
-            android:clickable="true"/>
+            android:clickable="true"
+            android:focusable="true" />
     </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

@@ -47,9 +47,9 @@ class AddHistoryDialog(
         }
 
         return AlertDialog.Builder(requireContext())
-            .setTitle("Ajouter un historique")
+            .setTitle(requireContext().resources.getString(R.string.add_history))
             .setView(view)
-            .setPositiveButton("Ajouter") { _, _ ->
+            .setPositiveButton(requireContext().resources.getString(R.string.add)) { _, _ ->
                 if (dateDebut == null) return@setPositiveButton
 
                 val historique = History(
@@ -64,7 +64,7 @@ class AddHistoryDialog(
 
                 onHistoryAdded()
             }
-            .setNegativeButton("Annuler", null)
+            .setNegativeButton(requireContext().resources.getString(R.string.cancel), null)
             .create()
     }
 

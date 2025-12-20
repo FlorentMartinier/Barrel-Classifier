@@ -46,7 +46,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ajouter une photo"
+                    android:text="@string/add_photo"
                     android:textColor="@android:color/white"
                     android:textStyle="bold"
                     android:layout_marginTop="8dp"/>
@@ -61,7 +61,7 @@
                 android:layout_margin="8dp"
                 android:background="@drawable/bg_icon_circle"
                 android:src="@drawable/ic_edit"
-                android:contentDescription="Modifier"
+                android:contentDescription="@string/modify"
                 app:tint="@android:color/white" />
 
             <!-- 🗑️ Bouton suppression -->
@@ -73,7 +73,7 @@
                 android:layout_margin="8dp"
                 android:background="@drawable/bg_icon_circle"
                 android:src="@drawable/ic_delete"
-                android:contentDescription="Supprimer"
+                android:contentDescription="@string/remove"
                 app:tint="@android:color/white" />
 
         </FrameLayout>
@@ -91,7 +91,6 @@
                 android:id="@+id/txtBarrelName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Fût 1"
                 android:textSize="20sp"
                 android:textStyle="bold"/>
 
@@ -101,7 +100,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Marque • Bois • 225 L"
                 android:textColor="#777777"
                 android:textSize="14sp"/>
 
@@ -111,12 +109,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:drawableStart="@drawable/ic_add"
                 android:drawablePadding="8dp"
                 android:paddingVertical="8dp"
-                android:text="Ajouter un historique"
+                android:text="@string/add_history"
                 android:textColor="?attr/colorPrimary"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                app:drawableStartCompat="@drawable/ic_add" />
 
             <!-- Séparateur -->
             <View
@@ -139,7 +137,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Historique"
+                    android:text="@string/history"
                     android:textSize="16sp"
                     android:textStyle="bold"/>
 
