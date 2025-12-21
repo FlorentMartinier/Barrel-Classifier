@@ -4,7 +4,7 @@ import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.Dialog
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
@@ -16,6 +16,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+
 class AddHistoryDialog(
     private val barrelId: Long,
     private val onHistoryAdded: () -> Unit
@@ -24,13 +25,16 @@ class AddHistoryDialog(
     private var dateDebut: Long? = null
     private var dateFin: Long? = null
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val view = LayoutInflater.from(requireContext())
-            .inflate(R.layout.dialog_add_history, null)
+    private lateinit var edtName: TextInputEditText
+    private lateinit var edtBeginDate: TextInputEditText
+    private lateinit var edtEndDate: TextInputEditText
 
-        val edtName = view.findViewById<TextInputEditText>(R.id.edtName)
-        val edtBeginDate = view.findViewById<TextInputEditText>(R.id.edtBeginDate)
-        val edtEndDate = view.findViewById<TextInputEditText>(R.id.edtEndDate)
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val view = layoutInflater.inflate(R.layout.dialog_add_history, null)
+
+        edtName = view.findViewById(R.id.edtName)
+        edtBeginDate = view.findViewById(R.id.edtBeginDate)
+        edtEndDate = view.findViewById(R.id.edtEndDate)
 
         edtBeginDate.setOnClickListener {
             openDatePicker {
@@ -47,25 +51,52 @@ class AddHistoryDialog(
         }
 
         return AlertDialog.Builder(requireContext())
-            .setTitle(requireContext().resources.getString(R.string.add_history))
+            .setTitle(getString(R.string.add_history))
             .setView(view)
-            .setPositiveButton(requireContext().resources.getString(R.string.add)) { _, _ ->
-                if (dateDebut == null) return@setPositiveButton
-
-                val history = History(
-                    barrelId = barrelId,
-                    name = edtName.text.toString(),
-                    beginDate = dateDebut!!,
-                    endDate = dateFin // peut être NULL
-                )
-
-                HistoryDao(DatabaseHelper(requireContext()))
-                    .insert(history)
-
-                onHistoryAdded()
-            }
-            .setNegativeButton(requireContext().resources.getString(R.string.cancel), null)
+            .setPositiveButton(getString(R.string.add), null) // IMPORTANT
+            .setNegativeButton(getString(R.string.cancel), null)
             .create()
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        val dialog = dialog as AlertDialog
+        val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+
+        positiveButton.setOnClickListener {
+
+            val name = edtName.text?.toString()?.trim().orEmpty()
+
+            when {
+                name.isEmpty() -> {
+                    showToast(getString(R.string.history_name) + " " + getString(R.string.required))
+                }
+
+                dateDebut == null -> {
+                    showToast(getString(R.string.begin_date) + " " + getString(R.string.required))
+                }
+
+                dateFin != null && dateFin!! < dateDebut!! -> {
+                    showToast(getString(R.string.incoherent_date))
+                }
+
+                else -> {
+                    val history = History(
+                        barrelId = barrelId,
+                        name = name,
+                        beginDate = dateDebut!!,
+                        endDate = dateFin
+                    )
+
+                    HistoryDao(DatabaseHelper(requireContext()))
+                        .insert(history)
+
+                    onHistoryAdded()
+                    dismiss() // 👈 fermeture contrôlée
+                }
+            }
+        }
     }
 
     private fun openDatePicker(onSelected: (Long) -> Unit) {
@@ -86,6 +117,9 @@ class AddHistoryDialog(
         return SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE)
             .format(Date(timestamp))
     }
-}
 
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+}
 

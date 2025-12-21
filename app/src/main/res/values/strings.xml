@@ -29,4 +29,6 @@
     <string name="optional_end_date">Date de fin (optionnelle)</string>
     <string name="add_photo">Ajouter une photo</string>
     <string name="history">Historique</string>
+    <string name="required">requis</string>
+    <string name="incoherent_date">La date de fin ne peut pas être antérieure à la date de début</string>
 </resources>

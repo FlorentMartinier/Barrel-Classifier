@@ -3,8 +3,8 @@ package com.fmartinier.barrelclassifier.ui
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
@@ -16,14 +16,18 @@ class EditBarrelDialog(
     private val onBarrelUpdated: () -> Unit
 ) : DialogFragment() {
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val view = LayoutInflater.from(requireContext())
-            .inflate(R.layout.dialog_add_barrel, null)
+    private lateinit var edtBarrelName: EditText
+    private lateinit var edtVolume: EditText
+    private lateinit var edtBrand: EditText
+    private lateinit var edtWoodType: EditText
 
-        val edtBarrelName = view.findViewById<EditText>(R.id.edtBarrelName)
-        val edtVolume = view.findViewById<EditText>(R.id.edtVolume)
-        val edtBrand = view.findViewById<EditText>(R.id.edtBrand)
-        val edtWoodType = view.findViewById<EditText>(R.id.edtWoodType)
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val view = layoutInflater.inflate(R.layout.dialog_add_barrel, null)
+
+        edtBarrelName = view.findViewById(R.id.edtBarrelName)
+        edtVolume = view.findViewById(R.id.edtVolume)
+        edtBrand = view.findViewById(R.id.edtBrand)
+        edtWoodType = view.findViewById(R.id.edtWoodType)
 
         // Pré-remplissage
         edtBarrelName.setText(barrel.name)
@@ -32,22 +36,62 @@ class EditBarrelDialog(
         edtWoodType.setText(barrel.woodType)
 
         return AlertDialog.Builder(requireContext())
-            .setTitle(requireContext().resources.getString(R.string.modify_barrel))
+            .setTitle(getString(R.string.modify_barrel))
             .setView(view)
-            .setPositiveButton(requireContext().resources.getString(R.string.modify)) { _, _ ->
-                val updatedBarrel = barrel.copy(
-                    name = edtBarrelName.text.toString(),
-                    volume = edtVolume.text.toString().toInt(),
-                    brand = edtBrand.text.toString(),
-                    woodType = edtWoodType.text.toString()
-                )
-
-                val db = DatabaseHelper(requireContext())
-                BarrelDao(db).update(updatedBarrel)
-
-                onBarrelUpdated()
-            }
-            .setNegativeButton(requireContext().resources.getString(R.string.cancel), null)
+            .setPositiveButton(getString(R.string.modify), null) // IMPORTANT
+            .setNegativeButton(getString(R.string.cancel), null)
             .create()
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        val dialog = dialog as AlertDialog
+        val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+
+        positiveButton.setOnClickListener {
+
+            val name = edtBarrelName.text.toString().trim()
+            val volumeText = edtVolume.text.toString().trim()
+            val brand = edtBrand.text.toString().trim()
+            val woodType = edtWoodType.text.toString().trim()
+
+            when {
+                name.isEmpty() -> {
+                    showToast(getString(R.string.barrel_name) + " " + getString(R.string.required))
+                }
+
+                volumeText.isEmpty() -> {
+                    showToast(getString(R.string.barrel_volume) + " " + getString(R.string.required))
+                }
+
+                brand.isEmpty() -> {
+                    showToast(getString(R.string.brand) + " " + getString(R.string.required))
+                }
+
+                woodType.isEmpty() -> {
+                    showToast(getString(R.string.wood_type) + " " + getString(R.string.required))
+                }
+
+                else -> {
+                    val updatedBarrel = barrel.copy(
+                        name = name,
+                        volume = volumeText.toInt(),
+                        brand = brand,
+                        woodType = woodType
+                    )
+
+                    BarrelDao(DatabaseHelper(requireContext()))
+                        .update(updatedBarrel)
+
+                    onBarrelUpdated()
+                    dismiss() // 👈 fermeture contrôlée
+                }
+            }
+        }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 }

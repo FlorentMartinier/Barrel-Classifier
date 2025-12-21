@@ -59,8 +59,16 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
     }
 
     fun deleteBarrel(barrelId: Long) {
-        dbHelper.writableDatabase.delete(HISTORY_TABLE_NAME, "$BARREL_ID_COLUMN_NAME = ?", arrayOf(barrelId.toString()))
-        dbHelper.writableDatabase.delete(BARREL_TABLE_NAME, "$ID_COLUMN_NAME = ?", arrayOf(barrelId.toString()))
+        dbHelper.writableDatabase.delete(
+            HISTORY_TABLE_NAME,
+            "$BARREL_ID_COLUMN_NAME = ?",
+            arrayOf(barrelId.toString())
+        )
+        dbHelper.writableDatabase.delete(
+            BARREL_TABLE_NAME,
+            "$ID_COLUMN_NAME = ?",
+            arrayOf(barrelId.toString())
+        )
     }
 
     fun update(barrel: Barrel) {
