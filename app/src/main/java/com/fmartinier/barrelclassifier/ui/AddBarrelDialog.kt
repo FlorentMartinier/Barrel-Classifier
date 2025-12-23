@@ -11,9 +11,7 @@ import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.dao.BarrelDao
 import com.fmartinier.barrelclassifier.data.model.Barrel
 
-class AddBarrelDialog(
-    private val onBarrelAdded: () -> Unit
-) : DialogFragment() {
+class AddBarrelDialog : DialogFragment() {
 
     private lateinit var edtBarrelName: EditText
     private lateinit var edtVolume: EditText
@@ -82,7 +80,10 @@ class AddBarrelDialog(
                     val db = DatabaseHelper(requireContext())
                     BarrelDao(db).insert(barrel)
 
-                    onBarrelAdded()
+                    parentFragmentManager.setFragmentResult(
+                        "add_barrel_result",
+                        Bundle.EMPTY
+                    )
                     dismiss() // 👈 fermeture MANUELLE
                 }
             }
@@ -91,5 +92,13 @@ class AddBarrelDialog(
 
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    companion object {
+        const val TAG = "AddBarrelDialog"
+
+        fun newInstance(): AddBarrelDialog {
+            return AddBarrelDialog()
+        }
     }
 }

@@ -11,19 +11,20 @@ import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.dao.BarrelDao
 import com.fmartinier.barrelclassifier.data.model.Barrel
 
-class EditBarrelDialog(
-    private val barrel: Barrel,
-    private val onBarrelUpdated: () -> Unit
-) : DialogFragment() {
+class EditBarrelDialog : DialogFragment() {
 
     private lateinit var edtBarrelName: EditText
     private lateinit var edtVolume: EditText
     private lateinit var edtBrand: EditText
     private lateinit var edtWoodType: EditText
+    private lateinit var barrel: Barrel
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val view = layoutInflater.inflate(R.layout.dialog_add_barrel, null)
 
+        val barrelId = requireArguments().getLong(ARG_BARREL_ID)
+        val db = DatabaseHelper(requireContext())
+        barrel = BarrelDao(db).getById(barrelId)
         edtBarrelName = view.findViewById(R.id.edtBarrelName)
         edtVolume = view.findViewById(R.id.edtVolume)
         edtBrand = view.findViewById(R.id.edtBrand)
@@ -84,7 +85,10 @@ class EditBarrelDialog(
                     BarrelDao(DatabaseHelper(requireContext()))
                         .update(updatedBarrel)
 
-                    onBarrelUpdated()
+                    parentFragmentManager.setFragmentResult(
+                        "add_barrel_result",
+                        Bundle.EMPTY
+                    )
                     dismiss() // 👈 fermeture contrôlée
                 }
             }
@@ -93,5 +97,18 @@ class EditBarrelDialog(
 
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    companion object {
+        const val TAG = "EditBarrelDialog"
+        private const val ARG_BARREL_ID = "barrel_id"
+
+        fun newInstance(barrelId: Long): EditBarrelDialog {
+            return EditBarrelDialog().apply {
+                arguments = Bundle().apply {
+                    putLong(ARG_BARREL_ID, barrelId)
+                }
+            }
+        }
     }
 }

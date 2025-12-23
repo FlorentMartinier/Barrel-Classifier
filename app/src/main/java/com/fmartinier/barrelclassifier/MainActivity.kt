@@ -43,6 +43,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        supportFragmentManager.setFragmentResultListener(
+            "add_barrel_result",
+            this
+        ) { _, _ ->
+            loadBarrels()
+        }
+
         cameraLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 if (it.resultCode == RESULT_OK) {
@@ -119,26 +126,19 @@ class MainActivity : AppCompatActivity() {
      * Ouvre le dialog d'ajout de fût
      */
     private fun openAddBarrelDialog() {
-        val dialog = AddBarrelDialog {
-            loadBarrels()
-        }
-        dialog.show(supportFragmentManager, "AddBarrelDialog")
+        AddBarrelDialog
+            .newInstance()
+            .show(supportFragmentManager, AddBarrelDialog.TAG)
     }
 
     private fun openAddHistoryDialog(barrelId: Long) {
-        val dialog = AddHistoryDialog(
-            barrelId = barrelId,
-            onHistoryAdded = {
-                loadBarrels()
-            }
-        )
-        dialog.show(supportFragmentManager, "AddHistoryDialog")
+        AddHistoryDialog.newInstance(barrelId)
+            .show(supportFragmentManager, AddHistoryDialog.TAG)
     }
 
     private fun openEditBarrel(barrel: Barrel) {
-        EditBarrelDialog(barrel) {
-            loadBarrels()
-        }.show(supportFragmentManager, "EditBarrelDialog")
+        EditBarrelDialog.newInstance(barrel.id)
+            .show(supportFragmentManager, EditBarrelDialog.TAG)
     }
 
     private fun startArrowAnimation() {

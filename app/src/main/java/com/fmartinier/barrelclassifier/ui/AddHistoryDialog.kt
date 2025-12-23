@@ -17,13 +17,10 @@ import java.util.Date
 import java.util.Locale
 
 
-class AddHistoryDialog(
-    private val barrelId: Long,
-    private val onHistoryAdded: () -> Unit
-) : DialogFragment() {
+class AddHistoryDialog : DialogFragment() {
 
-    private var dateDebut: Long? = null
-    private var dateFin: Long? = null
+    private var beginDate: Long? = null
+    private var endDate: Long? = null
 
     private lateinit var edtName: TextInputEditText
     private lateinit var edtBeginDate: TextInputEditText
@@ -35,17 +32,19 @@ class AddHistoryDialog(
         edtName = view.findViewById(R.id.edtName)
         edtBeginDate = view.findViewById(R.id.edtBeginDate)
         edtEndDate = view.findViewById(R.id.edtEndDate)
+        beginDate = parseDate(edtBeginDate.text.toString())
+        endDate = parseDate(edtEndDate.text.toString())
 
         edtBeginDate.setOnClickListener {
             openDatePicker {
-                dateDebut = it
+                beginDate = it
                 edtBeginDate.setText(formatDate(it))
             }
         }
 
         edtEndDate.setOnClickListener {
             openDatePicker {
-                dateFin = it
+                endDate = it
                 edtEndDate.setText(formatDate(it))
             }
         }
@@ -73,26 +72,29 @@ class AddHistoryDialog(
                     showToast(getString(R.string.history_name) + " " + getString(R.string.required))
                 }
 
-                dateDebut == null -> {
+                beginDate == null -> {
                     showToast(getString(R.string.begin_date) + " " + getString(R.string.required))
                 }
 
-                dateFin != null && dateFin!! < dateDebut!! -> {
+                endDate != null && endDate!! < beginDate!! -> {
                     showToast(getString(R.string.incoherent_date))
                 }
 
                 else -> {
                     val history = History(
-                        barrelId = barrelId,
+                        barrelId = requireArguments().getLong(ARG_BARREL_ID),
                         name = name,
-                        beginDate = dateDebut!!,
-                        endDate = dateFin
+                        beginDate = beginDate!!,
+                        endDate = endDate
                     )
 
                     HistoryDao(DatabaseHelper(requireContext()))
                         .insert(history)
 
-                    onHistoryAdded()
+                    parentFragmentManager.setFragmentResult(
+                        "add_barrel_result",
+                        Bundle.EMPTY
+                    )
                     dismiss() // 👈 fermeture contrôlée
                 }
             }
@@ -118,8 +120,32 @@ class AddHistoryDialog(
             .format(Date(timestamp))
     }
 
+    private fun parseDate(dateString: String?): Long? {
+        return try {
+            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE)
+            sdf.isLenient = false
+            sdf.parse(dateString ?: "")?.time
+        } catch (e: Exception) {
+            print(e)
+            null
+        }
+    }
+
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    companion object {
+        const val TAG = "AddHistoryDialog"
+        private const val ARG_BARREL_ID = "barrel_id"
+
+        fun newInstance(barrelId: Long): AddHistoryDialog {
+            return AddHistoryDialog().apply {
+                arguments = Bundle().apply {
+                    putLong(ARG_BARREL_ID, barrelId)
+                }
+            }
+        }
     }
 }
 

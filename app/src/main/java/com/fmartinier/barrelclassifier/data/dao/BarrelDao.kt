@@ -131,4 +131,43 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
         return list
     }
 
+    fun getById(barrelId: Long): Barrel {
+        val db = dbHelper.readableDatabase
+
+        val cursor = db.query(
+            BARREL_TABLE_NAME,
+            arrayOf(
+                ID_COLUMN_NAME,
+                NAME_COLUMN_NAME,
+                VOLUME_COLUMN_NAME,
+                BRAND_COLUMN_NAME,
+                WOOD_TYPE_COLUMN_NAME,
+                IMAGE_PATH_COLUMN_NAME
+            ),
+            "$ID_COLUMN_NAME = ?",
+            arrayOf(barrelId.toString()),
+            null,
+            null,
+            null
+        )
+
+        if (!cursor.moveToFirst()) {
+            cursor.close()
+            throw IllegalStateException("Barrel not found for id=$barrelId")
+        }
+
+        val barrel = Barrel(
+            id = cursor.getLong(cursor.getColumnIndexOrThrow(ID_COLUMN_NAME)),
+            name = cursor.getString(cursor.getColumnIndexOrThrow(NAME_COLUMN_NAME)),
+            volume = cursor.getInt(cursor.getColumnIndexOrThrow(VOLUME_COLUMN_NAME)),
+            brand = cursor.getString(cursor.getColumnIndexOrThrow(BRAND_COLUMN_NAME)),
+            woodType = cursor.getString(cursor.getColumnIndexOrThrow(WOOD_TYPE_COLUMN_NAME)),
+            imagePath = cursor.getString(cursor.getColumnIndexOrThrow(IMAGE_PATH_COLUMN_NAME)),
+            histories = getHistoriesForBarrel(barrelId)
+        )
+
+        cursor.close()
+        return barrel
+    }
+
 }
