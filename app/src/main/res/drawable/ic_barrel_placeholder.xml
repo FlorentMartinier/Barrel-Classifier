@@ -1,50 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
 
-    <!-- Fond doux (bois clair) -->
-    <item>
-        <shape android:shape="rectangle">
-            <solid android:color="#F2EDE8"/>
-        </shape>
-    </item>
+    <!-- Corps du fût -->
+    <path
+        android:fillColor="#8B5A2B"
+        android:pathData="
+            M64,128
+            C160,96 352,96 448,128
+            L448,384
+            C352,416 160,416 64,384
+            Z"/>
 
-    <!-- Icône tonneau centrée -->
-    <item
-        android:gravity="center">
-        <vector
-            android:width="96dp"
-            android:height="96dp"
-            android:viewportWidth="24"
-            android:viewportHeight="24">
+    <!-- Face gauche -->
+    <path
+        android:fillColor="#5C3A1E"
+        android:pathData="
+            M64,128
+            a32,128 0 1,0 0,256
+            a32,128 0 1,0 0,-256"/>
 
-            <!-- Corps du tonneau -->
-            <path
-                android:fillColor="#8D6E63"
-                android:pathData="
-                    M6,3
-                    C4,6 4,18 6,21
-                    H18
-                    C20,18 20,6 18,3
-                    Z"/>
+    <!-- Face droite -->
+    <path
+        android:fillColor="#5C3A1E"
+        android:pathData="
+            M448,128
+            a32,128 0 1,0 0,256
+            a32,128 0 1,0 0,-256"/>
 
-            <!-- Cercles -->
-            <path
-                android:fillColor="#6D4C41"
-                android:pathData="M6,8 H18 V10 H6 Z"/>
+    <!-- Cerclages métalliques -->
+    <path
+        android:fillColor="#7A7A7A"
+        android:pathData="M150,120 v272 h18 v-272 z"/>
 
-            <path
-                android:fillColor="#6D4C41"
-                android:pathData="M6,14 H18 V16 H6 Z"/>
+    <path
+        android:fillColor="#9E9E9E"
+        android:pathData="M250,120 v272 h18 v-272 z"/>
 
-            <!-- Bordures -->
-            <path
-                android:fillColor="#5D4037"
-                android:pathData="M6,3 H7 V21 H6 Z"/>
+    <path
+        android:fillColor="#7A7A7A"
+        android:pathData="M350,120 v272 h18 v-272 z"/>
 
-            <path
-                android:fillColor="#5D4037"
-                android:pathData="M17,3 H18 V21 H17 Z"/>
-        </vector>
-    </item>
+    <!-- Veines du bois -->
+    <path
+        android:strokeColor="#5E3A1E"
+        android:strokeWidth="4"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M80,200 L432,200"/>
 
-</layer-list>
+    <path
+        android:strokeColor="#5E3A1E"
+        android:strokeWidth="3"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M80,256 L432,256"/>
+
+    <path
+        android:strokeColor="#5E3A1E"
+        android:strokeWidth="4"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M80,312 L432,312"/>
+
+</vector>
