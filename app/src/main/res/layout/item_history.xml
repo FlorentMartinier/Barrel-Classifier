@@ -9,37 +9,56 @@
     app:cardElevation="2dp"
     app:cardUseCompatPadding="true">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:padding="12dp">
 
-        <!-- Nom historique -->
-        <TextView
-            android:id="@+id/txtName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textStyle="bold"/>
+        <!-- Ligne titre + actions -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <!-- Bouton suppression -->
-        <ImageButton
-            android:id="@+id/btnDeleteHistory"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_alignParentEnd="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/remove_history"
-            android:src="@drawable/ic_delete"
-            app:tint="@color/material_red_400"/>
+            <!-- Nom historique -->
+            <TextView
+                android:id="@+id/txtName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <!-- Bouton édition -->
+            <ImageButton
+                android:id="@+id/btnEditHistory"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="36dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/modify"
+                android:src="@drawable/ic_edit"
+                app:tint="?attr/colorPrimary"/>
+
+            <!-- Bouton suppression -->
+            <ImageButton
+                android:id="@+id/btnDeleteHistory"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentEnd="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/remove_history"
+                android:src="@drawable/ic_delete"
+                app:tint="@color/material_red_400"/>
+
+        </RelativeLayout>
 
         <!-- Durée -->
         <TextView
             android:id="@+id/txtDuration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/txtName"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="6dp"
             android:drawablePadding="6dp"
             android:textColor="?attr/colorPrimary"
             android:textSize="14sp"
@@ -50,11 +69,45 @@
             android:id="@+id/txtDates"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/txtDuration"
             android:layout_marginTop="4dp"
             android:textColor="#777777"
             android:textSize="13sp"/>
 
-    </RelativeLayout>
+        <!-- Bloc alertes (masquable) -->
+        <LinearLayout
+            android:id="@+id/alertsSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Séparateur -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="8dp"
+                android:background="#DDDDDD"/>
+
+            <!-- Titre -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/alerts"
+                android:textStyle="bold"
+                android:textSize="14sp"/>
+
+            <!-- Liste des alertes -->
+            <LinearLayout
+                android:id="@+id/historyAlertsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="4dp"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

@@ -31,4 +31,6 @@
     <string name="history">History</string>
     <string name="required">required</string>
     <string name="incoherent_date">The end date cannot be earlier than the start date</string>
+    <string name="incoherent_alert_date">Alerts cannot be in the past</string>
+    <string name="alerts">Alerts</string>
 </resources>

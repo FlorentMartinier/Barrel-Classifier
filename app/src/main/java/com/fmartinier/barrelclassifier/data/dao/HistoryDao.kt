@@ -25,7 +25,7 @@ class HistoryDao(private val dbHelper: DatabaseHelper) {
         return db.insert(HISTORY_TABLE_NAME, null, values)
     }
 
-    fun deleteHistory(id: Long) {
+    fun delete(id: Long) {
         dbHelper.writableDatabase.delete(
             HISTORY_TABLE_NAME,
             "$ID_COLUMN_NAME = ?",

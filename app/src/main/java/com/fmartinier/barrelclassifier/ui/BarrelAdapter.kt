@@ -14,8 +14,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
+import com.fmartinier.barrelclassifier.data.dao.AlertDao
 import com.fmartinier.barrelclassifier.data.dao.BarrelDao
 import com.fmartinier.barrelclassifier.data.dao.HistoryDao
+import com.fmartinier.barrelclassifier.data.model.Alert
 import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.data.model.History
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.calculateDuration
@@ -177,6 +179,9 @@ class BarrelAdapter(
             val txtDuration = view.findViewById<TextView>(R.id.txtDuration)
             val txtDates = view.findViewById<TextView>(R.id.txtDates)
             val btnDelete = view.findViewById<ImageButton>(R.id.btnDeleteHistory)
+            val alertsSection = view.findViewById<LinearLayout>(R.id.alertsSection)
+            val alertsContainer: LinearLayout =
+                view.findViewById(R.id.historyAlertsContainer)
 
             txtName.text = history.name
 
@@ -211,9 +216,40 @@ class BarrelAdapter(
                 .start()
 
             holder.layoutHistory.addView(view)
+            val alerts = AlertDao(DatabaseHelper(context)).getByHistoryId(history.id)
+            displayAlerts(alertsSection, alertsContainer, alerts)
         }
     }
 
+    private fun displayAlerts(
+        alertsSection: LinearLayout,
+        alertsContainer: LinearLayout,
+        alerts: List<Alert>
+    ) {
+        alertsContainer.removeAllViews()
+
+        val futureAlerts = alerts.filter { it.date >= System.currentTimeMillis() }
+        if (futureAlerts.isEmpty()) {
+            alertsSection.visibility = View.GONE
+        } else {
+            alertsSection.visibility = View.VISIBLE
+
+            futureAlerts
+                .forEach { alert ->
+                    val alertView = LayoutInflater.from(context).inflate(
+                        R.layout.item_alert_small,
+                        alertsContainer,
+                        false
+                    )
+
+                    alertView.findViewById<TextView>(R.id.txtAlertType).text = alert.type
+                    alertView.findViewById<TextView>(R.id.txtAlertDate).text =
+                        formatDate(alert.date)
+
+                    alertsContainer.addView(alertView)
+                }
+        }
+    }
 
     private fun confirmDeleteHistory(history: History) {
         AlertDialog.Builder(context)
@@ -223,7 +259,7 @@ class BarrelAdapter(
                 val dbHelper = DatabaseHelper(context)
                 val historyDao = HistoryDao(dbHelper)
 
-                historyDao.deleteHistory(history.id)
+                historyDao.delete(history.id)
 
                 // Recharge les données après suppression
                 refresh()

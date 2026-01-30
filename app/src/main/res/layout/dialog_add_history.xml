@@ -51,4 +51,32 @@
             android:focusable="true" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Titre Alertes -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Alertes"
+        android:textStyle="bold"
+        android:textSize="16sp" />
+
+    <!-- Conteneur des alertes -->
+    <LinearLayout
+        android:id="@+id/alertsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="8dp" />
+
+    <!-- Bouton Ajouter une alerte -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAddAlert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Ajouter une alerte"
+        app:icon="@drawable/ic_add"
+        app:iconGravity="textStart"
+        style="@style/Widget.Material3.Button.TextButton" />
+
 </LinearLayout>

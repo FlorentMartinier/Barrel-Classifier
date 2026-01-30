@@ -4,7 +4,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "barrel.db", null, 6) {
+class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "barrel.db", null, 8) {
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
@@ -27,18 +27,35 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "barrel.db", 
                     "    FOREIGN KEY ($BARREL_ID_COLUMN_NAME) REFERENCES $BARREL_TABLE_NAME($ID_COLUMN_NAME) ON DELETE CASCADE" +
                     ");"
         )
+        db.execSQL(
+            "CREATE TABLE $ALERT_TABLE_NAME (" +
+                    "    $ID_COLUMN_NAME INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "    $HISTORY_ID_COLUMN_NAME INTEGER NOT NULL," +
+                    "    $TYPE_COLUMN_NAME NOT NULL," +
+                    "    $DATE_COLUMN_NAME INTEGER NOT NULL," +
+                    "    FOREIGN KEY ($HISTORY_ID_COLUMN_NAME) REFERENCES $HISTORY_TABLE_NAME($ID_COLUMN_NAME) ON DELETE CASCADE" +
+                    ");"
+        )
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS $HISTORY_TABLE_NAME")
-        db.execSQL("DROP TABLE IF EXISTS $BARREL_TABLE_NAME")
-        onCreate(db)
+        db.execSQL("DROP TABLE IF EXISTS $ALERT_TABLE_NAME")
+        db.execSQL(
+            "CREATE TABLE $ALERT_TABLE_NAME (" +
+                    "    $ID_COLUMN_NAME INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "    $HISTORY_ID_COLUMN_NAME INTEGER NOT NULL," +
+                    "    $TYPE_COLUMN_NAME NOT NULL," +
+                    "    $DATE_COLUMN_NAME INTEGER NOT NULL," +
+                    "    FOREIGN KEY ($HISTORY_ID_COLUMN_NAME) REFERENCES $HISTORY_TABLE_NAME($ID_COLUMN_NAME) ON DELETE CASCADE" +
+                    ");"
+        )
     }
 
     companion object {
         // Nom des tables
         const val BARREL_TABLE_NAME: String = "barrel"
         const val HISTORY_TABLE_NAME: String = "history"
+        const val ALERT_TABLE_NAME: String = "alert"
 
         // Nom des colonnes des Barrel
         const val VOLUME_COLUMN_NAME: String = "volume"
@@ -47,9 +64,14 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "barrel.db", 
         const val IMAGE_PATH_COLUMN_NAME: String = "image_path"
 
         // Nom des colonnes des History
-        const val BARREL_ID_COLUMN_NAME: String = "barrel_id"
         const val BEGIN_DATE_COLUMN_NAME: String = "begin_date"
         const val END_DATE_COLUMN_NAME: String = "end_date"
+        const val BARREL_ID_COLUMN_NAME: String = "barrel_id"
+
+        // Nom des colonnes des Alertes
+        const val TYPE_COLUMN_NAME: String = "type"
+        const val DATE_COLUMN_NAME: String = "date"
+        const val HISTORY_ID_COLUMN_NAME: String = "history_id"
 
         // Colonnes transverses
         const val NAME_COLUMN_NAME: String = "name"
