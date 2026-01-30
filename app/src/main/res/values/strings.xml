@@ -33,4 +33,13 @@
     <string name="incoherent_date">La date de fin ne peut pas être antérieure à la date de début</string>
     <string name="incoherent_alert_date">Les alertes ne peuvent pas être dans le passé</string>
     <string name="alerts">Alertes</string>
+    <string name="alertTitle">Rappel programmé pour le fût \'%1$s\'</string>
+    <string name="alertContent">Rappel : %1$s</string>
+    <string name="alert_verify_description">Vérification générale</string>
+    <string name="alert_taste_description">Déguster</string>
+    <string name="alert_change_description">Changer de fût</string>
+    <string name="alert_topping_up_description">Effectuer un ouillage</string>
+    <string name="alert_move_description">Déplacer le fût</string>
+    <string name="alert_racking_description">Soutirer du contenu</string>
+    <string name="alert_lees_stirring_description">Effectuer un bâttonage</string>
 </resources>

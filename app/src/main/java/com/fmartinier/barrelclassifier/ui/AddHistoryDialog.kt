@@ -3,6 +3,7 @@ package com.fmartinier.barrelclassifier.ui
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -14,12 +15,18 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.dao.AlertDao
 import com.fmartinier.barrelclassifier.data.dao.HistoryDao
+import com.fmartinier.barrelclassifier.data.enums.EAlertType
 import com.fmartinier.barrelclassifier.data.model.Alert
+import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.data.model.History
+import com.fmartinier.barrelclassifier.service.AlertNotificationWorker
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -27,6 +34,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 
 class AddHistoryDialog : DialogFragment() {
@@ -88,6 +96,7 @@ class AddHistoryDialog : DialogFragment() {
             val name = edtName.text?.toString()?.trim().orEmpty()
             val alerts = mutableListOf<Alert>()
             val barrelId = requireArguments().getLong(ARG_BARREL_ID)
+            val barrelName = requireArguments().getString(ARG_BARREL_NAME) ?: ""
 
             for (i in 0 until alertsContainer.childCount) {
                 val row = alertsContainer.getChildAt(i) as? LinearLayout ?: continue
@@ -143,6 +152,10 @@ class AddHistoryDialog : DialogFragment() {
                     AlertDao(DatabaseHelper(requireContext()))
                         .insert(alerts, historyId)
 
+                    alerts.forEach {
+                        scheduleAlert(requireContext(), it, barrelName)
+                    }
+
                     parentFragmentManager.setFragmentResult(
                         "add_barrel_result",
                         Bundle.EMPTY
@@ -167,11 +180,14 @@ class AddHistoryDialog : DialogFragment() {
         }
 
         // Spinner type d’alerte
+        val alertTypes = EAlertType.entries
         val spinner = Spinner(context).apply {
             adapter = ArrayAdapter(
                 context,
                 android.R.layout.simple_spinner_dropdown_item,
-                listOf("Goûter", "Vérifier")
+                alertTypes.map {
+                    getString(it.alertDescription)
+                }
             )
             layoutParams = LinearLayout.LayoutParams(0, WRAP_CONTENT, 1f)
             id = View.generateViewId()
@@ -255,14 +271,36 @@ class AddHistoryDialog : DialogFragment() {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
+    private fun scheduleAlert(context: Context, alert: Alert, barrelName: String) {
+        var tenHoursToMillis = 360000000
+        val delay = alert.date + tenHoursToMillis - System.currentTimeMillis()
+        if (delay <= 0) return
+
+        val data = workDataOf(
+            "alertId" to alert.id,
+            "type" to alert.type,
+            "barrelName" to barrelName,
+        )
+
+        val workRequest = OneTimeWorkRequestBuilder<AlertNotificationWorker>()
+            .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+            .setInputData(data)
+            .addTag("alert_${alert.id}")
+            .build()
+
+        WorkManager.getInstance(context).enqueue(workRequest)
+    }
+
     companion object {
         const val TAG = "AddHistoryDialog"
         private const val ARG_BARREL_ID = "barrel_id"
+        private const val ARG_BARREL_NAME = "barrel_name"
 
-        fun newInstance(barrelId: Long): AddHistoryDialog {
+        fun newInstance(barrel: Barrel): AddHistoryDialog {
             return AddHistoryDialog().apply {
                 arguments = Bundle().apply {
-                    putLong(ARG_BARREL_ID, barrelId)
+                    putLong(ARG_BARREL_ID, barrel.id)
+                    putString(ARG_BARREL_NAME, barrel.name)
                 }
             }
         }

@@ -27,7 +27,7 @@ class BarrelAdapter(
     private val context: Context,
     private var barrels: List<Barrel>,
     private val refresh: () -> Unit,
-    private val onAddHistory: (Long) -> Unit,
+    private val onAddHistory: (Barrel) -> Unit,
     private val onEditBarrel: (Barrel) -> Unit,
     private val onEditPhoto: (Barrel) -> Unit
 ) : RecyclerView.Adapter<BarrelAdapter.BarrelViewHolder>() {
@@ -66,7 +66,7 @@ class BarrelAdapter(
         }
 
         holder.btnAddHistory.setOnClickListener {
-            onAddHistory(barrel.id)
+            onAddHistory(barrel)
         }
 
         holder.photoOverlay.setOnClickListener {

@@ -33,4 +33,14 @@
     <string name="incoherent_date">The end date cannot be earlier than the start date</string>
     <string name="incoherent_alert_date">Alerts cannot be in the past</string>
     <string name="alerts">Alerts</string>
+    <string name="alertTitle">Scheduled reminder for the barrel \'%1$s\'</string>
+    <string name="alertContent">Reminder: %1$s</string>
+    <string name="alert_verify_description">General inspection</string>
+    <string name="alert_taste_description">Taste</string>
+    <string name="alert_change_description">Change the barrel</string>
+    <string name="alert_topping_up_description">Top up the barrel</string>
+    <string name="alert_move_description">Move the barrel</string>
+    <string name="alert_racking_description">Rack the contents</string>
+    <string name="alert_lees_stirring_description">Stir the lees</string>
+
 </resources>

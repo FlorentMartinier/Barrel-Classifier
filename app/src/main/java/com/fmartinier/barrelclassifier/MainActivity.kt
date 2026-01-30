@@ -1,6 +1,12 @@
 package com.fmartinier.barrelclassifier
 
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
@@ -10,6 +16,7 @@ import android.widget.RelativeLayout
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -42,6 +49,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        createNotificationChannel(context = this)
 
         supportFragmentManager.setFragmentResultListener(
             "add_barrel_result",
@@ -80,8 +89,8 @@ class MainActivity : AppCompatActivity() {
             context = this,
             barrels = emptyList(),
             refresh = { loadBarrels() },
-            onAddHistory = { barrelId ->
-                openAddHistoryDialog(barrelId)
+            onAddHistory = { barrel ->
+                openAddHistoryDialog(barrel)
             },
             onEditBarrel = { barrel ->
                 openEditBarrel(barrel)
@@ -131,8 +140,8 @@ class MainActivity : AppCompatActivity() {
             .show(supportFragmentManager, AddBarrelDialog.TAG)
     }
 
-    private fun openAddHistoryDialog(barrelId: Long) {
-        AddHistoryDialog.newInstance(barrelId)
+    private fun openAddHistoryDialog(barrel: Barrel) {
+        AddHistoryDialog.newInstance(barrel)
             .show(supportFragmentManager, AddHistoryDialog.TAG)
     }
 
@@ -176,6 +185,35 @@ class MainActivity : AppCompatActivity() {
         currentPhotoPath = file.absolutePath
         return file
     }
+
+    private fun createNotificationChannel(context: Context) {
+        // Gérer la permission de lancer des notifications
+        if (Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(
+                this,
+                POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(
+                arrayOf(POST_NOTIFICATIONS),
+                1001
+            )
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "alerts_channel",
+                "Alertes de vieillissement",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = "Alertes liées aux historiques en fût"
+            }
+
+            val manager = context.getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
+        }
+    }
+
 
 
 }
