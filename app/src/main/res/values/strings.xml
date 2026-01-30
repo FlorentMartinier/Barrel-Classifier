@@ -36,6 +36,7 @@
     <string name="alertTitle">Rappel programmé pour le fût \'%1$s\'</string>
     <string name="alertContent">Rappel : %1$s</string>
     <string name="alert_verify_description">Vérification générale</string>
+    <string name="alert_bottle_up_description">Embouteiller</string>
     <string name="alert_taste_description">Déguster</string>
     <string name="alert_change_description">Changer de fût</string>
     <string name="alert_topping_up_description">Effectuer un ouillage</string>

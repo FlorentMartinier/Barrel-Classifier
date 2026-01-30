@@ -21,15 +21,16 @@ class AlertDao(private val dbHelper: DatabaseHelper) {
         return db.insert(ALERT_TABLE_NAME, null, values)
     }
 
-    fun insert(alerts: List<Alert>, historyId: Long) {
+    fun insert(alerts: List<Alert>, historyId: Long): List<Alert> {
         val db = dbHelper.writableDatabase
-        alerts.forEach {
+        return alerts.map {
             val values = ContentValues().apply {
                 put(HISTORY_ID_COLUMN_NAME, historyId)
                 put(TYPE_COLUMN_NAME, it.type)
                 put(DATE_COLUMN_NAME, it.date)
             }
-            db.insert(ALERT_TABLE_NAME, null, values)
+            val savedAlertId = db.insert(ALERT_TABLE_NAME, null, values)
+            it.copy(id = savedAlertId)
         }
     }
 

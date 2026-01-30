@@ -151,10 +151,9 @@ class AddHistoryDialog : DialogFragment() {
 
                     AlertDao(DatabaseHelper(requireContext()))
                         .insert(alerts, historyId)
-
-                    alerts.forEach {
-                        scheduleAlert(requireContext(), it, barrelName)
-                    }
+                        .forEach {
+                            scheduleAlert(requireContext(), it, barrelName)
+                        }
 
                     parentFragmentManager.setFragmentResult(
                         "add_barrel_result",
@@ -272,8 +271,9 @@ class AddHistoryDialog : DialogFragment() {
     }
 
     private fun scheduleAlert(context: Context, alert: Alert, barrelName: String) {
-        var tenHoursToMillis = 360000000
-        val delay = alert.date + tenHoursToMillis - System.currentTimeMillis()
+        //var tenHoursToMillis = 360000000
+        //val delay = alert.date + tenHoursToMillis - System.currentTimeMillis()
+        val delay = 6000L
         if (delay <= 0) return
 
         val data = workDataOf(

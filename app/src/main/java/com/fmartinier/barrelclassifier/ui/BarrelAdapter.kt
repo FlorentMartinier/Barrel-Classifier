@@ -12,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.WorkManager
 import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.dao.AlertDao
@@ -31,6 +32,10 @@ class BarrelAdapter(
     private val onEditBarrel: (Barrel) -> Unit,
     private val onEditPhoto: (Barrel) -> Unit
 ) : RecyclerView.Adapter<BarrelAdapter.BarrelViewHolder>() {
+
+    val dbHelper = DatabaseHelper(context)
+    val historyDao = HistoryDao(dbHelper)
+    val alertDao = AlertDao(dbHelper)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BarrelViewHolder {
         val view = LayoutInflater.from(context)
@@ -256,10 +261,12 @@ class BarrelAdapter(
             .setTitle(context.resources.getString(R.string.remove_history))
             .setMessage(context.resources.getString(R.string.remove_history_validation))
             .setPositiveButton(context.resources.getString(R.string.remove)) { _, _ ->
-                val dbHelper = DatabaseHelper(context)
-                val historyDao = HistoryDao(dbHelper)
-
-                historyDao.delete(history.id)
+                val historyId = history.id
+                alertDao.getByHistoryId(historyId).forEach {
+                    WorkManager.getInstance(context)
+                        .cancelAllWorkByTag("alert_${it.id}")
+                }
+                historyDao.delete(historyId)
 
                 // Recharge les données après suppression
                 refresh()
