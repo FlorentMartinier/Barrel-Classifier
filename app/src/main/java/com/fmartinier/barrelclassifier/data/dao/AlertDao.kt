@@ -57,10 +57,10 @@ class AlertDao(private val dbHelper: DatabaseHelper) {
         return list
     }
 
-    fun delete(id: Long) {
+    fun deleteByHistoryId(id: Long) {
         dbHelper.writableDatabase.delete(
             ALERT_TABLE_NAME,
-            "$ID_COLUMN_NAME = ?",
+            "$HISTORY_ID_COLUMN_NAME = ?",
             arrayOf(id.toString())
         )
     }

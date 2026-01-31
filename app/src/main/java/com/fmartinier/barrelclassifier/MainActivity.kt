@@ -89,8 +89,8 @@ class MainActivity : AppCompatActivity() {
             context = this,
             barrels = emptyList(),
             refresh = { loadBarrels() },
-            onAddHistory = { barrel ->
-                openAddHistoryDialog(barrel)
+            onAddHistory = { barrel, historyId ->
+                openAddHistoryDialog(barrel, historyId)
             },
             onEditBarrel = { barrel ->
                 openEditBarrel(barrel)
@@ -140,8 +140,8 @@ class MainActivity : AppCompatActivity() {
             .show(supportFragmentManager, AddBarrelDialog.TAG)
     }
 
-    private fun openAddHistoryDialog(barrel: Barrel) {
-        AddHistoryDialog.newInstance(barrel)
+    private fun openAddHistoryDialog(barrel: Barrel, historyId: Long? = null) {
+        AddHistoryDialog.newInstance(barrel, historyId)
             .show(supportFragmentManager, AddHistoryDialog.TAG)
     }
 

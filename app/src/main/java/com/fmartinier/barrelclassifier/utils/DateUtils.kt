@@ -1,8 +1,10 @@
 package com.fmartinier.barrelclassifier.utils
 
+import android.app.DatePickerDialog
 import android.content.Context
 import com.fmartinier.barrelclassifier.R
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -24,8 +26,33 @@ class DateUtils {
 
 
         fun formatDate(timestamp: Long): String {
-            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE)
-            return sdf.format(Date(timestamp))
+            return SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE)
+                .format(Date(timestamp))
+        }
+
+        fun parseDate(dateString: String?): Long? {
+            return try {
+                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE)
+                sdf.isLenient = false
+                sdf.parse(dateString ?: "")?.time
+            } catch (e: Exception) {
+                print(e)
+                null
+            }
+        }
+
+        fun openDatePicker(context: Context, onSelected: (Long) -> Unit) {
+            val cal = Calendar.getInstance()
+            DatePickerDialog(
+                context,
+                { _, y, m, d ->
+                    cal.set(y, m, d, 0, 0)
+                    onSelected(cal.timeInMillis)
+                },
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.MONTH),
+                cal.get(Calendar.DAY_OF_MONTH)
+            ).show()
         }
     }
 }

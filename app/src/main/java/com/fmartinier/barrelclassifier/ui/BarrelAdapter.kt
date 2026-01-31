@@ -12,7 +12,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
-import androidx.work.WorkManager
 import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.dao.AlertDao
@@ -21,6 +20,7 @@ import com.fmartinier.barrelclassifier.data.dao.HistoryDao
 import com.fmartinier.barrelclassifier.data.model.Alert
 import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.data.model.History
+import com.fmartinier.barrelclassifier.service.AlertService
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.calculateDuration
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.formatDate
 
@@ -28,7 +28,7 @@ class BarrelAdapter(
     private val context: Context,
     private var barrels: List<Barrel>,
     private val refresh: () -> Unit,
-    private val onAddHistory: (Barrel) -> Unit,
+    private val onAddHistory: (Barrel, Long?) -> Unit,
     private val onEditBarrel: (Barrel) -> Unit,
     private val onEditPhoto: (Barrel) -> Unit
 ) : RecyclerView.Adapter<BarrelAdapter.BarrelViewHolder>() {
@@ -36,6 +36,7 @@ class BarrelAdapter(
     val dbHelper = DatabaseHelper(context)
     val historyDao = HistoryDao(dbHelper)
     val alertDao = AlertDao(dbHelper)
+    val alertService = AlertService()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BarrelViewHolder {
         val view = LayoutInflater.from(context)
@@ -71,7 +72,7 @@ class BarrelAdapter(
         }
 
         holder.btnAddHistory.setOnClickListener {
-            onAddHistory(barrel)
+            onAddHistory(barrel, null)
         }
 
         holder.photoOverlay.setOnClickListener {
@@ -183,6 +184,7 @@ class BarrelAdapter(
             val txtName = view.findViewById<TextView>(R.id.txtName)
             val txtDuration = view.findViewById<TextView>(R.id.txtDuration)
             val txtDates = view.findViewById<TextView>(R.id.txtDates)
+            val btnEdit = view.findViewById<ImageButton>(R.id.btnEditHistory)
             val btnDelete = view.findViewById<ImageButton>(R.id.btnDeleteHistory)
             val alertsSection = view.findViewById<LinearLayout>(R.id.alertsSection)
             val alertsContainer: LinearLayout =
@@ -206,6 +208,10 @@ class BarrelAdapter(
                 dateDebut,
                 dateFin
             )
+
+            btnEdit.setOnClickListener {
+                onAddHistory(barrel, history.id)
+            }
 
             btnDelete.setOnClickListener {
                 confirmDeleteHistory(history)
@@ -263,8 +269,7 @@ class BarrelAdapter(
             .setPositiveButton(context.resources.getString(R.string.remove)) { _, _ ->
                 val historyId = history.id
                 alertDao.getByHistoryId(historyId).forEach {
-                    WorkManager.getInstance(context)
-                        .cancelAllWorkByTag("alert_${it.id}")
+                    alertService.cancelByAlertId(context, it.id)
                 }
                 historyDao.delete(historyId)
 
