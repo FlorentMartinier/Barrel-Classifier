@@ -90,7 +90,7 @@ class AddHistoryDialog : DialogFragment() {
             }
         }
 
-        val positiveButtonText = if(historyId == null) R.string.add else R.string.modify
+        val positiveButtonText = if (historyId == null) R.string.add else R.string.modify
 
         return AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.add_history))
@@ -202,14 +202,14 @@ class AddHistoryDialog : DialogFragment() {
         }
 
         // Spinner type d’alerte
-        val alertTypes = EAlertType.entries
+        val alertTypes = EAlertType.entries.map {
+            getString(it.alertDescription)
+        }
         val spinner = Spinner(context).apply {
             adapter = ArrayAdapter(
                 context,
                 android.R.layout.simple_spinner_dropdown_item,
-                alertTypes.map {
-                    getString(it.alertDescription)
-                }
+                alertTypes
             )
             layoutParams = LinearLayout.LayoutParams(0, WRAP_CONTENT, 1f)
             id = View.generateViewId()
@@ -255,6 +255,10 @@ class AddHistoryDialog : DialogFragment() {
         row.addView(btnDelete)
 
         alert?.let {
+            val indexOfSelectedAlert = alertTypes.indexOf(it.type)
+            if (indexOfSelectedAlert >= 0) {
+                spinner.setSelection(indexOfSelectedAlert)
+            }
             edtDate.setText(formatDate(it.date))
         }
 
