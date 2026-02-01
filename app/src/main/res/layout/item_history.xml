@@ -30,32 +30,20 @@
                 android:maxLines="2"
                 android:ellipsize="end"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/btnEditHistory"
+                app:layout_constraintEnd_toStartOf="@id/btnMenu"
                 app:layout_constraintTop_toTopOf="parent"/>
 
             <!-- Bouton édition -->
             <ImageButton
-                android:id="@+id/btnEditHistory"
+                android:id="@+id/btnMenu"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/modify"
-                android:src="@drawable/ic_edit"
-                app:tint="?attr/colorPrimary"
-                app:layout_constraintEnd_toStartOf="@id/btnDeleteHistory"
-                app:layout_constraintTop_toTopOf="parent"/>
-
-            <!-- Bouton suppression -->
-            <ImageButton
-                android:id="@+id/btnDeleteHistory"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/remove_history"
-                android:src="@drawable/ic_delete"
-                app:tint="@color/material_red_400"
+                android:contentDescription="@string/more_actions"
+                android:src="@drawable/ic_more_vert"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="?attr/colorOnSurface"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

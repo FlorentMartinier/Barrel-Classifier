@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
@@ -184,8 +185,7 @@ class BarrelAdapter(
             val txtName = view.findViewById<TextView>(R.id.txtName)
             val txtDuration = view.findViewById<TextView>(R.id.txtDuration)
             val txtDates = view.findViewById<TextView>(R.id.txtDates)
-            val btnEdit = view.findViewById<ImageButton>(R.id.btnEditHistory)
-            val btnDelete = view.findViewById<ImageButton>(R.id.btnDeleteHistory)
+            val btnMenu = view.findViewById<ImageButton>(R.id.btnMenu)
             val actionsSection = view.findViewById<LinearLayout>(R.id.actionsSection)
             val alertsSection = view.findViewById<LinearLayout>(R.id.alertsSection)
             val alertsContainer: LinearLayout =
@@ -212,12 +212,24 @@ class BarrelAdapter(
                 dateFin
             )
 
-            btnEdit.setOnClickListener {
-                onAddHistory(barrel, history.id)
-            }
+            btnMenu.setOnClickListener {
+                val popup = PopupMenu(it.context, it)
+                popup.inflate(R.menu.history_item_menu)
+                popup.setOnMenuItemClickListener { item ->
+                    when (item.itemId) {
+                        R.id.action_edit -> {
+                            onAddHistory(barrel, history.id)
+                            true
+                        }
+                        R.id.action_delete -> {
+                            confirmDeleteHistory(history)
+                            true
+                        }
+                        else -> false
+                    }
+                }
 
-            btnDelete.setOnClickListener {
-                confirmDeleteHistory(history)
+                popup.show()
             }
 
             // Animation d'apparition
