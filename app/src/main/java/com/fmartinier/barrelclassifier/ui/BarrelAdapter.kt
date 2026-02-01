@@ -186,9 +186,12 @@ class BarrelAdapter(
             val txtDates = view.findViewById<TextView>(R.id.txtDates)
             val btnEdit = view.findViewById<ImageButton>(R.id.btnEditHistory)
             val btnDelete = view.findViewById<ImageButton>(R.id.btnDeleteHistory)
+            val actionsSection = view.findViewById<LinearLayout>(R.id.actionsSection)
             val alertsSection = view.findViewById<LinearLayout>(R.id.alertsSection)
             val alertsContainer: LinearLayout =
                 view.findViewById(R.id.historyAlertsContainer)
+            val actionsContainer: LinearLayout =
+                view.findViewById(R.id.historyActionsContainer)
 
             txtName.text = history.name
 
@@ -228,36 +231,53 @@ class BarrelAdapter(
 
             holder.layoutHistory.addView(view)
             val alerts = AlertDao(DatabaseHelper(context)).getByHistoryId(history.id)
-            displayAlerts(alertsSection, alertsContainer, alerts)
+
+            // Affichage des actions effectuées
+            val doneActions = alerts.filter { it.date < System.currentTimeMillis() }
+            displayAlerts(
+                actionsSection,
+                actionsContainer,
+                doneActions,
+                "✅"
+            )
+
+            // Affichage des alertes à venir
+            val futureAlerts = alerts.filter { it.date >= System.currentTimeMillis() }
+            displayAlerts(
+                alertsSection,
+                alertsContainer,
+                futureAlerts,
+                "📆"
+            )
         }
     }
 
     private fun displayAlerts(
-        alertsSection: LinearLayout,
-        alertsContainer: LinearLayout,
-        alerts: List<Alert>
+        section: LinearLayout,
+        container: LinearLayout,
+        alerts: List<Alert>,
+        icon: String
     ) {
-        alertsContainer.removeAllViews()
+        container.removeAllViews()
 
-        val futureAlerts = alerts.filter { it.date >= System.currentTimeMillis() }
-        if (futureAlerts.isEmpty()) {
-            alertsSection.visibility = View.GONE
+        if (alerts.isEmpty()) {
+            section.visibility = View.GONE
         } else {
-            alertsSection.visibility = View.VISIBLE
+            section.visibility = View.VISIBLE
 
-            futureAlerts
+            alerts
                 .forEach { alert ->
                     val alertView = LayoutInflater.from(context).inflate(
-                        R.layout.item_alert_small,
-                        alertsContainer,
+                        R.layout.item_alert,
+                        container,
                         false
                     )
 
-                    alertView.findViewById<TextView>(R.id.txtAlertType).text = alert.type
+                    alertView.findViewById<TextView>(R.id.txtAlertType).text = "$icon ${alert.type}"
                     alertView.findViewById<TextView>(R.id.txtAlertDate).text =
                         formatDate(alert.date)
 
-                    alertsContainer.addView(alertView)
+                    container.addView(alertView)
                 }
         }
     }

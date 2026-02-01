@@ -153,10 +153,6 @@ class AddHistoryDialog : DialogFragment() {
                     showToast(getString(R.string.incoherent_date))
                 }
 
-                alerts.any { it.date < System.currentTimeMillis() } -> {
-                    showToast(getString(R.string.incoherent_date))
-                }
-
                 else -> {
                     val history = History(
                         barrelId = barrelId,

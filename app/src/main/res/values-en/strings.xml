@@ -33,6 +33,9 @@
     <string name="incoherent_date">The end date cannot be earlier than the start date</string>
     <string name="incoherent_alert_date">Alerts cannot be in the past</string>
     <string name="alerts">Alerts</string>
+    <string name="actions_done">Actions done</string>
+    <string name="ongoing_alerts">Ongoing alerts</string>
+    <string name="alert_action">Alerts / Actions</string>
     <string name="add_alerts">Add alert</string>
     <string name="alertTitle">Scheduled reminder for the barrel \'%1$s\'</string>
     <string name="alertContent">Reminder: %1$s</string>

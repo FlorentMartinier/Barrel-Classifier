@@ -16,42 +16,49 @@
         android:padding="12dp">
 
         <!-- Ligne titre + actions -->
-        <RelativeLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <!-- Nom historique -->
             <TextView
                 android:id="@+id/txtName"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:maxLines="2"
+                android:ellipsize="end"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btnEditHistory"
+                app:layout_constraintTop_toTopOf="parent"/>
 
             <!-- Bouton édition -->
             <ImageButton
                 android:id="@+id/btnEditHistory"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:layout_alignParentEnd="true"
-                android:layout_marginEnd="36dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/modify"
                 android:src="@drawable/ic_edit"
-                app:tint="?attr/colorPrimary"/>
+                app:tint="?attr/colorPrimary"
+                app:layout_constraintEnd_toStartOf="@id/btnDeleteHistory"
+                app:layout_constraintTop_toTopOf="parent"/>
 
             <!-- Bouton suppression -->
             <ImageButton
                 android:id="@+id/btnDeleteHistory"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:layout_alignParentEnd="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/remove_history"
                 android:src="@drawable/ic_delete"
-                app:tint="@color/material_red_400"/>
+                app:tint="@color/material_red_400"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
 
-        </RelativeLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         <!-- Durée -->
         <TextView
@@ -75,6 +82,40 @@
 
         <!-- Bloc alertes (masquable) -->
         <LinearLayout
+            android:id="@+id/actionsSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Séparateur -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="8dp"
+                android:background="#DDDDDD"/>
+
+            <!-- Titre -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/actions_done"
+                android:textStyle="bold"
+                android:textSize="14sp"/>
+
+            <!-- Liste des alertes -->
+            <LinearLayout
+                android:id="@+id/historyActionsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="4dp"/>
+
+        </LinearLayout>
+
+        <!-- Bloc alertes (masquable) -->
+        <LinearLayout
             android:id="@+id/alertsSection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -93,7 +134,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="@string/alerts"
+                android:text="@string/ongoing_alerts"
                 android:textStyle="bold"
                 android:textSize="14sp"/>
 
@@ -104,7 +145,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginTop="4dp"/>
-
         </LinearLayout>
 
 
