@@ -47,5 +47,14 @@
     <string name="alert_move_description">Move the barrel</string>
     <string name="alert_racking_description">Rack the contents</string>
     <string name="alert_lees_stirring_description">Stir the lees</string>
+    <string name="alert_putting_carboy_description">Putting in carboy</string>
     <string name="more_actions">More actions</string>
+    <string name="advanced_option_up">▲ Advanced options</string>
+    <string name="advanced_option_down">▼ Advanced options</string>
+    <string name="heating_type">Heating type</string>
+    <string name="heating_type_exemple">Ex: medium</string>
+    <string name="storage_hygrometer">Storage humidity (%)</string>
+    <string name="storage_hygrometer_exemple">Ex: 75</string>
+    <string name="storage_temperature">Storage temperature (°C)</string>
+    <string name="storage_temperature_ex">Ex: 12</string>
 </resources>

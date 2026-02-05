@@ -24,6 +24,8 @@ import com.fmartinier.barrelclassifier.data.model.History
 import com.fmartinier.barrelclassifier.service.AlertService
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.calculateDuration
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.formatDate
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 
 class BarrelAdapter(
     private val context: Context,
@@ -50,6 +52,27 @@ class BarrelAdapter(
 
         holder.txtBarrelName.text = barrel.name
         holder.txtBarrelDetails.text = "${barrel.brand} • ${barrel.woodType} • ${barrel.volume}L"
+        holder.chipGroup.removeAllViews()
+
+        var hasAdvanced = false
+
+        barrel.heatType?.takeIf { it.isNotBlank() }?.let {
+            addChip(holder, it, "🔥")
+            hasAdvanced = true
+        }
+
+        barrel.storageHygrometer?.takeIf { it.isNotBlank() }?.let {
+            addChip(holder, "$it%", "💧")
+            hasAdvanced = true
+        }
+
+        barrel.storageTemperature?.takeIf { it.isNotBlank() }?.let {
+            addChip(holder, "${it}°C", "🌡️")
+            hasAdvanced = true
+        }
+
+        holder.chipGroup.visibility = if (hasAdvanced) View.VISIBLE else View.GONE
+
 
         // Chevron + animation
         holder.layoutToggleHistory.setOnClickListener {
@@ -123,39 +146,17 @@ class BarrelAdapter(
 
     inner class BarrelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        val txtBarrelName: TextView =
-            itemView.findViewById(R.id.txtBarrelName)
-
-        val txtBarrelDetails: TextView =
-            itemView.findViewById(R.id.txtBarrelDetails)
-
-        val btnEditBarrel: ImageButton =
-            itemView.findViewById(R.id.btnEditBarrel)
-
-        val btnDeleteBarrel: ImageButton =
-            itemView.findViewById(R.id.btnDeleteBarrel)
-
-        // Bouton ajout historique
-        val btnAddHistory: TextView =
-            itemView.findViewById(R.id.btnAddHistory)
-
-        // Zone cliquable "Historique + chevron"
-        val layoutToggleHistory: LinearLayout =
-            itemView.findViewById(R.id.layoutToggleHistory)
-
-        // Chevron animé
-        val imgChevron: ImageView =
-            itemView.findViewById(R.id.imgChevron)
-
-        val imgBarrel: ImageView =
-            itemView.findViewById(R.id.imgBarrel)
-
-        val photoOverlay: LinearLayout =
-            itemView.findViewById(R.id.photoOverlay)
-
-        // Conteneur des historiques
-        val layoutHistory: LinearLayout =
-            itemView.findViewById(R.id.layoutHistory)
+        val txtBarrelName: TextView = itemView.findViewById(R.id.txtBarrelName)
+        val txtBarrelDetails: TextView = itemView.findViewById(R.id.txtBarrelDetails)
+        val btnEditBarrel: ImageButton = itemView.findViewById(R.id.btnEditBarrel)
+        val btnDeleteBarrel: ImageButton = itemView.findViewById(R.id.btnDeleteBarrel)
+        val btnAddHistory: TextView = itemView.findViewById(R.id.btnAddHistory)
+        val layoutToggleHistory: LinearLayout = itemView.findViewById(R.id.layoutToggleHistory)
+        val imgChevron: ImageView = itemView.findViewById(R.id.imgChevron)
+        val imgBarrel: ImageView = itemView.findViewById(R.id.imgBarrel)
+        val photoOverlay: LinearLayout = itemView.findViewById(R.id.photoOverlay)
+        val layoutHistory: LinearLayout = itemView.findViewById(R.id.layoutHistory)
+        val chipGroup = itemView.findViewById<ChipGroup>(R.id.chipGroupAdvanced)
 
         // Permet de savoir si l’historique est ouvert ou non
         var isExpanded: Boolean = false
@@ -221,10 +222,12 @@ class BarrelAdapter(
                             onAddHistory(barrel, history.id)
                             true
                         }
+
                         R.id.action_delete -> {
                             confirmDeleteHistory(history)
                             true
                         }
+
                         else -> false
                     }
                 }
@@ -310,5 +313,16 @@ class BarrelAdapter(
             }
             .setNegativeButton(context.resources.getString(R.string.cancel), null)
             .show()
+    }
+
+    fun addChip(holder: BarrelViewHolder, text: String, icon: String) {
+        val chip = Chip(holder.itemView.context).apply {
+            this.text = "$icon $text"
+            isChipIconVisible = true
+            isClickable = false
+            isCheckable = false
+            setEnsureMinTouchTargetSize(false)
+        }
+        holder.chipGroup.addView(chip)
     }
 }

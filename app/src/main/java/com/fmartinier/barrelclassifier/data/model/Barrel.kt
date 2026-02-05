@@ -7,5 +7,8 @@ data class Barrel(
     val brand: String,
     val woodType: String,
     val imagePath: String?, // chemin local de la photo
+    val heatType: String?,
+    val storageHygrometer: String?,
+    val storageTemperature: String?,
     val histories: List<History>
 )

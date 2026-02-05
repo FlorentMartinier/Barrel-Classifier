@@ -47,5 +47,14 @@
     <string name="alert_move_description">Déplacer le fût</string>
     <string name="alert_racking_description">Soutirer du contenu</string>
     <string name="alert_lees_stirring_description">Effectuer un bâttonage</string>
+    <string name="alert_putting_carboy_description">Mise en Dame Jeanne</string>
     <string name="more_actions">Actions supplémentaires</string>
+    <string name="advanced_option_up">▲ Options avancées</string>
+    <string name="advanced_option_down">▼ Options avancées</string>
+    <string name="heating_type">Type de chauffe</string>
+    <string name="heating_type_exemple">Ex: moyenne</string>
+    <string name="storage_hygrometer">Hygrométrie de stockage (%)</string>
+    <string name="storage_hygrometer_exemple">Ex: 75</string>
+    <string name="storage_temperature">Température de stockage (°C)</string>
+    <string name="storage_temperature_ex">Ex: 12</string>
 </resources>

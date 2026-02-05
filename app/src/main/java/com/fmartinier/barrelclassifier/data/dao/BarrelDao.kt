@@ -7,10 +7,13 @@ import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.BARREL_TABL
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.BEGIN_DATE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.BRAND_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.END_DATE_COLUMN_NAME
+import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.HEATING_TYPE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.HISTORY_TABLE_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.ID_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.IMAGE_PATH_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.NAME_COLUMN_NAME
+import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.STORAGE_HYGROMETER_COLUMN_NAME
+import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.STORAGE_TEMPERATURE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.VOLUME_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.WOOD_TYPE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.model.Barrel
@@ -26,6 +29,9 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
             put(BRAND_COLUMN_NAME, barrel.brand)
             put(WOOD_TYPE_COLUMN_NAME, barrel.woodType)
             put(IMAGE_PATH_COLUMN_NAME, barrel.imagePath)
+            put(HEATING_TYPE_COLUMN_NAME, barrel.heatType)
+            put(STORAGE_HYGROMETER_COLUMN_NAME, barrel.storageHygrometer)
+            put(STORAGE_TEMPERATURE_COLUMN_NAME, barrel.storageTemperature)
         }
         return db.insert(BARREL_TABLE_NAME, null, values)
     }
@@ -49,6 +55,9 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
                     brand = cursor.getString(cursor.getColumnIndexOrThrow(BRAND_COLUMN_NAME)),
                     woodType = cursor.getString(cursor.getColumnIndexOrThrow(WOOD_TYPE_COLUMN_NAME)),
                     imagePath = cursor.getString(cursor.getColumnIndexOrThrow(IMAGE_PATH_COLUMN_NAME)),
+                    heatType = cursor.getString(cursor.getColumnIndexOrThrow(HEATING_TYPE_COLUMN_NAME)),
+                    storageHygrometer = cursor.getString(cursor.getColumnIndexOrThrow(STORAGE_HYGROMETER_COLUMN_NAME)),
+                    storageTemperature = cursor.getString(cursor.getColumnIndexOrThrow(STORAGE_TEMPERATURE_COLUMN_NAME)),
                     histories = histories
                 )
             )
@@ -79,6 +88,9 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
             put(VOLUME_COLUMN_NAME, barrel.volume)
             put(BRAND_COLUMN_NAME, barrel.brand)
             put(WOOD_TYPE_COLUMN_NAME, barrel.woodType)
+            put(HEATING_TYPE_COLUMN_NAME, barrel.heatType)
+            put(STORAGE_HYGROMETER_COLUMN_NAME, barrel.storageHygrometer)
+            put(STORAGE_TEMPERATURE_COLUMN_NAME, barrel.storageTemperature)
         }
 
         db.update(
@@ -142,7 +154,10 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
                 VOLUME_COLUMN_NAME,
                 BRAND_COLUMN_NAME,
                 WOOD_TYPE_COLUMN_NAME,
-                IMAGE_PATH_COLUMN_NAME
+                IMAGE_PATH_COLUMN_NAME,
+                HEATING_TYPE_COLUMN_NAME,
+                STORAGE_HYGROMETER_COLUMN_NAME,
+                STORAGE_TEMPERATURE_COLUMN_NAME
             ),
             "$ID_COLUMN_NAME = ?",
             arrayOf(barrelId.toString()),
@@ -163,6 +178,9 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
             brand = cursor.getString(cursor.getColumnIndexOrThrow(BRAND_COLUMN_NAME)),
             woodType = cursor.getString(cursor.getColumnIndexOrThrow(WOOD_TYPE_COLUMN_NAME)),
             imagePath = cursor.getString(cursor.getColumnIndexOrThrow(IMAGE_PATH_COLUMN_NAME)),
+            heatType = cursor.getString(cursor.getColumnIndexOrThrow(HEATING_TYPE_COLUMN_NAME)),
+            storageHygrometer = cursor.getString(cursor.getColumnIndexOrThrow(STORAGE_HYGROMETER_COLUMN_NAME)),
+            storageTemperature = cursor.getString(cursor.getColumnIndexOrThrow(STORAGE_TEMPERATURE_COLUMN_NAME)),
             histories = getHistoriesForBarrel(barrelId)
         )
 

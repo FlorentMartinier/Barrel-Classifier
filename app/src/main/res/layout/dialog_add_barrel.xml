@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,8 +21,9 @@
             android:id="@+id/edtBarrelName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autofillHints=""
             android:hint="@string/ex_barrel_name"
-            android:inputType="textPersonName" />
+            android:inputType="text" />
 
         <!-- Contenance -->
         <TextView
@@ -35,6 +37,7 @@
             android:id="@+id/edtVolume"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autofillHints=""
             android:hint="@string/ex_barrel_volume"
             android:inputType="number" />
 
@@ -50,8 +53,9 @@
             android:id="@+id/edtBrand"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autofillHints=""
             android:hint="@string/ex_brand"
-            android:inputType="textPersonName" />
+            android:inputType="text" />
 
         <!-- Type de bois -->
         <TextView
@@ -65,7 +69,75 @@
             android:id="@+id/edtWoodType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autofillHints=""
             android:hint="@string/ex_wood_type"
-            android:inputType="textPersonName" />
+            android:inputType="text" />
+
+        <!-- ====== BOUTON OPTIONS AVANCÉES ====== -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/txtToggleAdvanced"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="@string/advanced_option_down"
+            android:textAllCaps="false"
+            style="@style/Widget.MaterialComponents.Button.TextButton" />
+
+        <!-- ====== SECTION AVANCÉE ====== -->
+        <LinearLayout
+            android:id="@+id/layoutAdvanced"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Type de chauffe -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/heating_type"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edtHeatType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints=""
+                android:hint="@string/heating_type_exemple"
+                android:inputType="text" />
+
+            <!-- Hygrométrie -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/storage_hygrometer"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edtHumidity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints=""
+                android:hint="@string/storage_hygrometer_exemple"
+                android:inputType="numberDecimal" />
+
+            <!-- Température -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/storage_temperature"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edtTemperature"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints=""
+                android:hint="@string/storage_temperature_ex"
+                android:inputType="numberDecimal" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>
