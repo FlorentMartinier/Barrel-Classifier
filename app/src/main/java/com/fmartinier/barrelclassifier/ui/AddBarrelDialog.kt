@@ -26,6 +26,9 @@ class AddBarrelDialog : DialogFragment() {
     private lateinit var edtHeatType: EditText
     private lateinit var edtHumidity: EditText
     private lateinit var edtTemperature: EditText
+    private lateinit var barrel: Barrel
+    private var barrelId: Long? = null
+    private var modificationMode = false
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val view = layoutInflater.inflate(R.layout.dialog_add_barrel, null)
@@ -50,11 +53,30 @@ class AddBarrelDialog : DialogFragment() {
             }
         }
 
+        // Pré-remplissage
+        arguments
+            ?.takeIf { it.containsKey(ARG_BARREL_ID) }
+            ?.getLong(ARG_BARREL_ID)
+            ?.let {
+                modificationMode = true
+                barrelId = it
+                val db = DatabaseHelper(requireContext())
+                barrel = BarrelDao(db).getById(it)
+                edtBarrelName.setText(barrel.name)
+                edtVolume.setText(barrel.volume.toString())
+                edtBrand.setText(barrel.brand)
+                edtWoodType.setText(barrel.woodType)
+                edtHeatType.setText(barrel.heatType)
+                edtHumidity.setText(barrel.storageHygrometer)
+                edtTemperature.setText(barrel.storageTemperature)
+            }
 
+        val dialogTitle = if (modificationMode) R.string.modify_barrel else R.string.add_barrel
+        val positiveButtonTitle = if (modificationMode) R.string.modify else R.string.add
         return AlertDialog.Builder(requireContext())
-            .setTitle(getString(R.string.add_barrel))
+            .setTitle(getString(dialogTitle))
             .setView(view)
-            .setPositiveButton(getString(R.string.add), null)
+            .setPositiveButton(getString(positiveButtonTitle), null)
             .setNegativeButton(getString(R.string.cancel), null)
             .create()
     }
@@ -99,6 +121,7 @@ class AddBarrelDialog : DialogFragment() {
                 else -> {
                     // ✅ Tout est valide → insertion
                     val barrel = Barrel(
+                        id = this.barrelId ?: 0,
                         name = name,
                         volume = volumeText.toInt(),
                         brand = brand,
@@ -111,7 +134,12 @@ class AddBarrelDialog : DialogFragment() {
                     )
 
                     val db = DatabaseHelper(requireContext())
-                    BarrelDao(db).insert(barrel)
+                    val barrelDao = BarrelDao(db)
+                    if (modificationMode) {
+                        barrelDao.update(barrel)
+                    } else {
+                        barrelDao.insert(barrel)
+                    }
 
                     parentFragmentManager.setFragmentResult(
                         "add_barrel_result",
@@ -129,9 +157,16 @@ class AddBarrelDialog : DialogFragment() {
 
     companion object {
         const val TAG = "AddBarrelDialog"
+        private const val ARG_BARREL_ID = "barrel_id"
 
-        fun newInstance(): AddBarrelDialog {
-            return AddBarrelDialog()
+        fun newInstance(barrelId: Long? = null): AddBarrelDialog {
+            return AddBarrelDialog().apply {
+                arguments = Bundle().apply {
+                    barrelId?.let {
+                        putLong(ARG_BARREL_ID, barrelId)
+                    }
+                }
+            }
         }
     }
 }

@@ -26,7 +26,6 @@ import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.ui.AddBarrelDialog
 import com.fmartinier.barrelclassifier.ui.AddHistoryDialog
 import com.fmartinier.barrelclassifier.ui.BarrelAdapter
-import com.fmartinier.barrelclassifier.ui.EditBarrelDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.File
 
@@ -146,8 +145,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openEditBarrel(barrel: Barrel) {
-        EditBarrelDialog.newInstance(barrel.id)
-            .show(supportFragmentManager, EditBarrelDialog.TAG)
+        AddBarrelDialog.newInstance(barrel.id)
+            .show(supportFragmentManager, AddBarrelDialog.TAG)
     }
 
     private fun startArrowAnimation() {
