@@ -65,9 +65,27 @@
     <string name="mix">Mix</string>
     <string name="see_more">See more</string>
     <string name="see_less">See less</string>
+    <string name="next_alert">Coming soon : %1$s (%2$s)</string>
     <string-array name="type_fut_array">
         <item>Aging</item>
         <item>Seasonning</item>
         <item>Mix</item>
+    </string-array>
+    <string-array name="wood_types_array">
+        <item>French Oak</item>
+        <item>American Oak</item>
+        <item>European Oak</item>
+        <item>Acacia</item>
+        <item>Chestnut</item>
+        <item>Cherry Wood</item>
+        <item>Mulberry</item>
+    </string-array>
+    <string-array name="heating_types_array">
+        <item>Light Toast</item>
+        <item>Medium Toast</item>
+        <item>Medium Plus Toast</item>
+        <item>Heavy Toast</item>
+        <item>Heavy Plus Toast</item>
+        <item>Steam</item>
     </string-array>
 </resources>

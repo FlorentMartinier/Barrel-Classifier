@@ -4,26 +4,28 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.isGone
 import androidx.fragment.app.DialogFragment
 import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.dao.BarrelDao
 import com.fmartinier.barrelclassifier.data.model.Barrel
-import androidx.core.view.isGone
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
 
 class AddBarrelDialog : DialogFragment() {
 
     private lateinit var edtBarrelName: EditText
     private lateinit var edtVolume: EditText
-    private lateinit var edtBrand: EditText
-    private lateinit var edtWoodType: EditText
+    private lateinit var edtBrand: MaterialAutoCompleteTextView
+    private lateinit var edtWoodType: MaterialAutoCompleteTextView
     private lateinit var toggle: TextView
     private lateinit var advancedLayout: LinearLayout
-    private lateinit var edtHeatType: EditText
+    private lateinit var edtHeatType: MaterialAutoCompleteTextView
     private lateinit var edtHumidity: EditText
     private lateinit var edtTemperature: EditText
     private lateinit var barrel: Barrel
@@ -35,13 +37,45 @@ class AddBarrelDialog : DialogFragment() {
 
         edtBarrelName = view.findViewById(R.id.edtBarrelName)
         edtVolume = view.findViewById(R.id.edtVolume)
-        edtBrand = view.findViewById(R.id.edtBrand)
-        edtWoodType = view.findViewById(R.id.edtWoodType)
+        edtBrand = view.findViewById<MaterialAutoCompleteTextView>(R.id.autoCompleteBrand)
+        edtWoodType = view.findViewById<MaterialAutoCompleteTextView>(R.id.autoCompleteWood)
         toggle = view.findViewById<TextView>(R.id.txtToggleAdvanced)
         advancedLayout = view.findViewById<LinearLayout>(R.id.layoutAdvanced)
-        edtHeatType = view.findViewById(R.id.edtHeatType)
+        edtHeatType = view.findViewById<MaterialAutoCompleteTextView>(R.id.edtHeatType)
         edtHumidity = view.findViewById(R.id.edtHumidity)
         edtTemperature = view.findViewById(R.id.edtTemperature)
+
+        val brandAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_dropdown_item_1line,
+            BARREL_BRANDS
+        )
+        val woodTypeAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_dropdown_item_1line,
+            resources.getStringArray(R.array.wood_types_array)
+        )
+        val heatingTypeAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_dropdown_item_1line,
+            resources.getStringArray(R.array.heating_types_array)
+        )
+
+        edtBrand.setAdapter(brandAdapter)
+        edtWoodType.setAdapter(woodTypeAdapter)
+        edtHeatType.setAdapter(heatingTypeAdapter)
+
+        edtBrand.setOnClickListener {
+            edtBrand.showDropDown()
+        }
+
+        edtWoodType.setOnClickListener {
+            edtWoodType.showDropDown()
+        }
+
+        edtHeatType.setOnClickListener {
+            edtHeatType.showDropDown()
+        }
 
         toggle.setOnClickListener {
             if (advancedLayout.isGone) {
@@ -158,6 +192,9 @@ class AddBarrelDialog : DialogFragment() {
     companion object {
         const val TAG = "AddBarrelDialog"
         private const val ARG_BARREL_ID = "barrel_id"
+
+        private val BARREL_BRANDS =
+            arrayOf("Allary", "Navarre", "Seguin Moreau", "Taransaud", "Radoux", "Damy").sorted()
 
         fun newInstance(barrelId: Long? = null): AddBarrelDialog {
             return AddBarrelDialog().apply {

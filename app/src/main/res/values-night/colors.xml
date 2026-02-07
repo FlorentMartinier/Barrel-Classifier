@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="aging_oak">#C48A5A</color>
-    <color name="aging_oak_soft">#3B2A1F</color>
-
-    <color name="aging_marking">#90A4AE</color>
-    <color name="aging_marking_soft">#263238</color>
-
-    <color name="aging_mixte">#CE93D8</color>
-    <color name="aging_mixte_soft">#3B1E45</color>
+    <color name="alert_bg">#2D2418</color>
+    <color name="alert_stroke">#F57C00</color>
+    <color name="alert_text">#FFB74D</color>
 </resources>

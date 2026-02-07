@@ -65,9 +65,27 @@
     <string name="mix">Mixte</string>
     <string name="see_more">Voir plus</string>
     <string name="see_less">Voir moins</string>
+    <string name="next_alert">Prochaine rendez-vous : %1$s (%2$s)</string>
     <string-array name="type_fut_array">
         <item>Vieillissement</item>
         <item>Marquage</item>
         <item>Mixte</item>
+    </string-array>
+    <string-array name="wood_types_array">
+        <item>Chêne Français</item>
+        <item>Chêne Américain</item>
+        <item>Chêne Européen</item>
+        <item>Acacia</item>
+        <item>Châtaignier</item>
+        <item>Cerisier</item>
+        <item>Mûrier</item>
+    </string-array>
+    <string-array name="heating_types_array">
+        <item>Légère</item>
+        <item>Moyenne</item>
+        <item>Moyenne Plus</item>
+        <item>Forte</item>
+        <item>Forte Plus</item>
+        <item>Vapeur</item>
     </string-array>
 </resources>

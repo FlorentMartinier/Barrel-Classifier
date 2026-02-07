@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -26,16 +25,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_barrel_placeholder"/>
+                android:src="@drawable/ic_barrel_placeholder" />
 
             <!-- Overlay ajout photo -->
             <LinearLayout
                 android:id="@+id/photoOverlay"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
+                android:background="#66000000"
                 android:gravity="center"
-                android:background="#66000000">
+                android:orientation="vertical">
 
                 <ImageView
                     android:layout_width="36dp"
@@ -46,10 +45,10 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:text="@string/add_photo"
                     android:textColor="@android:color/white"
-                    android:textStyle="bold"
-                    android:layout_marginTop="8dp"/>
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <!-- ✏️ Bouton édition -->
@@ -60,8 +59,8 @@
                 android:layout_gravity="top|start"
                 android:layout_margin="8dp"
                 android:background="@drawable/bg_icon_circle"
-                android:src="@drawable/ic_edit"
                 android:contentDescription="@string/modify"
+                android:src="@drawable/ic_edit"
                 app:tint="@android:color/white" />
 
             <!-- 🗑️ Bouton suppression -->
@@ -72,8 +71,8 @@
                 android:layout_gravity="top|end"
                 android:layout_margin="8dp"
                 android:background="@drawable/bg_icon_circle"
-                android:src="@drawable/ic_delete"
                 android:contentDescription="@string/remove"
+                android:src="@drawable/ic_delete"
                 app:tint="@android:color/white" />
 
         </FrameLayout>
@@ -92,7 +91,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <!-- Infos secondaires -->
             <TextView
@@ -101,15 +100,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:textColor="#777777"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
 
             <!-- Infos avancées -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:orientation="horizontal"
-                android:gravity="center_horizontal">
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
 
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/chipGroupAdvanced"
@@ -118,8 +117,31 @@
                     android:layout_marginTop="8dp"
                     android:visibility="gone"
                     app:chipSpacingHorizontal="6dp"
-                    app:chipSpacingVertical="4dp"/>
+                    app:chipSpacingVertical="4dp" />
+            </LinearLayout>
 
+            <!-- Date de la prochaine alerte-->
+            <LinearLayout
+                android:id="@+id/layoutNextAlert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:visibility="gone"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:background="@drawable/bg_alert_light" />
+
+                <TextView
+                    android:id="@+id/txtNextAlertDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:textColor="#777777"
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <!-- Ajouter historique -->
@@ -140,7 +162,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="16dp"
-                android:background="#E0E0E0"/>
+                android:background="#E0E0E0" />
 
             <!-- Header historique -->
             <LinearLayout
@@ -158,13 +180,13 @@
                     android:layout_weight="1"
                     android:text="@string/history"
                     android:textSize="16sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <ImageView
                     android:id="@+id/imgChevron"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_chevron_down"/>
+                    android:src="@drawable/ic_chevron_down" />
             </LinearLayout>
 
             <!-- Liste des historiques -->
@@ -174,7 +196,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:orientation="vertical"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
         </LinearLayout>
     </LinearLayout>

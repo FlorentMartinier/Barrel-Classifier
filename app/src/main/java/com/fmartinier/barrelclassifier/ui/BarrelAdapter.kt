@@ -58,6 +58,20 @@ class BarrelAdapter(
         holder.txtBarrelDetails.text = "${barrel.brand} • ${barrel.woodType} • ${barrel.volume}L"
         holder.chipGroup.removeAllViews()
 
+        barrel.histories
+            .flatMap { alertDao.getByHistoryId(it.id) }
+            .filter { it.date > System.currentTimeMillis() }
+            .minByOrNull { it.date }
+            ?.let {
+                holder.layoutNextAlert.visibility = View.VISIBLE
+                val nextAlertDate = formatDate(it.date)
+                holder.txtNextAlertDate.text = context.resources.getString(
+                    R.string.next_alert,
+                    it.type,
+                    nextAlertDate
+                )
+            }
+
         var hasAdvanced = false
 
         barrel.heatType?.takeIf { it.isNotBlank() }?.let {
@@ -161,6 +175,8 @@ class BarrelAdapter(
         val photoOverlay: LinearLayout = itemView.findViewById(R.id.photoOverlay)
         val layoutHistory: LinearLayout = itemView.findViewById(R.id.layoutHistory)
         val chipGroup: ChipGroup = itemView.findViewById<ChipGroup>(R.id.chipGroupAdvanced)
+        val txtNextAlertDate: TextView = itemView.findViewById<TextView>(R.id.txtNextAlertDate)
+        val layoutNextAlert: LinearLayout = itemView.findViewById<LinearLayout>(R.id.layoutNextAlert)
 
         // Permet de savoir si l’historique est ouvert ou non
         var isExpanded: Boolean = false
@@ -275,7 +291,10 @@ class BarrelAdapter(
                     txtDescription.maxLines = 1
                     txtDescription.ellipsize = TextUtils.TruncateAt.END
                     txtDescription.measure(
-                        View.MeasureSpec.makeMeasureSpec(txtDescription.width, View.MeasureSpec.EXACTLY),
+                        View.MeasureSpec.makeMeasureSpec(
+                            txtDescription.width,
+                            View.MeasureSpec.EXACTLY
+                        ),
                         View.MeasureSpec.UNSPECIFIED
                     )
                     val endHeight = txtDescription.measuredHeight
@@ -291,7 +310,10 @@ class BarrelAdapter(
                     txtDescription.maxLines = Int.MAX_VALUE
                     txtDescription.ellipsize = null
                     txtDescription.measure(
-                        View.MeasureSpec.makeMeasureSpec(txtDescription.width, View.MeasureSpec.EXACTLY),
+                        View.MeasureSpec.makeMeasureSpec(
+                            txtDescription.width,
+                            View.MeasureSpec.EXACTLY
+                        ),
                         View.MeasureSpec.UNSPECIFIED
                     )
                     val endHeight = txtDescription.measuredHeight
@@ -421,7 +443,8 @@ class BarrelAdapter(
             return
         }
 
-        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 if (width > 0) {
                     viewTreeObserver.removeOnGlobalLayoutListener(this)
@@ -446,7 +469,7 @@ class BarrelAdapter(
     }
 
     private fun getHistoryType(history: History): String {
-        return when(history.type) {
+        return when (history.type) {
             context.resources.getString(EHistoryType.AGING.historyTypeDescription) -> "${history.type} ⌛"
             context.resources.getString(EHistoryType.SEASONNING.historyTypeDescription) -> "${history.type} 🪵"
             context.resources.getString(EHistoryType.MIX.historyTypeDescription) -> "${history.type} 🔄"
