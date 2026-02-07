@@ -12,12 +12,14 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.Toast
+import androidx.core.view.isGone
 import androidx.fragment.app.DialogFragment
 import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.dao.AlertDao
 import com.fmartinier.barrelclassifier.data.dao.HistoryDao
 import com.fmartinier.barrelclassifier.data.enums.EAlertType
+import com.fmartinier.barrelclassifier.data.enums.EHistoryType
 import com.fmartinier.barrelclassifier.data.model.Alert
 import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.data.model.History
@@ -41,6 +43,12 @@ class AddHistoryDialog : DialogFragment() {
     private lateinit var edtEndDate: TextInputEditText
     private lateinit var alertsContainer: LinearLayout
     private lateinit var btnAddAlert: MaterialButton
+    private lateinit var advancedButton: MaterialButton
+    private lateinit var advancedLayout: LinearLayout
+    private lateinit var edtDescription: TextInputEditText
+    private lateinit var edtAngelsShare: TextInputEditText
+    private lateinit var edtAlcohol: TextInputEditText
+    private lateinit var edtHistoryType: Spinner
 
     private val alertService = AlertService()
 
@@ -59,6 +67,22 @@ class AddHistoryDialog : DialogFragment() {
         endDate = parseDate(edtEndDate.text.toString())
         alertsContainer = view.findViewById<LinearLayout>(R.id.alertsContainer)
         btnAddAlert = view.findViewById<MaterialButton>(R.id.btnAddAlert)
+        advancedButton = view.findViewById<MaterialButton>(R.id.txtToggleAdvanced)
+        advancedLayout = view.findViewById<LinearLayout>(R.id.layoutAdvanced)
+        edtDescription = view.findViewById(R.id.edtDescription)
+        edtAngelsShare = view.findViewById(R.id.edtAngelsShare)
+        edtAlcohol = view.findViewById(R.id.edtAlcohol)
+        edtHistoryType = view.findViewById(R.id.edtHistoryType)
+
+        advancedButton.setOnClickListener {
+            if (advancedLayout.isGone) {
+                advancedLayout.visibility = View.VISIBLE
+                advancedButton.text = getString(R.string.advanced_option_up)
+            } else {
+                advancedLayout.visibility = View.GONE
+                advancedButton.text = getString(R.string.advanced_option_down)
+            }
+        }
 
         edtBeginDate.setOnClickListener {
             openDatePicker(requireContext()) {
@@ -88,6 +112,15 @@ class AddHistoryDialog : DialogFragment() {
             alerts.forEach { alert ->
                 addAlertRow(alert)
             }
+            val indexOfSelectedAlert = EHistoryType.entries.map {
+                getString(it.historyTypeDescription)
+            }.indexOf(history.type)
+            if (indexOfSelectedAlert >= 0) {
+                edtHistoryType.setSelection(indexOfSelectedAlert)
+            }
+            history.description?.let { edtDescription.setText(it) }
+            history.angelsShare?.let { edtAngelsShare.setText(it) }
+            history.alcoholicStrength?.let { edtAlcohol.setText(it) }
         }
 
         val positiveButtonText = if (historyId == null) R.string.add else R.string.modify
@@ -116,6 +149,11 @@ class AddHistoryDialog : DialogFragment() {
             val alerts = mutableListOf<Alert>()
             val barrelId = requireArguments().getLong(ARG_BARREL_ID)
             val barrelName = requireArguments().getString(ARG_BARREL_NAME) ?: ""
+            val description = edtDescription.text?.toString()?.trim().orEmpty()
+            val angelsShare = edtAngelsShare.text?.toString()?.trim().orEmpty()
+            val alcohol = edtAlcohol.text?.toString()?.trim().orEmpty()
+            val historyType = edtHistoryType.selectedItem?.toString()?.trim().orEmpty()
+
 
             for (i in 0 until alertsContainer.childCount) {
                 val row = alertsContainer.getChildAt(i) as? LinearLayout ?: continue
@@ -158,7 +196,11 @@ class AddHistoryDialog : DialogFragment() {
                         barrelId = barrelId,
                         name = name,
                         beginDate = beginDate!!,
-                        endDate = endDate
+                        endDate = endDate,
+                        description = description,
+                        angelsShare = angelsShare,
+                        alcoholicStrength =  alcohol,
+                        type = historyType,
                     )
 
                     val historyDao = HistoryDao(DatabaseHelper(requireContext()))
@@ -182,7 +224,7 @@ class AddHistoryDialog : DialogFragment() {
                         "add_barrel_result",
                         Bundle.EMPTY
                     )
-                    dismiss() // 👈 fermeture contrôlée
+                    dismiss()
                 }
             }
         }

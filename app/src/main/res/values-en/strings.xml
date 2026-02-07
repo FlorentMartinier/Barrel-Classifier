@@ -57,4 +57,17 @@
     <string name="storage_hygrometer_exemple">Ex: 75</string>
     <string name="storage_temperature">Storage temperature (°C)</string>
     <string name="storage_temperature_ex">Ex: 12</string>
+    <string name="detailed_description">Detailed description</string>
+    <string name="angels_share">Angel\'s share (%)</string>
+    <string name="alcoolic_strenght">Alcohol strength (%)</string>
+    <string name="aging">Aging</string>
+    <string name="seasonning">Seasonning</string>
+    <string name="mix">Mix</string>
+    <string name="see_more">See more</string>
+    <string name="see_less">See less</string>
+    <string-array name="type_fut_array">
+        <item>Aging</item>
+        <item>Seasonning</item>
+        <item>Mix</item>
+    </string-array>
 </resources>

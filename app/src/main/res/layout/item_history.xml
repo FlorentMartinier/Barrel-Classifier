@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
+    android:layout_marginBottom="10dp"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="3dp"
     app:cardUseCompatPadding="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="14dp">
 
-        <!-- Ligne titre + actions -->
+        <!-- HEADER -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- Nom historique -->
             <TextView
                 android:id="@+id/txtName"
                 android:layout_width="0dp"
@@ -33,20 +33,42 @@
                 app:layout_constraintEnd_toStartOf="@id/btnMenu"
                 app:layout_constraintTop_toTopOf="parent"/>
 
-            <!-- Bouton édition -->
             <ImageButton
                 android:id="@+id/btnMenu"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/more_actions"
                 android:src="@drawable/ic_more_vert"
+                app:tint="?attr/colorOnSurface"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="?attr/colorOnSurface"/>
+                app:layout_constraintTop_toTopOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <!-- BADGES TYPE + INFOS TECH -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal">
+
+            <!-- Part des anges -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipAngels"
+                style="@style/Widget.Material3.Chip.Assist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"/>
+
+            <!-- Degré alcool -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipAlcohol"
+                style="@style/Widget.Material3.Chip.Assist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"/>
+
+        </LinearLayout>
 
         <!-- Durée -->
         <TextView
@@ -54,87 +76,102 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:drawablePadding="6dp"
             android:textColor="?attr/colorPrimary"
             android:textSize="14sp"
-            app:drawableStartCompat="@drawable/ic_timer" />
+            app:drawableStartCompat="@drawable/ic_timer"
+            android:drawablePadding="6dp"/>
 
         <!-- Dates -->
         <TextView
             android:id="@+id/txtDates"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textColor="#777777"
-            android:textSize="13sp"/>
+            android:textColor="#888888"
+            android:textSize="13sp"
+            android:layout_marginTop="2dp"/>
 
-        <!-- Bloc alertes (masquable) -->
+        <!-- Description (facultatif) -->
+        <TextView
+            android:id="@+id/txtDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:textSize="13sp"
+            android:textColor="#AAAAAA"
+            android:visibility="invisible"/>
+
+        <TextView
+            android:id="@+id/txtExpandDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="@string/see_more"
+            android:textSize="12sp"
+            android:textColor="?attr/colorPrimary"
+            android:visibility="invisible"
+            android:clickable="true"
+            android:focusable="true"/>
+
+
+        <!-- ACTIONS -->
         <LinearLayout
             android:id="@+id/actionsSection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:visibility="gone"
+            android:layout_marginTop="6dp">
 
-            <!-- Séparateur -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="8dp"
-                android:background="#DDDDDD"/>
+                android:background="#DDDDDD"
+                android:layout_marginTop="6dp"/>
 
-            <!-- Titre -->
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
                 android:text="@string/actions_done"
                 android:textStyle="bold"
-                android:textSize="14sp"/>
+                android:textSize="14sp"
+                android:layout_marginTop="6dp"
+                android:layout_height="1dp"
+                android:layout_width="match_parent"/>
 
-            <!-- Liste des alertes -->
             <LinearLayout
                 android:id="@+id/historyActionsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="4dp"/>
-
+                android:orientation="vertical"/>
         </LinearLayout>
 
-        <!-- Bloc alertes (masquable) -->
+        <!-- ALERTES -->
         <LinearLayout
             android:id="@+id/alertsSection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:visibility="gone"
+            android:layout_marginTop="6dp">
 
-            <!-- Séparateur -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="8dp"
-                android:background="#DDDDDD"/>
+                android:background="#DDDDDD"
+                android:layout_marginTop="6dp"/>
 
-            <!-- Titre -->
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
                 android:text="@string/ongoing_alerts"
                 android:textStyle="bold"
-                android:textSize="14sp"/>
+                android:textSize="14sp"
+                android:layout_marginTop="6dp"
+                android:layout_height="1dp"
+                android:layout_width="match_parent"/>
 
-            <!-- Liste des alertes -->
             <LinearLayout
                 android:id="@+id/historyAlertsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="4dp"/>
+                android:orientation="vertical"/>
         </LinearLayout>
-
 
     </LinearLayout>
 

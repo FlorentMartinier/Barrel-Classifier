@@ -57,4 +57,17 @@
     <string name="storage_hygrometer_exemple">Ex: 75</string>
     <string name="storage_temperature">Température de stockage (°C)</string>
     <string name="storage_temperature_ex">Ex: 12</string>
+    <string name="detailed_description">Description détaillée</string>
+    <string name="angels_share">Part des anges (%)</string>
+    <string name="alcoolic_strenght">Titre alcoométrique (%)</string>
+    <string name="aging">Vieillissement</string>
+    <string name="seasonning">Marquage</string>
+    <string name="mix">Mixte</string>
+    <string name="see_more">Voir plus</string>
+    <string name="see_less">Voir moins</string>
+    <string-array name="type_fut_array">
+        <item>Vieillissement</item>
+        <item>Marquage</item>
+        <item>Mixte</item>
+    </string-array>
 </resources>

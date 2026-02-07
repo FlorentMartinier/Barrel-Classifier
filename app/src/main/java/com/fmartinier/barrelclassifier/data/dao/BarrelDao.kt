@@ -2,10 +2,13 @@ package com.fmartinier.barrelclassifier.data.dao
 
 import android.content.ContentValues
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
+import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.ALCOHOLIC_STRENGTH_COLUMN_NAME
+import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.ANGEL_SHARE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.BARREL_ID_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.BARREL_TABLE_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.BEGIN_DATE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.BRAND_COLUMN_NAME
+import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.DESCRIPTION_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.END_DATE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.HEATING_TYPE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.HISTORY_TABLE_NAME
@@ -14,6 +17,7 @@ import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.IMAGE_PATH_
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.NAME_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.STORAGE_HYGROMETER_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.STORAGE_TEMPERATURE_COLUMN_NAME
+import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.TYPE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.VOLUME_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.WOOD_TYPE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.model.Barrel
@@ -134,7 +138,11 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
                     endDate = if (cursor.isNull(cursor.getColumnIndexOrThrow(END_DATE_COLUMN_NAME)))
                         null
                     else
-                        cursor.getLong(cursor.getColumnIndexOrThrow(END_DATE_COLUMN_NAME))
+                        cursor.getLong(cursor.getColumnIndexOrThrow(END_DATE_COLUMN_NAME)),
+                    type = cursor.getString(cursor.getColumnIndexOrThrow(TYPE_COLUMN_NAME)),
+                    description = cursor.getString(cursor.getColumnIndexOrThrow(DESCRIPTION_COLUMN_NAME)),
+                    angelsShare = cursor.getString(cursor.getColumnIndexOrThrow(ANGEL_SHARE_COLUMN_NAME)),
+                    alcoholicStrength = cursor.getString(cursor.getColumnIndexOrThrow(ALCOHOLIC_STRENGTH_COLUMN_NAME)),
                 )
             )
         }

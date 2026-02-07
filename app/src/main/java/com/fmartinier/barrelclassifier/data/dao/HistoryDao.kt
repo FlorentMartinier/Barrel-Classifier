@@ -2,10 +2,13 @@ package com.fmartinier.barrelclassifier.data.dao
 
 import android.content.ContentValues
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
+import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.ALCOHOLIC_STRENGTH_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.ALERT_TABLE_NAME
+import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.ANGEL_SHARE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.BARREL_ID_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.BEGIN_DATE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.DATE_COLUMN_NAME
+import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.DESCRIPTION_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.END_DATE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.HISTORY_ID_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.HISTORY_TABLE_NAME
@@ -40,6 +43,10 @@ class HistoryDao(private val dbHelper: DatabaseHelper) {
             put(BARREL_ID_COLUMN_NAME, history.barrelId)
             put(NAME_COLUMN_NAME, history.name)
             put(BEGIN_DATE_COLUMN_NAME, history.beginDate)
+            put(DESCRIPTION_COLUMN_NAME, history.description)
+            put(ANGEL_SHARE_COLUMN_NAME, history.angelsShare)
+            put(ALCOHOLIC_STRENGTH_COLUMN_NAME, history.alcoholicStrength)
+            put(TYPE_COLUMN_NAME, history.type)
 
             if (history.endDate != null) {
                 put(END_DATE_COLUMN_NAME, history.endDate)
@@ -72,6 +79,10 @@ class HistoryDao(private val dbHelper: DatabaseHelper) {
                     barrelId = cursor.getLong(cursor.getColumnIndexOrThrow(BARREL_ID_COLUMN_NAME)),
                     name = cursor.getString(cursor.getColumnIndexOrThrow(NAME_COLUMN_NAME)),
                     beginDate = cursor.getLong(cursor.getColumnIndexOrThrow(BEGIN_DATE_COLUMN_NAME)),
+                    type = cursor.getString(cursor.getColumnIndexOrThrow(TYPE_COLUMN_NAME)),
+                    description = cursor.getString(cursor.getColumnIndexOrThrow(DESCRIPTION_COLUMN_NAME)),
+                    angelsShare = cursor.getString(cursor.getColumnIndexOrThrow(ANGEL_SHARE_COLUMN_NAME)),
+                    alcoholicStrength = cursor.getString(cursor.getColumnIndexOrThrow(ALCOHOLIC_STRENGTH_COLUMN_NAME)),
                     endDate = if (cursor.isNull(cursor.getColumnIndexOrThrow(END_DATE_COLUMN_NAME)))
                         null
                     else

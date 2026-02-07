@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import androidx.core.database.sqlite.transaction
 import com.fmartinier.barrelclassifier.data.migrations.MigrationRegistry
 
-class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "barrel.db", null, 9) {
+class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "barrel.db", null, 10) {
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(

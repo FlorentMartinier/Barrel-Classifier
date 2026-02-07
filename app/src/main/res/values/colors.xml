@@ -4,4 +4,10 @@
     <color name="white">#FFFFFFFF</color>
     <color name="material_red_400">#EF5350</color>
     <color name="green">#4CAF50</color>
+    <color name="aging_oak">#7B4B2A</color> <!-- brun chêne -->
+    <color name="aging_oak_soft">#E7D2C2</color>
+    <color name="aging_marking">#546E7A</color> <!-- bleu gris -->
+    <color name="aging_marking_soft">#CFD8DC</color>
+    <color name="aging_mixte">#6A1B9A</color> <!-- violet whisky -->
+    <color name="aging_mixte_soft">#E1BEE7</color>
 </resources>

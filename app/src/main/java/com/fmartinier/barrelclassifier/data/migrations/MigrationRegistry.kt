@@ -4,7 +4,8 @@ object MigrationRegistry {
 
     val migrations: List<Migration> = listOf(
         MigrationV8(),
-        MigrationV9()
+        MigrationV9(),
+        MigrationV10()
     )
 
     fun getMigrations(fromVersion: Int, toVersion: Int): List<Migration> {

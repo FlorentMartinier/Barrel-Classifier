@@ -1,17 +1,22 @@
 package com.fmartinier.barrelclassifier.ui
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.doOnLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
@@ -189,12 +194,14 @@ class BarrelAdapter(
             val btnMenu = view.findViewById<ImageButton>(R.id.btnMenu)
             val actionsSection = view.findViewById<LinearLayout>(R.id.actionsSection)
             val alertsSection = view.findViewById<LinearLayout>(R.id.alertsSection)
-            val alertsContainer: LinearLayout =
-                view.findViewById(R.id.historyAlertsContainer)
-            val actionsContainer: LinearLayout =
-                view.findViewById(R.id.historyActionsContainer)
+            val alertsContainer: LinearLayout = view.findViewById(R.id.historyAlertsContainer)
+            val actionsContainer: LinearLayout = view.findViewById(R.id.historyActionsContainer)
+            val chipAngels: Chip = view.findViewById(R.id.chipAngels)
+            val chipAlcohol: Chip = view.findViewById(R.id.chipAlcohol)
+            val txtDescription: TextView = view.findViewById(R.id.txtDescription)
+            val txtExpandDescription: TextView = view.findViewById(R.id.txtExpandDescription)
 
-            txtName.text = history.name
+            txtName.text = "${history.name} · ${history.type}"
 
             txtDuration.text = calculateDuration(
                 context,
@@ -212,6 +219,84 @@ class BarrelAdapter(
                 dateDebut,
                 dateFin
             )
+
+            history.angelsShare?.takeIf { it.isNotBlank() }
+                .let {
+                    chipAngels.text = "👼 ${history.angelsShare}%"
+                }
+
+            history.alcoholicStrength?.takeIf { it.isNotBlank() }
+                .let {
+                    chipAlcohol.text = "🥃 ${history.alcoholicStrength}%"
+                }
+
+            val description = history.description
+
+            if (description.isNullOrBlank()) {
+                txtDescription.visibility = View.GONE
+                txtExpandDescription.visibility = View.GONE
+            } else {
+                txtDescription.text = description
+                txtDescription.visibility = View.INVISIBLE
+                txtExpandDescription.visibility = View.GONE
+
+                txtDescription.maxLines = Integer.MAX_VALUE
+                txtDescription.ellipsize = null
+            }
+
+            txtDescription.afterMeasured {
+
+                val lineCount = txtDescription.lineCount
+
+                if (lineCount <= 1) {
+                    txtExpandDescription.visibility = View.GONE
+                } else {
+                    txtExpandDescription.visibility = View.VISIBLE
+                    txtExpandDescription.text = txtDescription.context.getString(R.string.see_more)
+                    txtDescription.maxLines = 1
+                    txtDescription.ellipsize = TextUtils.TruncateAt.END
+                }
+
+                txtDescription.visibility = View.VISIBLE
+            }
+
+            txtExpandDescription.setOnClickListener {
+
+                val expanded = txtDescription.maxLines > 1
+
+                if (expanded) {
+                    // collapse
+                    val startHeight = txtDescription.height
+
+                    txtDescription.maxLines = 1
+                    txtDescription.ellipsize = TextUtils.TruncateAt.END
+                    txtDescription.measure(
+                        View.MeasureSpec.makeMeasureSpec(txtDescription.width, View.MeasureSpec.EXACTLY),
+                        View.MeasureSpec.UNSPECIFIED
+                    )
+                    val endHeight = txtDescription.measuredHeight
+
+                    animateTextViewHeight(txtDescription, startHeight, endHeight)
+
+                    txtExpandDescription.text = context.getString(R.string.see_more)
+
+                } else {
+                    // expand
+                    val startHeight = txtDescription.height
+
+                    txtDescription.maxLines = Int.MAX_VALUE
+                    txtDescription.ellipsize = null
+                    txtDescription.measure(
+                        View.MeasureSpec.makeMeasureSpec(txtDescription.width, View.MeasureSpec.EXACTLY),
+                        View.MeasureSpec.UNSPECIFIED
+                    )
+                    val endHeight = txtDescription.measuredHeight
+
+                    animateTextViewHeight(txtDescription, startHeight, endHeight)
+
+                    txtExpandDescription.text = context.getString(R.string.see_less)
+                }
+            }
 
             btnMenu.setOnClickListener {
                 val popup = PopupMenu(it.context, it)
@@ -325,4 +410,35 @@ class BarrelAdapter(
         }
         holder.chipGroup.addView(chip)
     }
+
+    fun TextView.afterMeasured(block: () -> Unit) {
+        if (width > 0) {
+            block()
+            return
+        }
+
+        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                if (width > 0) {
+                    viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    block()
+                }
+            }
+        })
+    }
+
+    fun animateTextViewHeight(view: TextView, start: Int, end: Int, duration: Long = 220) {
+        val animator = ValueAnimator.ofInt(start, end)
+        animator.duration = duration
+        animator.interpolator = android.view.animation.DecelerateInterpolator()
+
+        animator.addUpdateListener {
+            val value = it.animatedValue as Int
+            view.layoutParams.height = value
+            view.requestLayout()
+        }
+
+        animator.start()
+    }
+
 }
