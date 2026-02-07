@@ -83,95 +83,84 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="20dp">
 
-            <!-- Nom du fût -->
             <TextView
                 android:id="@+id/txtBarrelName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="22sp"
                 android:textStyle="bold" />
 
-            <!-- Infos secondaires -->
             <TextView
                 android:id="@+id/txtBarrelDetails"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textColor="#777777"
+                android:layout_marginTop="2dp"
+                android:alpha="0.7"
                 android:textSize="14sp" />
 
-            <!-- Infos avancées -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:gravity="center_horizontal"
-                android:orientation="horizontal">
-
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/chipGroupAdvanced"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:visibility="gone"
-                    app:chipSpacingHorizontal="6dp"
-                    app:chipSpacingVertical="4dp" />
-            </LinearLayout>
-
-            <!-- Date de la prochaine alerte-->
             <LinearLayout
                 android:id="@+id/layoutNextAlert"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:visibility="gone"
+                android:layout_marginTop="8dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="gone">
 
                 <View
                     android:layout_width="8dp"
                     android:layout_height="8dp"
-                    android:background="@drawable/bg_alert_light" />
+                    android:background="@drawable/circle_amber" />
 
                 <TextView
                     android:id="@+id/txtNextAlertDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:textColor="#777777"
-                    android:textSize="12sp" />
+                    android:layout_marginStart="8dp"
+                    android:textColor="@color/alert_text"
+                    android:textSize="13sp"
+                    android:textStyle="italic" />
             </LinearLayout>
 
-            <!-- Ajouter historique -->
-            <TextView
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupAdvanced"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:visibility="gone"
+                app:chipSpacingHorizontal="8dp"
+                app:chipSpacingVertical="4dp" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddHistory"
+                style="@style/Widget.Material3.Button.TextButton.Icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:drawablePadding="8dp"
-                android:paddingVertical="8dp"
                 android:text="@string/add_history"
-                android:textColor="?attr/colorPrimary"
-                android:textStyle="bold"
-                app:drawableStartCompat="@drawable/ic_add" />
+                android:textAllCaps="false"
+                app:icon="@drawable/ic_add" />
 
-            <!-- Séparateur -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="16dp"
-                android:background="#E0E0E0" />
+                android:layout_marginTop="8dp"
+                android:background="#1F000000" />
 
-            <!-- Header historique -->
             <LinearLayout
                 android:id="@+id/layoutToggleHistory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingVertical="4dp">
 
                 <TextView
                     android:id="@+id/txtHistoryTitle"
@@ -186,10 +175,10 @@
                     android:id="@+id/imgChevron"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:alpha="0.5"
                     android:src="@drawable/ic_chevron_down" />
             </LinearLayout>
 
-            <!-- Liste des historiques -->
             <LinearLayout
                 android:id="@+id/layoutHistory"
                 android:layout_width="match_parent"
