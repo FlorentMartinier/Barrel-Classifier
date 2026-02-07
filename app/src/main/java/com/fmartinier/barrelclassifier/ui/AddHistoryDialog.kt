@@ -19,7 +19,6 @@ import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.dao.AlertDao
 import com.fmartinier.barrelclassifier.data.dao.HistoryDao
 import com.fmartinier.barrelclassifier.data.enums.EAlertType
-import com.fmartinier.barrelclassifier.data.enums.EHistoryType
 import com.fmartinier.barrelclassifier.data.model.Alert
 import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.data.model.History
@@ -28,6 +27,7 @@ import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.formatDate
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.openDatePicker
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.parseDate
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
@@ -48,7 +48,7 @@ class AddHistoryDialog : DialogFragment() {
     private lateinit var edtDescription: TextInputEditText
     private lateinit var edtAngelsShare: TextInputEditText
     private lateinit var edtAlcohol: TextInputEditText
-    private lateinit var edtHistoryType: Spinner
+    private lateinit var edtHistoryType: MaterialAutoCompleteTextView
 
     private val alertService = AlertService()
 
@@ -72,7 +72,11 @@ class AddHistoryDialog : DialogFragment() {
         edtDescription = view.findViewById(R.id.edtDescription)
         edtAngelsShare = view.findViewById(R.id.edtAngelsShare)
         edtAlcohol = view.findViewById(R.id.edtAlcohol)
-        edtHistoryType = view.findViewById(R.id.edtHistoryType)
+        edtHistoryType = view.findViewById(R.id.autoCompleteHistoryType)
+
+        val items = resources.getStringArray(R.array.type_fut_array)
+        val historyTypeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, items)
+        edtHistoryType.setAdapter(historyTypeAdapter)
 
         advancedButton.setOnClickListener {
             if (advancedLayout.isGone) {
@@ -112,12 +116,7 @@ class AddHistoryDialog : DialogFragment() {
             alerts.forEach { alert ->
                 addAlertRow(alert)
             }
-            val indexOfSelectedAlert = EHistoryType.entries.map {
-                getString(it.historyTypeDescription)
-            }.indexOf(history.type)
-            if (indexOfSelectedAlert >= 0) {
-                edtHistoryType.setSelection(indexOfSelectedAlert)
-            }
+            edtHistoryType.setText(history.type, false)
             history.description?.let { edtDescription.setText(it) }
             history.angelsShare?.let { edtAngelsShare.setText(it) }
             history.alcoholicStrength?.let { edtAlcohol.setText(it) }
@@ -152,7 +151,7 @@ class AddHistoryDialog : DialogFragment() {
             val description = edtDescription.text?.toString()?.trim().orEmpty()
             val angelsShare = edtAngelsShare.text?.toString()?.trim().orEmpty()
             val alcohol = edtAlcohol.text?.toString()?.trim().orEmpty()
-            val historyType = edtHistoryType.selectedItem?.toString()?.trim().orEmpty()
+            val historyType = edtHistoryType.text?.toString()?.trim().orEmpty()
 
 
             for (i in 0 until alertsContainer.childCount) {

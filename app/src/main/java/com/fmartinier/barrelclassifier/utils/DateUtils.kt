@@ -11,11 +11,35 @@ import java.util.Locale
 class DateUtils {
     companion object {
         fun calculateDuration(context: Context, dateDebut: Long, dateFin: Long?): String {
-            val end = dateFin ?: System.currentTimeMillis()
+            val endMillis = dateFin ?: System.currentTimeMillis()
 
-            val days = (end - dateDebut) / (1000 * 60 * 60 * 24)
-            val months = days / 30
-            val weeks = (days % 30) / 7
+            val startCal = Calendar.getInstance().apply { timeInMillis = dateDebut }
+            val endCal = Calendar.getInstance().apply { timeInMillis = endMillis }
+
+            var months = (endCal.get(Calendar.YEAR) - startCal.get(Calendar.YEAR)) * 12 +
+                    (endCal.get(Calendar.MONTH) - startCal.get(Calendar.MONTH))
+
+            // Calcul du reliquat de jours pour trouver les semaines
+            val dayOfMonthStart = startCal.get(Calendar.DAY_OF_MONTH)
+            val dayOfMonthEnd = endCal.get(Calendar.DAY_OF_MONTH)
+
+            var daysRemaining = dayOfMonthEnd - dayOfMonthStart
+
+            // Si le jour de fin est inférieur au jour de début, on retire un mois
+            // et on calcule les jours sur le mois précédent
+            if (daysRemaining < 0) {
+                months -= 1
+                val lastMonthMaxDays = startCal.getActualMaximum(Calendar.DAY_OF_MONTH)
+                daysRemaining += lastMonthMaxDays
+            }
+
+            var weeks = daysRemaining / 7
+
+            // Logique d'arrondi : 4 semaines = 1 mois de plus
+            if (weeks >= 4) {
+                months += 1
+                weeks = 0
+            }
 
             return context.resources.getString(
                 R.string.month_and_week,
