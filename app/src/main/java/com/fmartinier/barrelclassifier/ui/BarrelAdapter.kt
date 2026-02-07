@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,13 +15,13 @@ import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.doOnLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.dao.AlertDao
 import com.fmartinier.barrelclassifier.data.dao.BarrelDao
 import com.fmartinier.barrelclassifier.data.dao.HistoryDao
+import com.fmartinier.barrelclassifier.data.enums.EHistoryType
 import com.fmartinier.barrelclassifier.data.model.Alert
 import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.data.model.History
@@ -161,7 +160,7 @@ class BarrelAdapter(
         val imgBarrel: ImageView = itemView.findViewById(R.id.imgBarrel)
         val photoOverlay: LinearLayout = itemView.findViewById(R.id.photoOverlay)
         val layoutHistory: LinearLayout = itemView.findViewById(R.id.layoutHistory)
-        val chipGroup = itemView.findViewById<ChipGroup>(R.id.chipGroupAdvanced)
+        val chipGroup: ChipGroup = itemView.findViewById<ChipGroup>(R.id.chipGroupAdvanced)
 
         // Permet de savoir si l’historique est ouvert ou non
         var isExpanded: Boolean = false
@@ -201,7 +200,8 @@ class BarrelAdapter(
             val txtDescription: TextView = view.findViewById(R.id.txtDescription)
             val txtExpandDescription: TextView = view.findViewById(R.id.txtExpandDescription)
 
-            txtName.text = "${history.name} · ${history.type}"
+            val historyType = getHistoryType(history)
+            txtName.text = "${history.name} · $historyType"
 
             txtDuration.text = calculateDuration(
                 context,
@@ -220,13 +220,17 @@ class BarrelAdapter(
                 dateFin
             )
 
-            history.angelsShare?.takeIf { it.isNotBlank() }
-                .let {
+            history.angelsShare
+                ?.takeIf { it.isNotBlank() }
+                ?.let {
+                    chipAngels.visibility = View.VISIBLE
                     chipAngels.text = "👼 ${history.angelsShare}%"
                 }
 
-            history.alcoholicStrength?.takeIf { it.isNotBlank() }
-                .let {
+            history.alcoholicStrength
+                ?.takeIf { it.isNotBlank() }
+                ?.let {
+                    chipAlcohol.visibility = View.VISIBLE
                     chipAlcohol.text = "🥃 ${history.alcoholicStrength}%"
                 }
 
@@ -427,7 +431,7 @@ class BarrelAdapter(
         })
     }
 
-    fun animateTextViewHeight(view: TextView, start: Int, end: Int, duration: Long = 220) {
+    private fun animateTextViewHeight(view: TextView, start: Int, end: Int, duration: Long = 220) {
         val animator = ValueAnimator.ofInt(start, end)
         animator.duration = duration
         animator.interpolator = android.view.animation.DecelerateInterpolator()
@@ -441,4 +445,12 @@ class BarrelAdapter(
         animator.start()
     }
 
+    private fun getHistoryType(history: History): String {
+        return when(history.type) {
+            context.resources.getString(EHistoryType.AGING.historyTypeDescription) -> "${history.type} ⌛"
+            context.resources.getString(EHistoryType.SEASONNING.historyTypeDescription) -> "${history.type} 🪵"
+            context.resources.getString(EHistoryType.MIX.historyTypeDescription) -> "${history.type} 🔄"
+            else -> history.type
+        }
+    }
 }

@@ -50,23 +50,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center_horizontal">
 
-            <!-- Part des anges -->
             <com.google.android.material.chip.Chip
-                android:id="@+id/chipAngels"
-                style="@style/Widget.Material3.Chip.Assist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"/>
+            android:id="@+id/chipAngels"
+            style="@style/Widget.Material3.Chip.Assist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:visibility="gone" />
 
-            <!-- Degré alcool -->
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipAlcohol"
                 style="@style/Widget.Material3.Chip.Assist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"/>
+                android:visibility="gone" />
 
         </LinearLayout>
 
