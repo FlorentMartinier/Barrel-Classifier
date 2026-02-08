@@ -1,9 +1,10 @@
 <resources>
 
-    <color name="bg_app">#EFE7DC</color>
+    <color name="bg_app">#F4EEE6</color>
 
-    <color name="card_barrel">#FFFFFF</color>
-    <color name="card_history">#FBF9F6</color>
+    <color name="card_barrel">#FFFBF7</color>
+    <color name="card_history">#F6F1EA</color>
+    <color name="card_history_stroke">#E8DED2</color>
 
     <color name="chip_bg">#E9DFC9</color>
     <color name="chip_text">#5C3A21</color>

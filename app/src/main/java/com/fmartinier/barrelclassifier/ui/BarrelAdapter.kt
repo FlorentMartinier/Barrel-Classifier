@@ -15,6 +15,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.TextView
+import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.fmartinier.barrelclassifier.R
@@ -94,17 +95,24 @@ class BarrelAdapter(
         holder.chipGroup.visibility = if (hasAdvanced) View.VISIBLE else View.GONE
 
 
-        // Chevron + animation
         holder.layoutToggleHistory.setOnClickListener {
-            holder.isExpanded = !holder.isExpanded
-            holder.layoutHistory.visibility =
-                if (holder.isExpanded) View.VISIBLE else View.GONE
 
+            val view = holder.layoutHistory
+            holder.isExpanded = !holder.isExpanded
+
+            if (holder.isExpanded) {
+                expand(view)
+            } else {
+                collapse(view)
+            }
+
+            // rotation chevron
             holder.imgChevron.animate()
                 .rotation(if (holder.isExpanded) 180f else 0f)
-                .setDuration(200)
+                .setDuration(250)
                 .start()
         }
+
 
         // Suppression fût
         holder.btnDeleteBarrel.setOnClickListener {
@@ -486,4 +494,43 @@ class BarrelAdapter(
             else -> history.type
         }
     }
+
+    private fun expand(view: View) {
+        view.measure(
+            View.MeasureSpec.makeMeasureSpec((view.parent as View).width, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        )
+        val targetHeight = view.measuredHeight
+
+        view.layoutParams.height = 0
+        view.visibility = View.VISIBLE
+
+        val animator = ValueAnimator.ofInt(0, targetHeight)
+        animator.duration = 280
+        animator.addUpdateListener {
+            val value = it.animatedValue as Int
+            view.layoutParams.height = value
+            view.requestLayout()
+        }
+        animator.start()
+    }
+
+    private fun collapse(view: View) {
+        val initialHeight = view.measuredHeight
+
+        val animator = ValueAnimator.ofInt(initialHeight, 0)
+        animator.duration = 220
+        animator.addUpdateListener {
+            val value = it.animatedValue as Int
+            view.layoutParams.height = value
+            view.requestLayout()
+        }
+
+        animator.doOnEnd {
+            view.visibility = View.GONE
+        }
+
+        animator.start()
+    }
+
 }

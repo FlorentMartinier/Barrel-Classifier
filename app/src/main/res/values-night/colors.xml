@@ -1,16 +1,18 @@
 <resources>
 
-    <color name="bg_app">#181512</color>
+    <color name="bg_app">#141210</color>
 
     <color name="card_barrel">#221E1A</color>
     <color name="card_history">#1E1A16</color>
+    <color name="card_history_stroke">#1E1A16</color>
+
 
     <color name="chip_bg">#3A2F25</color>
     <color name="chip_text">#E6D5C3</color>
 
-    <color name="accent_whisky">#E6A65A</color>
+    <color name="accent_whisky">#E0A85B</color>
 
-    <color name="text_primary">#F2EDE7</color>
+    <color name="text_primary">#F3EEE7</color>
     <color name="text_secondary">#CBBFB4</color>
     <color name="text_tertiary">#9F948B</color>
 

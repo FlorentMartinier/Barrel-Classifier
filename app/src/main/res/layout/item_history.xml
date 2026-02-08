@@ -5,6 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/card_history"
+    app:strokeColor="@color/card_history_stroke"
+    app:strokeWidth="1dp"
     app:cardCornerRadius="18dp"
     app:cardElevation="3dp"
     app:cardUseCompatPadding="true">
