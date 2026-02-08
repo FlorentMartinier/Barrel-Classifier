@@ -92,7 +92,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:textColor="#888888"
+            android:textColor="@color/text_tertiary"
             android:textSize="13sp" />
 
         <!-- Description (facultatif) -->
@@ -101,7 +101,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:textColor="#AAAAAA"
+            android:textColor="@color/text_tertiary"
             android:textSize="13sp"
             android:visibility="invisible" />
 

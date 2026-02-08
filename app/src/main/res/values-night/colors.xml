@@ -1,20 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="alert_bg">#2D2418</color>
-    <color name="alert_stroke">#F57C00</color>
-    <color name="alert_text">#FFB74D</color>
 
-    <color name="bg_app">#1A1612</color>
+    <color name="bg_app">#181512</color>
 
-    <color name="card_barrel">#241F1B</color>
-    <color name="card_history">#2B2521</color>
+    <color name="card_barrel">#221E1A</color>
+    <color name="card_history">#1E1A16</color>
 
-    <color name="chip_bg">#3D342D</color>
-    <color name="chip_text">#E9DFC9</color>
+    <color name="chip_bg">#3A2F25</color>
+    <color name="chip_text">#E6D5C3</color>
 
-    <color name="accent_whisky">#D98F40</color>
-    <color name="dialog_bg">#241F1B</color>
+    <color name="accent_whisky">#E6A65A</color>
 
-    <color name="text_primary">#EFE7DC</color>
-    <color name="text_secondary">#BCAAA4</color>
+    <color name="text_primary">#F2EDE7</color>
+    <color name="text_secondary">#CBBFB4</color>
+    <color name="text_tertiary">#9F948B</color>
+
+    <color name="alert_bg">#3A2A1A</color>
+    <color name="alert_stroke">#D08A3C</color>
+    <color name="alert_text">#FFB86B</color>
+
+    <color name="dialog_bg">#221E1A</color>
+
 </resources>
