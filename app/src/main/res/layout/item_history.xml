@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/card_history"
     app:cardCornerRadius="18dp"
     app:cardElevation="3dp"
     app:cardUseCompatPadding="true">
@@ -24,13 +24,14 @@
                 android:id="@+id/txtName"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:maxLines="2"
-                android:ellipsize="end"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/btnMenu"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
                 android:id="@+id/btnMenu"
@@ -38,9 +39,9 @@
                 android:layout_height="34dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_more_vert"
-                app:tint="?attr/colorOnSurface"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="?attr/colorOnSurface" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -49,23 +50,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:orientation="horizontal"
-            android:gravity="center_horizontal">
+            android:orientation="horizontal">
 
             <com.google.android.material.chip.Chip
-            android:id="@+id/chipAngels"
-            style="@style/Widget.Material3.Chip.Assist"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="6dp"
-            android:visibility="gone" />
+                android:id="@+id/chipAngels"
+                style="@style/Widget.Material3.Chip.Assist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:backgroundTint="@color/chip_bg"
+                android:textColor="@color/chip_text"
+                android:visibility="gone"
+                app:chipStrokeWidth="0px" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipAlcohol"
                 style="@style/Widget.Material3.Chip.Assist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone" />
+                android:backgroundTint="@color/chip_bg"
+                android:textColor="@color/chip_text"
+                android:visibility="gone"
+                app:chipStrokeWidth="0px" />
 
         </LinearLayout>
 
@@ -75,19 +81,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
+            android:drawablePadding="6dp"
             android:textColor="?attr/colorPrimary"
             android:textSize="14sp"
-            app:drawableStartCompat="@drawable/ic_timer"
-            android:drawablePadding="6dp"/>
+            app:drawableStartCompat="@drawable/ic_timer" />
 
         <!-- Dates -->
         <TextView
             android:id="@+id/txtDates"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
             android:textColor="#888888"
-            android:textSize="13sp"
-            android:layout_marginTop="2dp"/>
+            android:textSize="13sp" />
 
         <!-- Description (facultatif) -->
         <TextView
@@ -95,21 +101,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:textSize="13sp"
             android:textColor="#AAAAAA"
-            android:visibility="invisible"/>
+            android:textSize="13sp"
+            android:visibility="invisible" />
 
         <TextView
             android:id="@+id/txtExpandDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:text="@string/see_more"
-            android:textSize="12sp"
-            android:textColor="?attr/colorPrimary"
-            android:visibility="invisible"
             android:clickable="true"
-            android:focusable="true"/>
+            android:focusable="true"
+            android:text="@string/see_more"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="12sp"
+            android:visibility="invisible" />
 
 
         <!-- ACTIONS -->
@@ -117,29 +123,29 @@
             android:id="@+id/actionsSection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
             android:orientation="vertical"
-            android:visibility="gone"
-            android:layout_marginTop="6dp">
+            android:visibility="gone">
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#DDDDDD"
-                android:layout_marginTop="6dp"/>
+                android:layout_marginTop="6dp"
+                android:background="#DDDDDD" />
 
             <TextView
-                android:text="@string/actions_done"
-                android:textStyle="bold"
-                android:textSize="14sp"
-                android:layout_marginTop="6dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/actions_done"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:id="@+id/historyActionsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"/>
+                android:orientation="vertical" />
         </LinearLayout>
 
         <!-- ALERTES -->
@@ -147,29 +153,29 @@
             android:id="@+id/alertsSection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
             android:orientation="vertical"
-            android:visibility="gone"
-            android:layout_marginTop="6dp">
+            android:visibility="gone">
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#DDDDDD"
-                android:layout_marginTop="6dp"/>
+                android:layout_marginTop="6dp"
+                android:background="#DDDDDD" />
 
             <TextView
-                android:text="@string/ongoing_alerts"
-                android:textStyle="bold"
-                android:textSize="14sp"
-                android:layout_marginTop="6dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/ongoing_alerts"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:id="@+id/historyAlertsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"/>
+                android:orientation="vertical" />
         </LinearLayout>
 
     </LinearLayout>

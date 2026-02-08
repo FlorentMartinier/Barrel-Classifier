@@ -8,6 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/dialog_bg"
         android:orientation="vertical"
         android:padding="16dp">
 
@@ -16,6 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/barrel_name"
+            android:textColor="@color/text_primary"
             android:textStyle="bold" />
 
         <EditText
@@ -32,6 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="@string/barrel_volume"
+            android:textColor="@color/text_primary"
             android:textStyle="bold" />
 
         <EditText
@@ -47,6 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="@string/brand"
+            android:textColor="@color/text_primary"
             android:textStyle="bold" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -56,12 +60,12 @@
             app:hintEnabled="false">
 
             <com.google.android.material.textfield.MaterialAutoCompleteTextView
-            android:id="@+id/autoCompleteBrand"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/ex_brand"
-            android:inputType="text"
-            android:padding="12dp" />
+                android:id="@+id/autoCompleteBrand"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/ex_brand"
+                android:inputType="text"
+                android:padding="12dp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -70,6 +74,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="@string/wood_type"
+            android:textColor="@color/text_primary"
             android:textStyle="bold" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -91,12 +96,12 @@
         <!-- ====== BOUTON OPTIONS AVANCÉES ====== -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/txtToggleAdvanced"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
             android:text="@string/advanced_option_down"
-            android:textAllCaps="false"
-            style="@style/Widget.MaterialComponents.Button.TextButton" />
+            android:textAllCaps="false" />
 
         <!-- ====== SECTION AVANCÉE ====== -->
         <LinearLayout
@@ -112,6 +117,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/heating_type"
+                android:textColor="@color/text_primary"
                 android:textStyle="bold" />
 
             <com.google.android.material.textfield.TextInputLayout
@@ -136,6 +142,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:text="@string/storage_hygrometer"
+                android:textColor="@color/text_primary"
                 android:textStyle="bold" />
 
             <EditText
@@ -152,6 +159,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:text="@string/storage_temperature"
+                android:textColor="@color/text_primary"
                 android:textStyle="bold" />
 
             <EditText

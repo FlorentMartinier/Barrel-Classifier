@@ -1,7 +1,8 @@
 package com.fmartinier.barrelclassifier.ui
 
-import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Context
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
@@ -9,12 +10,17 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.fragment.app.DialogFragment
 import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.dao.BarrelDao
 import com.fmartinier.barrelclassifier.data.model.Barrel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.shape.MaterialShapeDrawable
+import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 
 class AddBarrelDialog : DialogFragment() {
@@ -107,11 +113,12 @@ class AddBarrelDialog : DialogFragment() {
 
         val dialogTitle = if (modificationMode) R.string.modify_barrel else R.string.add_barrel
         val positiveButtonTitle = if (modificationMode) R.string.modify else R.string.add
-        return AlertDialog.Builder(requireContext())
+        return MaterialAlertDialogBuilder(requireActivity())
             .setTitle(getString(dialogTitle))
             .setView(view)
             .setPositiveButton(getString(positiveButtonTitle), null)
             .setNegativeButton(getString(R.string.cancel), null)
+            .setBackground(requireContext(), R.color.dialog_bg)
             .create()
     }
 
@@ -206,4 +213,21 @@ class AddBarrelDialog : DialogFragment() {
             }
         }
     }
+}
+
+fun MaterialAlertDialogBuilder.setBackground(
+    context: Context,
+    ressource: Int
+): MaterialAlertDialogBuilder {
+    val shapeAppearanceModel = ShapeAppearanceModel.builder(
+        context,
+        R.style.RoundedDialog,
+        0
+    ).build()
+
+    val background = MaterialShapeDrawable(shapeAppearanceModel).apply {
+        fillColor =
+            ColorStateList.valueOf(ContextCompat.getColor(context, ressource))
+    }
+    return setBackground(background)
 }

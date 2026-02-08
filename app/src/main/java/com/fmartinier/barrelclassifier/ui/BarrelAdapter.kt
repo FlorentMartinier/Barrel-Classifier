@@ -2,6 +2,7 @@ package com.fmartinier.barrelclassifier.ui
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.text.TextUtils
@@ -14,7 +15,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
@@ -30,6 +31,7 @@ import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.calculateDurati
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.formatDate
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class BarrelAdapter(
     private val context: Context,
@@ -141,7 +143,8 @@ class BarrelAdapter(
     override fun getItemCount() = barrels.size
 
     private fun confirmDeleteBarrel(barrel: Barrel) {
-        AlertDialog.Builder(context)
+        MaterialAlertDialogBuilder(context)
+            .setBackground(context, R.color.dialog_bg)
             .setTitle(context.resources.getString(R.string.remove_barrel))
             .setMessage(context.resources.getString(R.string.remove_barrel_validation))
             .setPositiveButton(context.resources.getString(R.string.remove)) { _, _ ->
@@ -176,7 +179,8 @@ class BarrelAdapter(
         val layoutHistory: LinearLayout = itemView.findViewById(R.id.layoutHistory)
         val chipGroup: ChipGroup = itemView.findViewById<ChipGroup>(R.id.chipGroupAdvanced)
         val txtNextAlertDate: TextView = itemView.findViewById<TextView>(R.id.txtNextAlertDate)
-        val layoutNextAlert: LinearLayout = itemView.findViewById<LinearLayout>(R.id.layoutNextAlert)
+        val layoutNextAlert: LinearLayout =
+            itemView.findViewById<LinearLayout>(R.id.layoutNextAlert)
 
         // Permet de savoir si l’historique est ouvert ou non
         var isExpanded: Boolean = false
@@ -409,7 +413,8 @@ class BarrelAdapter(
     }
 
     private fun confirmDeleteHistory(history: History) {
-        AlertDialog.Builder(context)
+        MaterialAlertDialogBuilder(context)
+            .setBackground(context, R.color.dialog_bg)
             .setTitle(context.resources.getString(R.string.remove_history))
             .setMessage(context.resources.getString(R.string.remove_history_validation))
             .setPositiveButton(context.resources.getString(R.string.remove)) { _, _ ->
@@ -433,6 +438,11 @@ class BarrelAdapter(
             isClickable = false
             isCheckable = false
             setEnsureMinTouchTargetSize(false)
+            chipBackgroundColor = ColorStateList.valueOf(
+                ContextCompat.getColor(context, R.color.chip_bg)
+            )
+            setTextColor(ContextCompat.getColor(context, R.color.chip_text))
+            chipStrokeWidth = 0f
         }
         holder.chipGroup.addView(chip)
     }

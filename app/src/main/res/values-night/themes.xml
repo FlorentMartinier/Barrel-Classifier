@@ -1,7 +1,17 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.BarrelClassifier" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+<resources>
+    <style name="Theme.BarrelClassifier" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:colorBackground">@color/bg_app</item>
+        <item name="colorSurface">@color/bg_app</item>
+
+        <item name="colorPrimary">@color/accent_whisky</item>
+        <item name="colorPrimaryContainer">@color/accent_whisky</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+
+        <item name="colorOnBackground">@color/text_primary</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+
+        <item name="android:statusBarColor">@color/bg_app</item>
+        <item name="android:navigationBarColor">@color/bg_app</item>
     </style>
 </resources>

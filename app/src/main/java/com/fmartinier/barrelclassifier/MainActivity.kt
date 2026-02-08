@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
@@ -46,6 +47,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cameraLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d("THEME", theme.toString())
+        val ta = theme.obtainStyledAttributes(intArrayOf(android.R.attr.textColorPrimary))
+        Log.d("THEME_TEST", "textColorPrimary=" + ta.getColor(0, 0))
+        ta.recycle()
+        setTheme(R.style.Theme_BarrelClassifier)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -134,6 +140,7 @@ class MainActivity : AppCompatActivity() {
      * Ouvre le dialog d'ajout de fût
      */
     private fun openAddBarrelDialog() {
+        Log.d("MainActivity, this.theme.toString()", this.theme.toString())
         AddBarrelDialog
             .newInstance()
             .show(supportFragmentManager, AddBarrelDialog.TAG)

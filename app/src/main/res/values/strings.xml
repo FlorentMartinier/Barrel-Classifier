@@ -66,6 +66,7 @@
     <string name="see_more">Voir plus</string>
     <string name="see_less">Voir moins</string>
     <string name="next_alert">Prochaine rendez-vous : %1$s (%2$s)</string>
+    <string name="history_type">Type d\'historique</string>
     <string-array name="type_fut_array">
         <item>Vieillissement</item>
         <item>Marquage</item>

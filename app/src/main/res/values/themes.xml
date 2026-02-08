@@ -1,9 +1,17 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
-    <style name="Base.Theme.BarrelClassifier" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <style name="Theme.BarrelClassifier" parent="Theme.Material3.DayNight.NoActionBar">
+
+        <!-- Background global -->
+        <item name="android:colorBackground">@color/bg_app</item>
+
+        <!-- FAB -->
+        <item name="colorPrimary">@color/accent_whisky</item>
+        <item name="colorPrimaryContainer">@color/accent_whisky</item>
     </style>
 
-    <style name="Theme.BarrelClassifier" parent="Base.Theme.BarrelClassifier" />
+    <style name="RoundedDialog" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">20dp</item>
+    </style>
 </resources>

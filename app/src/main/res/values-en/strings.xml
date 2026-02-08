@@ -66,6 +66,7 @@
     <string name="see_more">See more</string>
     <string name="see_less">See less</string>
     <string name="next_alert">Coming soon : %1$s (%2$s)</string>
+    <string name="history_type">History type</string>
     <string-array name="type_fut_array">
         <item>Aging</item>
         <item>Seasonning</item>

@@ -3,4 +3,18 @@
     <color name="alert_bg">#2D2418</color>
     <color name="alert_stroke">#F57C00</color>
     <color name="alert_text">#FFB74D</color>
+
+    <color name="bg_app">#1A1612</color>
+
+    <color name="card_barrel">#241F1B</color>
+    <color name="card_history">#2B2521</color>
+
+    <color name="chip_bg">#3D342D</color>
+    <color name="chip_text">#E9DFC9</color>
+
+    <color name="accent_whisky">#D98F40</color>
+    <color name="dialog_bg">#241F1B</color>
+
+    <color name="text_primary">#EFE7DC</color>
+    <color name="text_secondary">#BCAAA4</color>
 </resources>

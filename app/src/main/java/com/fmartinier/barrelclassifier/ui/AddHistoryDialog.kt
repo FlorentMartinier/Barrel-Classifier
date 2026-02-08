@@ -1,6 +1,5 @@
 package com.fmartinier.barrelclassifier.ui
 
-import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import android.view.Gravity
@@ -12,6 +11,7 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isGone
 import androidx.fragment.app.DialogFragment
 import com.fmartinier.barrelclassifier.R
@@ -27,6 +27,7 @@ import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.formatDate
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.openDatePicker
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.parseDate
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -75,7 +76,8 @@ class AddHistoryDialog : DialogFragment() {
         edtHistoryType = view.findViewById(R.id.autoCompleteHistoryType)
 
         val items = resources.getStringArray(R.array.type_fut_array)
-        val historyTypeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, items)
+        val historyTypeAdapter =
+            ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, items)
         edtHistoryType.setAdapter(historyTypeAdapter)
 
         advancedButton.setOnClickListener {
@@ -124,11 +126,12 @@ class AddHistoryDialog : DialogFragment() {
 
         val positiveButtonText = if (historyId == null) R.string.add else R.string.modify
 
-        return AlertDialog.Builder(requireContext())
+        return MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.add_history))
             .setView(view)
             .setPositiveButton(getString(positiveButtonText), null) // IMPORTANT
             .setNegativeButton(getString(R.string.cancel), null)
+            .setBackground(requireContext(), R.color.dialog_bg)
             .create()
     }
 
@@ -198,7 +201,7 @@ class AddHistoryDialog : DialogFragment() {
                         endDate = endDate,
                         description = description,
                         angelsShare = angelsShare,
-                        alcoholicStrength =  alcohol,
+                        alcoholicStrength = alcohol,
                         type = historyType,
                     )
 

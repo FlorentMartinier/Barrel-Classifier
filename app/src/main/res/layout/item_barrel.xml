@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="12dp"
+    android:background="@color/card_barrel"
     app:cardCornerRadius="20dp"
     app:cardElevation="6dp"
     app:cardUseCompatPadding="true">
@@ -89,7 +90,7 @@
                 android:id="@+id/txtBarrelName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?attr/colorOnSurface"
+                android:textColor="@color/text_primary"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
@@ -99,6 +100,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:alpha="0.7"
+                android:textColor="@color/text_secondary"
                 android:textSize="14sp" />
 
             <LinearLayout
@@ -168,6 +170,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/history"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
