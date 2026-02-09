@@ -497,7 +497,7 @@ class BarrelAdapter(
 
     private fun expand(view: View) {
         view.measure(
-            View.MeasureSpec.makeMeasureSpec((view.parent as View).width, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
             View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
         )
         val targetHeight = view.measuredHeight
@@ -510,6 +510,10 @@ class BarrelAdapter(
         animator.addUpdateListener {
             val value = it.animatedValue as Int
             view.layoutParams.height = value
+            view.requestLayout()
+        }
+        animator.doOnEnd {
+            view.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
             view.requestLayout()
         }
         animator.start()
