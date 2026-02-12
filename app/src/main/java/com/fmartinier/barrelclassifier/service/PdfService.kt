@@ -8,6 +8,7 @@ import android.graphics.Path
 import android.graphics.RectF
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
 import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.model.Barrel
@@ -97,6 +98,9 @@ class PdfService(private val context: Context) {
     private fun drawCover(canvas: Canvas, barrel: Barrel) {
         canvas.drawColor(bg)
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = dark }
+
+        // Ajout du logo en haut à droite
+        drawAppLogo(canvas, pageWidth - margin - 120f, 100f, 120f)
 
         // Header
         paint.textSize = 72f
@@ -300,12 +304,60 @@ class PdfService(private val context: Context) {
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = grey
             textSize = 22f
-            textAlign = Paint.Align.CENTER
         }
-        canvas.drawText("${context.getString(R.string.generated_by)} Barrel Manager app — ${dateFormat.format(Date())}", (pageWidth / 2).toFloat(), pageHeight - 50f, paint)
-    }
 
+        val footerText = "${context.getString(R.string.generated_by)} Barrel Manager — ${dateFormat.format(Date())}"
+        val textWidth = paint.measureText(footerText)
+        val logoSize = 30f
+        val spacing = 15f
+
+        // Calcul pour centrer l'ensemble [Logo + Texte]
+        val totalWidth = logoSize + spacing + textWidth
+        val startX = (pageWidth - totalWidth) / 2
+
+        // Dessin du mini logo
+        drawAppLogo(canvas, startX, pageHeight - 70f, logoSize)
+
+        // Dessin du texte
+        canvas.drawText(
+            footerText,
+            startX + logoSize + spacing,
+            pageHeight - 48f,
+            paint
+        )
+    }
     private fun startPage(pdf: PdfDocument, number: Int): PdfDocument.Page {
         return pdf.startPage(PdfDocument.PageInfo.Builder(pageWidth, pageHeight, number).create())
+    }
+
+    private fun drawAppLogo(canvas: Canvas, x: Float, y: Float, size: Float) {
+        val drawable = ContextCompat.getDrawable(context, R.mipmap.ic_launcher_foreground)
+            ?: ContextCompat.getDrawable(context, R.mipmap.ic_launcher)
+            ?: return
+
+        val rect = RectF(x, y, x + size, y + size)
+        val cornerRadius = size * 0.2f
+        val path = Path().apply {
+            addRoundRect(rect, cornerRadius, cornerRadius, Path.Direction.CW)
+        }
+
+        canvas.withClip(path) {
+            val offset = size * 0.25f
+            drawable.setBounds(
+                (x - offset).toInt(),
+                (y - offset).toInt(),
+                (x + size + offset).toInt(),
+                (y + size + offset).toInt()
+            )
+
+            drawable.draw(this)
+        }
+
+        val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = gold
+            style = Paint.Style.STROKE
+            strokeWidth = 2f
+        }
+        canvas.drawRoundRect(rect, cornerRadius, cornerRadius, borderPaint)
     }
 }

@@ -71,7 +71,7 @@
     <string name="technical_barrel_sheet">Fiche technique du fût</string>
     <string name="since">Depuis le</string>
     <string name="barrel_history">Historique du fût</string>
-    <string name="generated_by">Généré par</string>
+    <string name="generated_by">Généré avec</string>
     <string-array name="type_fut_array">
         <item>Vieillissement</item>
         <item>Marquage</item>
