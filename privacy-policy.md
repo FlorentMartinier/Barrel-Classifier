@@ -1,7 +1,7 @@
-# Politique de confidentialité – Barrel Classifier
+# Politique de confidentialité – Barrel Manager
 
 ## 1. Introduction
-L’application Barrel Classifier respecte la vie privée de ses utilisateurs. Cette politique de confidentialité explique quelles données sont collectées et comment elles sont utilisées.
+L’application Barrel Manager respecte la vie privée de ses utilisateurs. Cette politique de confidentialité explique quelles données sont collectées et comment elles sont utilisées.
 
 ## 2. Données collectées
 L’application collecte uniquement les données saisies par l’utilisateur, notamment :
@@ -25,7 +25,7 @@ Toutes les données sont stockées localement sur l’appareil de l’utilisateu
 Aucune donnée n’est envoyée vers un serveur externe.
 
 ## 5. Partage des données
-L’application Barrel Classifier ne partage aucune donnée avec des tiers.
+L’application Barrel Manager ne partage aucune donnée avec des tiers.
 
 ## 6. Droits de l’utilisateur
 L’utilisateur peut à tout moment :

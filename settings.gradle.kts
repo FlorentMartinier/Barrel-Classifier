@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Barrel Classifier"
+rootProject.name = "Barrel Manager"
 include(":app")
  

@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_edit_barrel"
+        android:title="@string/modify"
+        android:icon="@drawable/ic_edit"/>
+
+    <item
+        android:id="@+id/action_delete_barrel"
+        android:title="@string/remove"
+        android:icon="@drawable/ic_delete"/>
+
+    <item
+        android:id="@+id/action_pdf_export"
+        android:title="Exporter en PDF"
+        android:icon="@drawable/ic_delete"/>
+
+</menu>

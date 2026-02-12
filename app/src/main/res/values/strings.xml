@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Barrel Classifier</string>
+    <string name="app_name">Barrel Manager</string>
     <string name="no_history">Aucun historique</string>
     <string name="in_progress">en cours</string>
     <string name="begin_and_end_date">Début : %1$s • Fin : %2$s</string>
@@ -68,6 +68,10 @@
     <string name="see_less">Voir moins</string>
     <string name="next_alert">Prochaine rendez-vous : %1$s (%2$s)</string>
     <string name="history_type">Type d\'historique</string>
+    <string name="technical_barrel_sheet">Fiche technique du fût</string>
+    <string name="since">Depuis le</string>
+    <string name="barrel_history">Historique du fût</string>
+    <string name="generated_by">Généré par</string>
     <string-array name="type_fut_array">
         <item>Vieillissement</item>
         <item>Marquage</item>

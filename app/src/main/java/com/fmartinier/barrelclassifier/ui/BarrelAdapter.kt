@@ -2,6 +2,7 @@ package com.fmartinier.barrelclassifier.ui
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.graphics.Color
@@ -17,6 +18,7 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
@@ -28,6 +30,7 @@ import com.fmartinier.barrelclassifier.data.model.Alert
 import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.data.model.History
 import com.fmartinier.barrelclassifier.service.AlertService
+import com.fmartinier.barrelclassifier.service.PdfService
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.calculateDuration
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.formatDate
 import com.google.android.material.chip.Chip
@@ -113,14 +116,38 @@ class BarrelAdapter(
                 .start()
         }
 
+        holder.btnMenu.setOnClickListener {
+            val popup = PopupMenu(it.context, it)
+            popup.inflate(R.menu.barrel_menu)
+            popup.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.action_edit_barrel -> {
+                        onEditBarrel(barrel)
+                        true
+                    }
 
-        // Suppression fût
-        holder.btnDeleteBarrel.setOnClickListener {
-            confirmDeleteBarrel(barrel)
-        }
+                    R.id.action_delete_barrel -> {
+                        confirmDeleteBarrel(barrel)
+                        true
+                    }
 
-        holder.btnEditBarrel.setOnClickListener {
-            onEditBarrel(barrel)
+                    R.id.action_pdf_export -> {
+                        val file = PdfService(context).export(barrel)
+                        val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                            setDataAndType(uri, "application/pdf")
+                            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NO_HISTORY
+                        }
+
+                        context.startActivity(intent)
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+
+            popup.show()
         }
 
         holder.btnAddHistory.setOnClickListener {
@@ -177,8 +204,7 @@ class BarrelAdapter(
 
         val txtBarrelName: TextView = itemView.findViewById(R.id.txtBarrelName)
         val txtBarrelDetails: TextView = itemView.findViewById(R.id.txtBarrelDetails)
-        val btnEditBarrel: ImageButton = itemView.findViewById(R.id.btnEditBarrel)
-        val btnDeleteBarrel: ImageButton = itemView.findViewById(R.id.btnDeleteBarrel)
+        val btnMenu: ImageButton = itemView.findViewById(R.id.btnBarrelMenu)
         val btnAddHistory: TextView = itemView.findViewById(R.id.btnAddHistory)
         val layoutToggleHistory: LinearLayout = itemView.findViewById(R.id.layoutToggleHistory)
         val imgChevron: ImageView = itemView.findViewById(R.id.imgChevron)
