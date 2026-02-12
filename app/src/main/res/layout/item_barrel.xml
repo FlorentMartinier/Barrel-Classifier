@@ -53,16 +53,19 @@
             </LinearLayout>
 
             <ImageButton
-                android:layout_gravity="top|end"
                 android:id="@+id/btnBarrelMenu"
-                android:layout_width="34dp"
-                android:layout_height="34dp"
-                android:layout_margin="8dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_margin="12dp"
+                android:layout_gravity="top|end"
                 android:background="@drawable/bg_icon_circle"
+                android:elevation="4dp"
+                android:padding="8dp"
+                android:scaleType="centerInside"
                 android:src="@drawable/ic_more_vert"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="?attr/colorOnSurface" />
+                app:tint="@color/text_primary" />
 
         </FrameLayout>
 

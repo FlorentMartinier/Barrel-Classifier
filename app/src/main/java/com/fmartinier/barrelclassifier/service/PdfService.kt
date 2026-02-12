@@ -120,10 +120,10 @@ class PdfService(private val context: Context) {
         paint.color = dark
         paint.textSize = 54f
         paint.typeface = Typeface.DEFAULT_BOLD
-        canvas.drawText(barrel.name, margin, 970f, paint)
+        y = drawMultilineText(canvas, barrel.name, margin, 970f, paint)
 
         fun drawField(label: String, value: String?) {
-            if (value.isNullOrBlank()) return
+            if (value.isNullOrBlank() || listOf(" L", "°C", "%").contains(value)) return
             paint.textSize = 32f
             paint.typeface = Typeface.DEFAULT_BOLD
             canvas.drawText("$label :", margin, y, paint)
@@ -164,9 +164,7 @@ class PdfService(private val context: Context) {
         paint.color = dark
         paint.textSize = 34f
         paint.typeface = Typeface.DEFAULT_BOLD
-        canvas.drawText(history.name, timelineX + 50f, y, paint)
-
-        y += 40f
+        y = drawMultilineText(canvas, history.name, timelineX + 50f, y, paint)
 
         // Type (Tag)
         paint.textSize = 24f
@@ -178,8 +176,8 @@ class PdfService(private val context: Context) {
         paint.typeface = Typeface.DEFAULT
 
         fun drawWrapped(label: String, value: String?) {
-            if (value.isNullOrBlank()) return
-            y = drawMultilineText(canvas, "$label : $value", timelineX + 50f, y, contentWidth - 100f, paint)
+            if (value.isNullOrBlank() || value == "%") return
+            y = drawMultilineText(canvas, "$label : $value", timelineX + 50f, y, paint)
             y += 10f
         }
 
@@ -190,14 +188,14 @@ class PdfService(private val context: Context) {
         return y + 60f // Espace entre deux blocs
     }
 
-    private fun drawMultilineText(canvas: Canvas, text: String, x: Float, y: Float, maxWidth: Float, paint: Paint): Float {
+    private fun drawMultilineText(canvas: Canvas, text: String, x: Float, y: Float, paint: Paint): Float {
         var currentY = y
         val words = text.split(" ")
         var line = ""
 
         for (word in words) {
             val testLine = if (line.isEmpty()) word else "$line $word"
-            if (paint.measureText(testLine) > maxWidth) {
+            if (paint.measureText(testLine) > contentWidth - 100f) {
                 canvas.drawText(line, x, currentY, paint)
                 line = word
                 currentY += paint.textSize + 12f
