@@ -72,6 +72,11 @@
     <string name="since">Depuis le</string>
     <string name="barrel_history">Historique du fût</string>
     <string name="generated_by">Généré avec</string>
+    <string name="export_pdf">Exporter en PDF</string>
+    <string name="rate_popup_title">Vous aimez Barrel Manager ?</string>
+    <string name="rate_popup_description">Soutenez le projet en laissant une note sur le Play Store !</string>
+    <string name="note_app">Noter</string>
+    <string name="later">Plus tard</string>
     <string-array name="type_fut_array">
         <item>Vieillissement</item>
         <item>Marquage</item>

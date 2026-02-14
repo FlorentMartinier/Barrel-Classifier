@@ -12,7 +12,7 @@
 
     <item
         android:id="@+id/action_pdf_export"
-        android:title="Exporter en PDF"
+        android:title="@string/export_pdf"
         android:icon="@drawable/ic_delete"/>
 
 </menu>

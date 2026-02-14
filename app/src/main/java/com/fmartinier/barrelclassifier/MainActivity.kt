@@ -3,9 +3,11 @@ package com.fmartinier.barrelclassifier
 import android.Manifest.permission.POST_NOTIFICATIONS
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -16,6 +18,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -29,6 +32,8 @@ import com.fmartinier.barrelclassifier.ui.AddHistoryDialog
 import com.fmartinier.barrelclassifier.ui.BarrelAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.File
+import androidx.core.content.edit
+import androidx.core.net.toUri
 
 class MainActivity : AppCompatActivity() {
 
@@ -47,9 +52,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cameraLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d("THEME", theme.toString())
         val ta = theme.obtainStyledAttributes(intArrayOf(android.R.attr.textColorPrimary))
-        Log.d("THEME_TEST", "textColorPrimary=" + ta.getColor(0, 0))
+        managePopupRate()
         ta.recycle()
         setTheme(R.style.Theme_BarrelClassifier)
         super.onCreate(savedInstanceState)
@@ -220,6 +224,47 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun managePopupRate() {
+        val prefs = getSharedPreferences("app_stats", MODE_PRIVATE)
+        val hasRated = prefs.getBoolean("has_rated", false)
 
+        if (!hasRated) {
+            val launchCount = prefs.getInt("launch_count", 0) + 1
 
+            prefs.edit { putInt("launch_count", launchCount) }
+            println("launchCount : $launchCount")
+
+            if (listOf(3, 6, 9).contains(launchCount)) {
+                showRatePopup()
+            }
+        }
+    }
+
+    private fun showRatePopup() {
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.rate_popup_title))
+            .setMessage(getString(R.string.rate_popup_description))
+            .setPositiveButton(getString(R.string.note_app)) { _, _ ->
+                // On marque comme noté pour ne plus redemander
+                getSharedPreferences("app_stats", MODE_PRIVATE).edit {
+                    putBoolean(
+                        "has_rated",
+                        true
+                    )
+                }
+
+                val appPackage = packageName
+                try {
+                    startActivity(Intent(Intent.ACTION_VIEW,
+                        "market://details?id=$appPackage".toUri())
+                    )
+                } catch (_: ActivityNotFoundException) {
+                    startActivity(Intent(Intent.ACTION_VIEW,
+                        "https://play.google.com/store/apps/details?id=$appPackage".toUri())
+                    )
+                }
+            }
+            .setNegativeButton(getString(R.string.later), null)
+            .show()
+    }
 }

@@ -26,6 +26,9 @@
             android:layout_height="wrap_content"
             android:autofillHints=""
             android:hint="@string/ex_barrel_name"
+            android:imeActionId="6"
+            android:imeActionLabel="OK"
+            android:imeOptions="actionDone"
             android:inputType="text" />
 
         <!-- Contenance -->
@@ -43,6 +46,9 @@
             android:layout_height="wrap_content"
             android:autofillHints=""
             android:hint="@string/ex_barrel_volume"
+            android:imeActionId="6"
+            android:imeActionLabel="OK"
+            android:imeOptions="actionDone"
             android:inputType="number" />
 
         <TextView
@@ -64,6 +70,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/ex_brand"
+                android:imeActionId="6"
+                android:imeActionLabel="OK"
+                android:imeOptions="actionDone"
                 android:inputType="text"
                 android:padding="12dp" />
 
@@ -88,6 +97,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/ex_wood_type"
+                android:imeActionId="6"
+                android:imeActionLabel="OK"
+                android:imeOptions="actionDone"
                 android:inputType="text"
                 android:padding="12dp" />
 
@@ -131,6 +143,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/heating_type_exemple"
+                    android:imeActionId="6"
+                    android:imeActionLabel="OK"
+                    android:imeOptions="actionDone"
                     android:inputType="text"
                     android:padding="12dp" />
 
@@ -151,6 +166,9 @@
                 android:layout_height="wrap_content"
                 android:autofillHints=""
                 android:hint="@string/storage_hygrometer_exemple"
+                android:imeActionId="6"
+                android:imeActionLabel="OK"
+                android:imeOptions="actionDone"
                 android:inputType="numberDecimal" />
 
             <!-- Température -->
@@ -168,6 +186,9 @@
                 android:layout_height="wrap_content"
                 android:autofillHints=""
                 android:hint="@string/storage_temperature_ex"
+                android:imeActionId="6"
+                android:imeActionLabel="OK"
+                android:imeOptions="actionDone"
                 android:inputType="numberDecimal" />
         </LinearLayout>
     </LinearLayout>
