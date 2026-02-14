@@ -1,16 +1,8 @@
 package com.fmartinier.barrelclassifier
 
-import android.Manifest.permission.POST_NOTIFICATIONS
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
@@ -20,20 +12,21 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
+import androidx.core.content.edit
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.dao.BarrelDao
+import com.fmartinier.barrelclassifier.data.dao.HistoryDao
 import com.fmartinier.barrelclassifier.data.model.Barrel
+import com.fmartinier.barrelclassifier.data.model.History
+import com.fmartinier.barrelclassifier.service.ImageService
+import com.fmartinier.barrelclassifier.service.NotificationService
 import com.fmartinier.barrelclassifier.ui.AddBarrelDialog
 import com.fmartinier.barrelclassifier.ui.AddHistoryDialog
 import com.fmartinier.barrelclassifier.ui.BarrelAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import java.io.File
-import androidx.core.content.edit
-import androidx.core.net.toUri
 
 class MainActivity : AppCompatActivity() {
 
@@ -42,14 +35,27 @@ class MainActivity : AppCompatActivity() {
     private lateinit var emptyStateLayout: RelativeLayout
 
     private lateinit var adapter: BarrelAdapter
-    private lateinit var dbHelper: DatabaseHelper
-    private lateinit var barrelDao: BarrelDao
 
     private lateinit var imgArrow: ImageView
 
-    private var currentPhotoPath: String? = null
+    private var currentBarrelPhotoPath: String? = null
+    private var currentHistoryPhotoPath: String? = null
     private var barrelForPhoto: Barrel? = null
-    private lateinit var cameraLauncher: ActivityResultLauncher<Intent>
+    private var historyForPhoto: History? = null
+    private lateinit var barrelCameraLauncher: ActivityResultLauncher<Intent>
+    private lateinit var historyCameraLauncher: ActivityResultLauncher<Intent>
+    private lateinit var pickHistoryImageLauncher: ActivityResultLauncher<String>
+    private lateinit var pickBarrelImageLauncher: ActivityResultLauncher<String>
+
+    // DAO
+    private val db = DatabaseHelper(this)
+    private val barrelDao = BarrelDao(db)
+    private val historyDao = HistoryDao(db)
+
+    // Services
+    private val notificationService = NotificationService()
+    private val imageService = ImageService()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val ta = theme.obtainStyledAttributes(intArrayOf(android.R.attr.textColorPrimary))
@@ -59,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        createNotificationChannel(context = this)
+        notificationService.createNotificationChannel(this)
 
         supportFragmentManager.setFragmentResultListener(
             "add_barrel_result",
@@ -68,22 +74,54 @@ class MainActivity : AppCompatActivity() {
             loadBarrels()
         }
 
-        cameraLauncher =
+        barrelCameraLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 if (it.resultCode == RESULT_OK) {
-                    currentPhotoPath?.let { path ->
+                    currentBarrelPhotoPath?.let { path ->
                         barrelForPhoto?.let { barrel ->
-                            val db = DatabaseHelper(this)
-                            BarrelDao(db).updateImage(barrel.id, path)
+                            barrelDao.updateImage(barrel.id, path)
                             loadBarrels()
                         }
                     }
                 }
             }
 
-        // Initialisation BDD
-        dbHelper = DatabaseHelper(this)
-        barrelDao = BarrelDao(dbHelper)
+        historyCameraLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == RESULT_OK) {
+                    currentHistoryPhotoPath?.let { path ->
+                        historyForPhoto?.let { history ->
+                            historyDao.updateImage(history.id, path)
+                            loadBarrels()
+                        }
+                    }
+                }
+            }
+
+        pickHistoryImageLauncher =
+            registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+                uri?.let {
+                    val path = imageService.copyImageToInternalStorage(it, this)
+                    currentHistoryPhotoPath = path
+                    historyForPhoto?.let { history ->
+                        historyDao.updateImage(history.id, path)
+                    }
+                }
+                loadBarrels()
+            }
+
+        pickBarrelImageLauncher = registerForActivityResult(
+            ActivityResultContracts.GetContent()
+        ) { uri ->
+            uri?.let {
+                val path = imageService.copyImageToInternalStorage(it, this)
+                currentBarrelPhotoPath = path
+                barrelForPhoto?.let { barrel ->
+                    barrelDao.updateImage(barrel.id, path)
+                }
+            }
+            loadBarrels()
+        }
 
         // Views
         imgArrow = findViewById(R.id.imgArrow)
@@ -104,9 +142,20 @@ class MainActivity : AppCompatActivity() {
             onEditBarrel = { barrel ->
                 openEditBarrel(barrel)
             },
-            onEditPhoto = { barrel ->
-                takePhoto(barrel)
-            }
+            onTakeBarrelPicture = { barrel ->
+                takePhotoForBarrel(barrel)
+            },
+            onImportBarrelPicture = { barrel ->
+                barrelForPhoto = barrel
+                pickBarrelImageLauncher.launch("image/*")
+            },
+            onTakeHistoryPicture = { history ->
+                takePhotoForHistory(history)
+            },
+            onImportHistoryPicture = { history ->
+                historyForPhoto = history
+                pickHistoryImageLauncher.launch("image/*")
+            },
         )
 
         recyclerView.adapter = adapter
@@ -169,59 +218,18 @@ class MainActivity : AppCompatActivity() {
         imgArrow.clearAnimation()
     }
 
-    private fun takePhoto(barrel: Barrel) {
+    private fun takePhotoForBarrel(barrel: Barrel) {
         barrelForPhoto = barrel
-
-        val photoFile = createImageFile()
-        val photoURI = FileProvider.getUriForFile(
-            this,
-            "${packageName}.fileprovider",
-            photoFile
-        )
-
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-
-        cameraLauncher.launch(intent)
+        val photoFile = imageService.createImageFile(this)
+        currentBarrelPhotoPath = photoFile.absolutePath
+        barrelCameraLauncher.launch(imageService.takePhoto(this, photoFile))
     }
 
-    private fun createImageFile(): File {
-        val storageDir = filesDir
-        val file = File.createTempFile(
-            "barrel_${System.currentTimeMillis()}",
-            ".jpg",
-            storageDir
-        )
-        currentPhotoPath = file.absolutePath
-        return file
-    }
-
-    private fun createNotificationChannel(context: Context) {
-        // Gérer la permission de lancer des notifications
-        if (Build.VERSION.SDK_INT >= 33 &&
-            ContextCompat.checkSelfPermission(
-                this,
-                POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissions(
-                arrayOf(POST_NOTIFICATIONS),
-                1001
-            )
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                "alerts_channel",
-                "Alertes de vieillissement",
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                description = "Alertes liées aux historiques en fût"
-            }
-
-            val manager = context.getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
-        }
+    private fun takePhotoForHistory(history: History) {
+        historyForPhoto = history
+        val photoFile = imageService.createImageFile(this)
+        currentHistoryPhotoPath = photoFile.absolutePath
+        historyCameraLauncher.launch(imageService.takePhoto(this, photoFile))
     }
 
     private fun managePopupRate() {
@@ -255,12 +263,18 @@ class MainActivity : AppCompatActivity() {
 
                 val appPackage = packageName
                 try {
-                    startActivity(Intent(Intent.ACTION_VIEW,
-                        "market://details?id=$appPackage".toUri())
+                    startActivity(
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            "market://details?id=$appPackage".toUri()
+                        )
                     )
                 } catch (_: ActivityNotFoundException) {
-                    startActivity(Intent(Intent.ACTION_VIEW,
-                        "https://play.google.com/store/apps/details?id=$appPackage".toUri())
+                    startActivity(
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            "https://play.google.com/store/apps/details?id=$appPackage".toUri()
+                        )
                     )
                 }
             }

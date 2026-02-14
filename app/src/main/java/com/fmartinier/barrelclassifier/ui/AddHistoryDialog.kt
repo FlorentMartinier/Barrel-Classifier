@@ -50,16 +50,19 @@ class AddHistoryDialog : DialogFragment() {
     private lateinit var edtAngelsShare: TextInputEditText
     private lateinit var edtAlcohol: TextInputEditText
     private lateinit var edtHistoryType: MaterialAutoCompleteTextView
+    private var imagePath: String? = null
+    private lateinit var alertDao: AlertDao
+    private lateinit var historyDao: HistoryDao
 
     private val alertService = AlertService()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val view = layoutInflater.inflate(R.layout.dialog_add_history, null)
+        alertDao = AlertDao(DatabaseHelper(requireContext()))
+        historyDao = HistoryDao(DatabaseHelper(requireContext()))
         historyId = arguments
             ?.takeIf { it.containsKey(ARG_HISTORY_ID) }
             ?.getLong(ARG_HISTORY_ID)
-        val alertDao = AlertDao(DatabaseHelper(requireContext()))
-        val historyDao = HistoryDao(DatabaseHelper(requireContext()))
 
         edtName = view.findViewById(R.id.edtName)
         edtBeginDate = view.findViewById(R.id.edtBeginDate)
@@ -122,6 +125,7 @@ class AddHistoryDialog : DialogFragment() {
             history.description?.let { edtDescription.setText(it) }
             history.angelsShare?.let { edtAngelsShare.setText(it) }
             history.alcoholicStrength?.let { edtAlcohol.setText(it) }
+            imagePath = history.imagePath
         }
 
         val positiveButtonText = if (historyId == null) R.string.add else R.string.modify
@@ -207,10 +211,9 @@ class AddHistoryDialog : DialogFragment() {
                         angelsShare = angelsShare,
                         alcoholicStrength = alcohol,
                         type = historyType,
+                        imagePath = imagePath,
                     )
 
-                    val historyDao = HistoryDao(DatabaseHelper(requireContext()))
-                    val alertDao = AlertDao(DatabaseHelper(requireContext()))
                     if (this.historyId != null) {
                         historyDao.update(historyId!!, history)
                         alertService.cancelByHistoryId(requireContext(), historyId!!)

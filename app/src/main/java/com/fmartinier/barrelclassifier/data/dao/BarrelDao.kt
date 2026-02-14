@@ -143,6 +143,7 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
                     description = cursor.getString(cursor.getColumnIndexOrThrow(DESCRIPTION_COLUMN_NAME)),
                     angelsShare = cursor.getString(cursor.getColumnIndexOrThrow(ANGEL_SHARE_COLUMN_NAME)),
                     alcoholicStrength = cursor.getString(cursor.getColumnIndexOrThrow(ALCOHOLIC_STRENGTH_COLUMN_NAME)),
+                    imagePath = cursor.getString(cursor.getColumnIndexOrThrow(IMAGE_PATH_COLUMN_NAME))
                 )
             )
         }

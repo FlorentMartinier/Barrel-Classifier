@@ -10,6 +10,7 @@ import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.DESCRIPTION
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.END_DATE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.HISTORY_TABLE_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.ID_COLUMN_NAME
+import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.IMAGE_PATH_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.NAME_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.TYPE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.model.History
@@ -43,6 +44,7 @@ class HistoryDao(private val dbHelper: DatabaseHelper) {
             put(ANGEL_SHARE_COLUMN_NAME, history.angelsShare)
             put(ALCOHOLIC_STRENGTH_COLUMN_NAME, history.alcoholicStrength)
             put(TYPE_COLUMN_NAME, history.type)
+            put(IMAGE_PATH_COLUMN_NAME, history.imagePath)
 
             if (history.endDate != null) {
                 put(END_DATE_COLUMN_NAME, history.endDate)
@@ -82,7 +84,8 @@ class HistoryDao(private val dbHelper: DatabaseHelper) {
                     endDate = if (cursor.isNull(cursor.getColumnIndexOrThrow(END_DATE_COLUMN_NAME)))
                         null
                     else
-                        cursor.getLong(cursor.getColumnIndexOrThrow(END_DATE_COLUMN_NAME))
+                        cursor.getLong(cursor.getColumnIndexOrThrow(END_DATE_COLUMN_NAME)),
+                    imagePath = cursor.getString(cursor.getColumnIndexOrThrow(IMAGE_PATH_COLUMN_NAME)),
                 )
             )
         }
@@ -92,6 +95,20 @@ class HistoryDao(private val dbHelper: DatabaseHelper) {
             throw Exception("Il y a une incohérence dans le nombre d'historiques (${list.size}) possédant l'id $id")
         }
         return list[0]
+    }
+
+    fun updateImage(historyId: Long, imagePath: String) {
+        val db = dbHelper.writableDatabase
+        val values = ContentValues().apply {
+            put(IMAGE_PATH_COLUMN_NAME, imagePath)
+        }
+
+        db.update(
+            HISTORY_TABLE_NAME,
+            values,
+            "$ID_COLUMN_NAME = ?",
+            arrayOf(historyId.toString())
+        )
     }
 
 }

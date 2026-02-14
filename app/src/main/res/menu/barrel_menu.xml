@@ -11,6 +11,16 @@
         android:icon="@drawable/ic_delete"/>
 
     <item
+        android:id="@+id/barrel_take_picture"
+        android:title="@string/take_picture"
+        android:icon="@drawable/ic_delete"/>
+
+    <item
+        android:id="@+id/barrel_import_image"
+        android:title="@string/import_image"
+        android:icon="@drawable/ic_delete"/>
+
+    <item
         android:id="@+id/action_pdf_export"
         android:title="@string/export_pdf"
         android:icon="@drawable/ic_delete"/>

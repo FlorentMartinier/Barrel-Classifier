@@ -77,6 +77,8 @@
     <string name="rate_popup_description">Support the project with a quick rating on the Play Store!</string>
     <string name="note_app">Rate it</string>
     <string name="later">Later</string>
+    <string name="import_image">Import image</string>
+    <string name="take_picture">Take a picture</string>
     <string-array name="type_fut_array">
         <item>Aging</item>
         <item>Seasonning</item>

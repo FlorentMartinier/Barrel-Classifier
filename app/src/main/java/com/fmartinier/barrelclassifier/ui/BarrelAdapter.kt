@@ -30,12 +30,14 @@ import com.fmartinier.barrelclassifier.data.model.Alert
 import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.data.model.History
 import com.fmartinier.barrelclassifier.service.AlertService
+import com.fmartinier.barrelclassifier.service.ImageService
 import com.fmartinier.barrelclassifier.service.PdfService
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.calculateDuration
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.formatDate
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.io.File
 
 class BarrelAdapter(
     private val context: Context,
@@ -43,13 +45,17 @@ class BarrelAdapter(
     private val refresh: () -> Unit,
     private val onAddHistory: (Barrel, Long?) -> Unit,
     private val onEditBarrel: (Barrel) -> Unit,
-    private val onEditPhoto: (Barrel) -> Unit
+    private val onTakeBarrelPicture: (Barrel) -> Unit,
+    private val onImportBarrelPicture: (Barrel) -> Unit,
+    private val onTakeHistoryPicture: (History) -> Unit,
+    private val onImportHistoryPicture: (History) -> Unit,
 ) : RecyclerView.Adapter<BarrelAdapter.BarrelViewHolder>() {
 
     val dbHelper = DatabaseHelper(context)
     val historyDao = HistoryDao(dbHelper)
     val alertDao = AlertDao(dbHelper)
     val alertService = AlertService()
+    val imageService = ImageService()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BarrelViewHolder {
         val view = LayoutInflater.from(context)
@@ -131,6 +137,16 @@ class BarrelAdapter(
                         true
                     }
 
+                    R.id.barrel_take_picture -> {
+                        onTakeBarrelPicture(barrel)
+                        true
+                    }
+
+                    R.id.barrel_import_image -> {
+                        onImportBarrelPicture(barrel)
+                        true
+                    }
+
                     R.id.action_pdf_export -> {
                         val file = PdfService(context).export(barrel)
                         val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
@@ -155,11 +171,11 @@ class BarrelAdapter(
         }
 
         holder.photoOverlay.setOnClickListener {
-            onEditPhoto(barrel)
+            takePictureOrOpenImageOrBarrel(barrel)
         }
 
         holder.imgBarrel.setOnClickListener {
-            onEditPhoto(barrel)
+            takePictureOrOpenImageOrBarrel(barrel)
         }
 
         if (barrel.imagePath == null) {
@@ -176,6 +192,15 @@ class BarrelAdapter(
     }
 
     override fun getItemCount() = barrels.size
+
+    private fun takePictureOrOpenImageOrBarrel(barrel: Barrel) {
+        val barrelImagePath = barrel.imagePath
+        if (barrelImagePath == null) {
+            onTakeBarrelPicture(barrel)
+        } else {
+            imageService.showImageFullscreen(context, barrelImagePath)
+        }
+    }
 
     private fun confirmDeleteBarrel(barrel: Barrel) {
         MaterialAlertDialogBuilder(context)
@@ -253,6 +278,7 @@ class BarrelAdapter(
             val chipAlcohol: Chip = view.findViewById(R.id.chipAlcohol)
             val txtDescription: TextView = view.findViewById(R.id.txtDescription)
             val txtExpandDescription: TextView = view.findViewById(R.id.txtExpandDescription)
+            val img = view.findViewById<ImageView>(R.id.imgHistory)
 
             val historyType = getHistoryType(history)
             txtName.text = "${history.name} · $historyType"
@@ -377,11 +403,39 @@ class BarrelAdapter(
                             true
                         }
 
+                        R.id.action_take_picture -> {
+                            onTakeHistoryPicture(history)
+                            true
+                        }
+
+                        R.id.action_import_image -> {
+                            onImportHistoryPicture(history)
+                            true
+                        }
+
                         else -> false
                     }
                 }
 
                 popup.show()
+            }
+
+            if (!history.imagePath.isNullOrEmpty()) {
+                val file = File(history.imagePath)
+
+                if (file.exists()) {
+                    img.visibility = View.VISIBLE
+                    val bmp = BitmapFactory.decodeFile(file.absolutePath)
+                    img.setImageBitmap(bmp)
+
+                    img.setOnClickListener {
+                        imageService.showImageFullscreen(it.context, history.imagePath)
+                    }
+                } else {
+                    img.visibility = View.GONE
+                }
+            } else {
+                img.visibility = View.GONE
             }
 
             // Animation d'apparition
@@ -562,5 +616,4 @@ class BarrelAdapter(
 
         animator.start()
     }
-
 }

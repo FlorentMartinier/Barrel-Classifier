@@ -10,4 +10,14 @@
         android:title="@string/remove"
         android:icon="@drawable/ic_delete"/>
 
+    <item
+        android:id="@+id/action_take_picture"
+        android:title="@string/take_picture"
+        android:icon="@drawable/ic_delete"/>
+
+    <item
+        android:id="@+id/action_import_image"
+        android:title="@string/import_image"
+        android:icon="@drawable/ic_delete"/>
+
 </menu>

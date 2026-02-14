@@ -33,6 +33,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "barrel.db", 
                     "    $DESCRIPTION_COLUMN_NAME TEXT," +
                     "    $ANGEL_SHARE_COLUMN_NAME TEXT," +
                     "    $ALCOHOLIC_STRENGTH_COLUMN_NAME TEXT," +
+                    "    $IMAGE_PATH_COLUMN_NAME TEXT," +
                     "    FOREIGN KEY ($BARREL_ID_COLUMN_NAME) REFERENCES $BARREL_TABLE_NAME($ID_COLUMN_NAME) ON DELETE CASCADE" +
                     ");"
         )
@@ -68,7 +69,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "barrel.db", 
         const val VOLUME_COLUMN_NAME: String = "volume"
         const val BRAND_COLUMN_NAME: String = "brand"
         const val WOOD_TYPE_COLUMN_NAME: String = "wood_type"
-        const val IMAGE_PATH_COLUMN_NAME: String = "image_path"
         const val HEATING_TYPE_COLUMN_NAME: String = "heating_type"
         const val STORAGE_HYGROMETER_COLUMN_NAME: String = "storage_hygrometer"
         const val STORAGE_TEMPERATURE_COLUMN_NAME: String = "storage_temperature"
@@ -86,6 +86,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "barrel.db", 
         const val HISTORY_ID_COLUMN_NAME: String = "history_id"
 
         // Colonnes transverses
+        const val IMAGE_PATH_COLUMN_NAME: String = "image_path"
         const val TYPE_COLUMN_NAME: String = "type"
         const val NAME_COLUMN_NAME: String = "name"
         const val ID_COLUMN_NAME: String = "id"
