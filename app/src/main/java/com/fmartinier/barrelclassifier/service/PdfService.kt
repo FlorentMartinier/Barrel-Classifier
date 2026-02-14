@@ -10,15 +10,16 @@ import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
+import androidx.core.graphics.withClip
 import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.data.model.History
+import com.fmartinier.barrelclassifier.utils.DateUtils
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import androidx.core.graphics.withClip
 
 class PdfService(private val context: Context) {
 
@@ -137,62 +138,148 @@ class PdfService(private val context: Context) {
             y += lineSpace
         }
 
+        val firstHistory: Long = barrel.histories.minOfOrNull { it.beginDate } ?: 0
+
         drawField(context.getString(R.string.brand), barrel.brand)
         drawField(context.getString(R.string.barrel_volume), "${barrel.volume} L")
         drawField(context.getString(R.string.wood_type), barrel.woodType)
         drawField(context.getString(R.string.heating_type), barrel.heatType)
         drawField(context.getString(R.string.storage_temperature), "${barrel.storageTemperature}°C")
         drawField(context.getString(R.string.storage_hygrometer), "${barrel.storageHygrometer}%")
+        drawField(
+            context.getString(R.string.first_history_date),
+            dateFormat.format(Date(firstHistory))
+        )
+        drawField(context.getString(R.string.aging_number), barrel.histories.size.toString())
     }
 
-    private fun drawHistoryEntry(canvas: Canvas, history: History, startY: Float, timelineX: Float): Float {
-        var y = startY
+    private fun drawHistoryEntry(
+        canvas: Canvas,
+        history: History,
+        startY: Float,
+        timelineX: Float
+    ): Float {
+        var currentY = startY
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-        // Point timeline
-        paint.color = gold
-        canvas.drawCircle(timelineX, y, 12f, paint)
+        // Paramètres de l'indicateur (cercle)
+        val imageSize = 80f
+        val textMarginX = timelineX + (imageSize / 2f) + 40f
+        val textMaxWidth = pageWidth - textMarginX - margin
 
-        // Date
+        // Positionnement du cercle sur la ligne
+        // On centre le cercle verticalement par rapport à la première ligne de texte
+        val circleCenterY = startY + 15f
+        val rect = RectF(
+            timelineX - (imageSize / 2f),
+            circleCenterY - (imageSize / 2f),
+            timelineX + (imageSize / 2f),
+            circleCenterY + (imageSize / 2f)
+        )
+
+        // --- 1. DESSIN DE L'INDICATEUR (PHOTO OU DISQUE DORÉ) ---
+        if (!history.imagePath.isNullOrBlank()) {
+            val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            BitmapFactory.decodeFile(history.imagePath, options)
+            options.inSampleSize = calculateInSampleSize(options, 150, 150)
+            options.inJustDecodeBounds = false
+
+            val bmp = BitmapFactory.decodeFile(history.imagePath, options)
+            if (bmp != null) {
+                val clipPath = Path().apply {
+                    addCircle(rect.centerX(), rect.centerY(), imageSize / 2f, Path.Direction.CW)
+                }
+                canvas.save()
+                canvas.clipPath(clipPath)
+
+                // Logique Center Crop
+                val bitmapRatio = bmp.width.toFloat() / bmp.height.toFloat()
+                val drawRect = if (bitmapRatio > 1f) {
+                    val scaledWidth = imageSize * bitmapRatio
+                    val sideMargin = (scaledWidth - imageSize) / 2
+                    RectF(rect.left - sideMargin, rect.top, rect.right + sideMargin, rect.bottom)
+                } else {
+                    val scaledHeight = imageSize / bitmapRatio
+                    val topMargin = (scaledHeight - imageSize) / 2
+                    RectF(rect.left, rect.top - topMargin, rect.right, rect.bottom + topMargin)
+                }
+
+                canvas.drawBitmap(bmp, null, drawRect, Paint(Paint.FILTER_BITMAP_FLAG))
+                canvas.restore()
+                bmp.recycle()
+
+                // Petite bordure dorée pour finir le contour de la photo
+                val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = gold
+                    style = Paint.Style.STROKE
+                    strokeWidth = 2f
+                }
+                canvas.drawCircle(rect.centerX(), rect.centerY(), imageSize / 2f, borderPaint)
+            }
+        } else {
+            // S'il n'y a pas d'image : on dessine un disque doré plein (le fameux sceau)
+            paint.style = Paint.Style.FILL
+            paint.color = gold
+            // On prend 90% de la taille pour un aspect "point d'étape" imposant mais propre
+            canvas.drawCircle(rect.centerX(), rect.centerY(), (imageSize / 2f) * 0.9f, paint)
+        }
+
+        // --- 2. DESSIN DU TEXTE ---
+        // Date et Durée
+        paint.style = Paint.Style.FILL
         paint.color = grey
         paint.textSize = 26f
         paint.typeface = Typeface.DEFAULT_BOLD
+
+        val calculationTime = DateUtils.calculateDuration(context, history.beginDate, history.endDate ?: DateUtils.getCurrentDate())
         val dateRange = if (history.endDate != null)
-            "${dateFormat.format(Date(history.beginDate))} — ${dateFormat.format(Date(history.endDate))}"
-        else "${context.getString(R.string.since)} ${dateFormat.format(Date(history.beginDate))}"
-        canvas.drawText(dateRange, timelineX + 50f, y + 8f, paint)
+            "${dateFormat.format(Date(history.beginDate))} — ${dateFormat.format(Date(history.endDate))} ($calculationTime)"
+        else
+            "${context.getString(R.string.since)} ${dateFormat.format(Date(history.beginDate))} ($calculationTime)"
 
-        y += 45f
+        canvas.drawText(dateRange, textMarginX, startY + 5f, paint)
+        currentY += 45f
 
-        // Nom de l'étape
+        // Titre de l'étape (ex: Nom du rhum ou de l'opération)
         paint.color = dark
         paint.textSize = 34f
         paint.typeface = Typeface.DEFAULT_BOLD
-        y = drawMultilineText(canvas, history.name, timelineX + 50f, y, paint)
+        currentY = drawMultilineText(canvas, history.name, textMarginX, currentY, paint, textMaxWidth)
 
-        // Type (Tag)
+        // Type d'opération (AGING, FILLING, etc.)
         paint.textSize = 24f
         paint.color = gold
-        canvas.drawText(history.type.uppercase(), timelineX + 50f, y, paint)
+        canvas.drawText(history.type.uppercase(), textMarginX, currentY, paint)
+        currentY += 35f
 
-        y += 35f
+        // Détails techniques
         paint.color = dark
         paint.typeface = Typeface.DEFAULT
+        paint.textSize = 28f
 
         fun drawWrapped(label: String, value: String?) {
             if (value.isNullOrBlank() || value == "%") return
-            y = drawMultilineText(canvas, "$label : $value", timelineX + 50f, y, paint)
-            y += 10f
+            currentY = drawMultilineText(canvas, "$label : $value", textMarginX, currentY, paint, textMaxWidth)
+            currentY += 10f
         }
 
         drawWrapped(context.getString(R.string.detailed_description), history.description)
         drawWrapped(context.getString(R.string.angels_share), "${history.angelsShare}%")
         drawWrapped(context.getString(R.string.alcoolic_strenght), "${history.alcoholicStrength}%")
 
-        return y + 60f // Espace entre deux blocs
+        // Retourne la hauteur totale consommée pour savoir où commence la ligne suivante
+        // On s'assure de laisser un espace après le dernier élément (texte ou cercle)
+        val blockBottom = maxOf(currentY + 40f, rect.bottom + 40f)
+        return blockBottom
     }
 
-    private fun drawMultilineText(canvas: Canvas, text: String, x: Float, y: Float, paint: Paint): Float {
+    private fun drawMultilineText(
+        canvas: Canvas,
+        text: String,
+        x: Float,
+        y: Float,
+        paint: Paint
+    ): Float {
         var currentY = y
         val words = text.split(" ")
         var line = ""
@@ -212,76 +299,80 @@ class PdfService(private val context: Context) {
     }
 
     private fun measureHistoryHeight(history: History, paintText: Paint, maxWidth: Float): Float {
-        var h = 180f // Hauteur fixe (Dates + Titre + Type + Marges)
+        val imageSize = 80f
+        val textMarginX = 140f + (imageSize / 2f) + 40f
+        val textMaxWidth = pageWidth - textMarginX - 80f // 80f est la marge droite
+
+        var hText = 100f // Marge initiale pour date, titre et type
 
         fun wrappedHeight(label: String, value: String?): Float {
-            if (value.isNullOrBlank()) return 0f
+            if (value.isNullOrBlank() || value == "%") return 0f
             val fullText = "$label : $value"
             val words = fullText.split(" ")
             var lines = 1
             var line = ""
             for (word in words) {
                 val test = if (line.isEmpty()) word else "$line $word"
-                if (paintText.measureText(test) > maxWidth) {
+                if (paintText.measureText(test) > textMaxWidth) {
                     lines++
                     line = word
                 } else {
                     line = test
                 }
             }
-            return lines * (paintText.textSize + 12f) + 10f
+            return lines * (paintText.textSize + 12f) + 12f
         }
 
-        h += wrappedHeight("Description", history.description)
-        h += wrappedHeight("Angels", history.angelsShare)
-        h += wrappedHeight("ABV", history.alcoholicStrength)
-        return h
+        hText += wrappedHeight("Nom", history.name)
+        hText += wrappedHeight("Description", history.description)
+        hText += wrappedHeight("Angels", history.angelsShare)
+        hText += wrappedHeight("ABV", history.alcoholicStrength)
+
+        return maxOf(hText, imageSize + 20f) + 40f
     }
 
     private fun drawBarrelImage(canvas: Canvas, barrel: Barrel) {
         barrel.imagePath?.let { path ->
-            val bmp = BitmapFactory.decodeFile(path) ?: return
+            // --- OPTIMISATION ICI AUSSI ---
+            val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            BitmapFactory.decodeFile(path, options)
 
-            // On agrandit la zone : de y=280f à y=900f (au lieu de 850f)
-            // L'image prendra presque toute la largeur disponible entre les marges
+            // Pour la grande image, on demande une résolution un peu plus haute (ex: 1000px)
+            options.inSampleSize = calculateInSampleSize(options, 1000, 800)
+            options.inJustDecodeBounds = false
+
+            val bmp = BitmapFactory.decodeFile(path, options) ?: return
+
             val rect = RectF(margin, 280f, pageWidth - margin, 900f)
-
-            // Calcul du ratio pour un affichage "Center Crop" intelligent
             val canvasRatio = rect.width() / rect.height()
             val bitmapRatio = bmp.width.toFloat() / bmp.height.toFloat()
 
-            val drawRect: RectF
-            if (bitmapRatio > canvasRatio) {
-                // L'image est plus large que la zone : on centre horizontalement
+            val drawRect = if (bitmapRatio > canvasRatio) {
                 val scaledWidth = rect.height() * bitmapRatio
                 val sideMargin = (scaledWidth - rect.width()) / 2
-                drawRect = RectF(rect.left - sideMargin, rect.top, rect.right + sideMargin, rect.bottom)
+                RectF(rect.left - sideMargin, rect.top, rect.right + sideMargin, rect.bottom)
             } else {
-                // L'image est plus haute : on centre verticalement
                 val scaledHeight = rect.width() / bitmapRatio
                 val topMargin = (scaledHeight - rect.height()) / 2
-                drawRect = RectF(rect.left, rect.top - topMargin, rect.right, rect.bottom + topMargin)
+                RectF(rect.left, rect.top - topMargin, rect.right, rect.bottom + topMargin)
             }
 
-            // Rayon des coins augmenté à 60f pour un aspect plus "soft"
             val cornerRadius = 60f
-            val clipPath = Path().apply {
-                addRoundRect(rect, cornerRadius, cornerRadius, Path.Direction.CW)
-            }
+            val clipPath =
+                Path().apply { addRoundRect(rect, cornerRadius, cornerRadius, Path.Direction.CW) }
 
             canvas.withClip(clipPath) {
-                // Paint avec filtre pour éviter la pixellisation lors du redimensionnement
                 val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
                 drawBitmap(bmp, null, drawRect, paint)
-
             }
 
-            // Optionnel : Ajouter une bordure très fine autour de l'image pour la finition
+            bmp.recycle() // INDISPENSABLE pour la fluidité
+
             val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = gold
                 style = Paint.Style.STROKE
                 strokeWidth = 2f
-                alpha = 40 // Très léger
+                alpha = 40
             }
             canvas.drawRoundRect(rect, cornerRadius, cornerRadius, borderPaint)
         }
@@ -306,7 +397,8 @@ class PdfService(private val context: Context) {
             textSize = 22f
         }
 
-        val footerText = "${context.getString(R.string.generated_by)} Barrel Manager — ${dateFormat.format(Date())}"
+        val footerText =
+            "${context.getString(R.string.generated_by)} Barrel Manager — ${dateFormat.format(Date())}"
         val textWidth = paint.measureText(footerText)
         val logoSize = 30f
         val spacing = 15f
@@ -326,6 +418,7 @@ class PdfService(private val context: Context) {
             paint
         )
     }
+
     private fun startPage(pdf: PdfDocument, number: Int): PdfDocument.Page {
         return pdf.startPage(PdfDocument.PageInfo.Builder(pageWidth, pageHeight, number).create())
     }
@@ -359,5 +452,51 @@ class PdfService(private val context: Context) {
             strokeWidth = 2f
         }
         canvas.drawRoundRect(rect, cornerRadius, cornerRadius, borderPaint)
+    }
+
+    // Utilitaire pour calculer la réduction de l'image
+    private fun calculateInSampleSize(
+        options: BitmapFactory.Options,
+        reqWidth: Int,
+        reqHeight: Int
+    ): Int {
+        val (height: Int, width: Int) = options.outHeight to options.outWidth
+        var inSampleSize = 1
+        if (height > reqHeight || width > reqWidth) {
+            val halfHeight: Int = height / 2
+            val halfWidth: Int = width / 2
+            while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
+                inSampleSize *= 2
+            }
+        }
+        return inSampleSize
+    }
+
+    // Modifier drawMultilineText pour accepter une largeur personnalisée
+    private fun drawMultilineText(
+        canvas: Canvas,
+        text: String,
+        x: Float,
+        y: Float,
+        paint: Paint,
+        customWidth: Float? = null
+    ): Float {
+        var currentY = y
+        val maxWidth = customWidth ?: (contentWidth - 100f)
+        val words = text.split(" ")
+        var line = ""
+
+        for (word in words) {
+            val testLine = if (line.isEmpty()) word else "$line $word"
+            if (paint.measureText(testLine) > maxWidth) {
+                canvas.drawText(line, x, currentY, paint)
+                line = word
+                currentY += paint.textSize + 12f
+            } else {
+                line = testLine
+            }
+        }
+        canvas.drawText(line, x, currentY, paint)
+        return currentY + paint.textSize
     }
 }

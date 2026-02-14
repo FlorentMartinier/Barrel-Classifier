@@ -15,6 +15,8 @@
     <string name="modify_barrel">Edit barrel</string>
     <string name="remove_barrel_validation">Do you really want to delete this barrel?\n\nAll associated histories will be permanently deleted.</string>
     <string name="month_and_week">%1$s months and %2$s weeks</string>
+    <string name="month">%1$s months</string>
+    <string name="week">%1$s weeks</string>
     <string name="no_barrel_saved">You have not saved any barrels yet</string>
     <string name="barrel_name">Barrel name</string>
     <string name="ex_barrel_name">e.g.: Barrel #12</string>
@@ -79,6 +81,8 @@
     <string name="later">Later</string>
     <string name="import_image">Import image</string>
     <string name="take_picture">Take a picture</string>
+    <string name="first_history_date">First barreling date</string>
+    <string name="aging_number">Number of agings</string>
     <string-array name="type_fut_array">
         <item>Aging</item>
         <item>Seasonning</item>

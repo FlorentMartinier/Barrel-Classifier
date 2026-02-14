@@ -41,11 +41,24 @@ class DateUtils {
                 weeks = 0
             }
 
-            return context.resources.getString(
-                R.string.month_and_week,
-                months.toString(),
-                weeks.toString()
-            )
+            return if (weeks == 0) {
+                context.resources.getString(
+                    R.string.month,
+                    months.toString(),
+                )
+            } else if (months == 0) {
+                context.resources.getString(
+                    R.string.month_and_week,
+                    months.toString(),
+                    weeks.toString()
+                )
+            } else {
+                context.resources.getString(
+                    R.string.month_and_week,
+                    months.toString(),
+                    weeks.toString()
+                )
+            }
         }
 
 
@@ -77,6 +90,10 @@ class DateUtils {
                 cal.get(Calendar.MONTH),
                 cal.get(Calendar.DAY_OF_MONTH)
             ).show()
+        }
+
+        fun getCurrentDate(): Long {
+            return System.currentTimeMillis()
         }
     }
 }

@@ -15,6 +15,8 @@
     <string name="modify_barrel">Modifier le fût</string>
     <string name="remove_barrel_validation">Voulez-vous vraiment supprimer ce fût ? \n \nTous les historiques associés seront définitivement supprimés.</string>
     <string name="month_and_week">%1$s mois et %2$s semaines</string>
+    <string name="month">%1$s mois</string>
+    <string name="week">%1$s semaines</string>
     <string name="no_barrel_saved">Vous n\'avez pas encore enregistré de fût</string>
     <string name="barrel_name">Nom du fût</string>
     <string name="ex_barrel_name">Ex : Fût n°12</string>
@@ -79,6 +81,8 @@
     <string name="later">Plus tard</string>
     <string name="import_image">Importer une image</string>
     <string name="take_picture">Prendre une photo</string>
+    <string name="first_history_date">Date de première mise en fût</string>
+    <string name="aging_number">Nombre de vieillissements</string>
     <string-array name="type_fut_array">
         <item>Vieillissement</item>
         <item>Marquage</item>
