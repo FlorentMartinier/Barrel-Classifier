@@ -27,6 +27,7 @@ import com.fmartinier.barrelclassifier.ui.AddBarrelDialog
 import com.fmartinier.barrelclassifier.ui.AddHistoryDialog
 import com.fmartinier.barrelclassifier.ui.BarrelAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -79,7 +80,9 @@ class MainActivity : AppCompatActivity() {
                 if (it.resultCode == RESULT_OK) {
                     currentBarrelPhotoPath?.let { path ->
                         barrelForPhoto?.let { barrel ->
+                            val oldImagePath = barrel.imagePath
                             barrelDao.updateImage(barrel.id, path)
+                            imageService.deleteImageIfExist(oldImagePath)
                             loadBarrels()
                         }
                     }
@@ -91,7 +94,9 @@ class MainActivity : AppCompatActivity() {
                 if (it.resultCode == RESULT_OK) {
                     currentHistoryPhotoPath?.let { path ->
                         historyForPhoto?.let { history ->
+                            val oldImagePath = history.imagePath
                             historyDao.updateImage(history.id, path)
+                            imageService.deleteImageIfExist(oldImagePath)
                             loadBarrels()
                         }
                     }
@@ -104,7 +109,9 @@ class MainActivity : AppCompatActivity() {
                     val path = imageService.copyImageToInternalStorage(it, this)
                     currentHistoryPhotoPath = path
                     historyForPhoto?.let { history ->
+                        val oldImagePath = history.imagePath
                         historyDao.updateImage(history.id, path)
+                        imageService.deleteImageIfExist(oldImagePath)
                     }
                 }
                 loadBarrels()
@@ -117,7 +124,9 @@ class MainActivity : AppCompatActivity() {
                 val path = imageService.copyImageToInternalStorage(it, this)
                 currentBarrelPhotoPath = path
                 barrelForPhoto?.let { barrel ->
+                    val oldImagePath = barrel.imagePath
                     barrelDao.updateImage(barrel.id, path)
+                    imageService.deleteImageIfExist(oldImagePath)
                 }
             }
             loadBarrels()

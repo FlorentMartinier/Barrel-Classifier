@@ -1,15 +1,18 @@
 package com.fmartinier.barrelclassifier.data.migrations
 
+import android.content.Context
+
 object MigrationRegistry {
 
-    val migrations: List<Migration> = listOf(
-        MigrationV8(),
-        MigrationV9(),
-        MigrationV10(),
-        MigrationV11(),
-    )
+    fun getMigrations(fromVersion: Int, toVersion: Int, context: Context): List<Migration> {
+        val migrations = listOf(
+            MigrationV8(),
+            MigrationV9(),
+            MigrationV10(),
+            MigrationV11(),
+            MigrationV12(context),
+        )
 
-    fun getMigrations(fromVersion: Int, toVersion: Int): List<Migration> {
         return migrations
             .filter { it.fromVersion >= fromVersion && it.toVersion <= toVersion }
             .sortedBy { it.fromVersion }

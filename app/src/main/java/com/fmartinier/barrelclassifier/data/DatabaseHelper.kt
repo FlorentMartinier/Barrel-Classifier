@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import androidx.core.database.sqlite.transaction
 import com.fmartinier.barrelclassifier.data.migrations.MigrationRegistry
 
-class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "barrel.db", null, 10) {
+class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "barrel.db", null, 12) {
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
@@ -49,7 +49,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "barrel.db", 
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        val migrations = MigrationRegistry.getMigrations(oldVersion, newVersion)
+        val migrations = MigrationRegistry.getMigrations(oldVersion, newVersion, context)
 
         db.transaction {
             migrations.forEach { migration ->

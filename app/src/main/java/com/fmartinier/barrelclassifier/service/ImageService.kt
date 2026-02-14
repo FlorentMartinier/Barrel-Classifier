@@ -108,4 +108,13 @@ class ImageService {
         intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
         return intent
     }
+
+    fun deleteImageIfExist(path: String?) {
+        path?.let {
+            val oldFile = File(path)
+            if (oldFile.exists()) {
+                oldFile.delete()
+            }
+        }
+    }
 }
