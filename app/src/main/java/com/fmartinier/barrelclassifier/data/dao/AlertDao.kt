@@ -9,17 +9,7 @@ import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.ID_COLUMN_N
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.TYPE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.model.Alert
 
-class AlertDao(private val dbHelper: DatabaseHelper) {
-
-    fun insert(alert: Alert): Long {
-        val db = dbHelper.writableDatabase
-        val values = ContentValues().apply {
-            put(HISTORY_ID_COLUMN_NAME, alert.historyId)
-            put(TYPE_COLUMN_NAME, alert.type)
-            put(DATE_COLUMN_NAME, alert.date)
-        }
-        return db.insert(ALERT_TABLE_NAME, null, values)
-    }
+class AlertDao private constructor(private val dbHelper: DatabaseHelper) {
 
     fun insert(alerts: List<Alert>, historyId: Long): List<Alert> {
         val db = dbHelper.writableDatabase
@@ -34,7 +24,7 @@ class AlertDao(private val dbHelper: DatabaseHelper) {
         }
     }
 
-    fun getByHistoryId(historyId: Long): List<Alert> {
+    fun findAllByHistoryId(historyId: Long): List<Alert> {
         val db = dbHelper.writableDatabase
         val list = mutableListOf<Alert>()
         val cursor = db.rawQuery(
@@ -63,6 +53,19 @@ class AlertDao(private val dbHelper: DatabaseHelper) {
             "$HISTORY_ID_COLUMN_NAME = ?",
             arrayOf(id.toString())
         )
+    }
+
+    companion object {
+        @Volatile
+        private var INSTANCE: AlertDao? = null
+
+        fun getInstance(dbHelper: DatabaseHelper): AlertDao {
+            return INSTANCE ?: synchronized(this) {
+                val instance = AlertDao(dbHelper)
+                INSTANCE = instance
+                instance
+            }
+        }
     }
 
 }

@@ -11,4 +11,5 @@ data class History(
     val angelsShare: String? = null,
     val alcoholicStrength: String? = null,
     val imagePath: String? = null,
+    val alerts: List<Alert>
 )

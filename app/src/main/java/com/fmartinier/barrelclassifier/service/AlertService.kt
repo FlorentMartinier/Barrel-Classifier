@@ -35,7 +35,7 @@ class AlertService {
             .cancelAllWorkByTag("history_$historyId")
     }
 
-    fun cancelByAlertId(context: Context, alertId: Long) {
+    fun cancelById(context: Context, alertId: Long) {
         WorkManager.getInstance(context)
             .cancelAllWorkByTag("alert_$alertId")
     }

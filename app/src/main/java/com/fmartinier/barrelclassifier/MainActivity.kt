@@ -27,7 +27,6 @@ import com.fmartinier.barrelclassifier.ui.AddBarrelDialog
 import com.fmartinier.barrelclassifier.ui.AddHistoryDialog
 import com.fmartinier.barrelclassifier.ui.BarrelAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -49,9 +48,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var pickBarrelImageLauncher: ActivityResultLauncher<String>
 
     // DAO
-    private val db = DatabaseHelper(this)
-    private val barrelDao = BarrelDao(db)
-    private val historyDao = HistoryDao(db)
+    private lateinit var db: DatabaseHelper
+    private lateinit var barrelDao: BarrelDao
+    private lateinit var historyDao: HistoryDao
 
     // Services
     private val notificationService = NotificationService()
@@ -59,6 +58,10 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        db = DatabaseHelper.getInstance(this)
+        barrelDao = BarrelDao.getInstance(db)
+        historyDao = HistoryDao.getInstance(db)
+
         val ta = theme.obtainStyledAttributes(intArrayOf(android.R.attr.textColorPrimary))
         managePopupRate()
         ta.recycle()
@@ -183,7 +186,7 @@ class MainActivity : AppCompatActivity() {
      * et met à jour l'UI
      */
     private fun loadBarrels() {
-        val barrels = barrelDao.getAllBarrelsWithHistories()
+        val barrels = barrelDao.findAllWithHistories()
 
         adapter.updateData(barrels)
 

@@ -5,12 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -22,22 +19,15 @@ import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
-import com.fmartinier.barrelclassifier.data.dao.AlertDao
-import com.fmartinier.barrelclassifier.data.dao.BarrelDao
-import com.fmartinier.barrelclassifier.data.dao.HistoryDao
-import com.fmartinier.barrelclassifier.data.enums.EHistoryType
-import com.fmartinier.barrelclassifier.data.model.Alert
 import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.data.model.History
-import com.fmartinier.barrelclassifier.service.AlertService
+import com.fmartinier.barrelclassifier.service.BarrelService
 import com.fmartinier.barrelclassifier.service.ImageService
 import com.fmartinier.barrelclassifier.service.PdfService
-import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.calculateDuration
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.formatDate
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.io.File
 
 class BarrelAdapter(
     private val context: Context,
@@ -47,15 +37,15 @@ class BarrelAdapter(
     private val onEditBarrel: (Barrel) -> Unit,
     private val onTakeBarrelPicture: (Barrel) -> Unit,
     private val onImportBarrelPicture: (Barrel) -> Unit,
-    private val onTakeHistoryPicture: (History) -> Unit,
-    private val onImportHistoryPicture: (History) -> Unit,
+    onTakeHistoryPicture: (History) -> Unit,
+    onImportHistoryPicture: (History) -> Unit,
 ) : RecyclerView.Adapter<BarrelAdapter.BarrelViewHolder>() {
 
-    val dbHelper = DatabaseHelper(context)
-    val historyDao = HistoryDao(dbHelper)
-    val alertDao = AlertDao(dbHelper)
-    val alertService = AlertService()
+    val dbHelper = DatabaseHelper.getInstance(context)
+    val barrelService = BarrelService(context, dbHelper)
     val imageService = ImageService()
+    val historyDrawer =
+        HistoryDrawer(context, refresh, onAddHistory, onTakeHistoryPicture, onImportHistoryPicture)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BarrelViewHolder {
         val view = LayoutInflater.from(context)
@@ -71,7 +61,7 @@ class BarrelAdapter(
         holder.chipGroup.removeAllViews()
 
         barrel.histories
-            .flatMap { alertDao.getByHistoryId(it.id) }
+            .flatMap { it.alerts }
             .filter { it.date > System.currentTimeMillis() }
             .minByOrNull { it.date }
             ?.let {
@@ -149,10 +139,15 @@ class BarrelAdapter(
 
                     R.id.action_pdf_export -> {
                         val file = PdfService(context).export(barrel)
-                        val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+                        val uri = FileProvider.getUriForFile(
+                            context,
+                            "${context.packageName}.fileprovider",
+                            file
+                        )
                         val intent = Intent(Intent.ACTION_VIEW).apply {
                             setDataAndType(uri, "application/pdf")
-                            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NO_HISTORY
+                            flags =
+                                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NO_HISTORY
                         }
 
                         context.startActivity(intent)
@@ -188,7 +183,7 @@ class BarrelAdapter(
             )
         }
 
-        displayHistories(holder, barrel)
+        historyDrawer.displayAllForBarrel(holder, barrel)
     }
 
     override fun getItemCount() = barrels.size
@@ -208,10 +203,7 @@ class BarrelAdapter(
             .setTitle(context.resources.getString(R.string.remove_barrel))
             .setMessage(context.resources.getString(R.string.remove_barrel_validation))
             .setPositiveButton(context.resources.getString(R.string.remove)) { _, _ ->
-                val dbHelper = DatabaseHelper(context)
-                val barrelDao = BarrelDao(dbHelper)
-
-                barrelDao.deleteBarrel(barrel.id)
+                barrelService.delete(barrel)
 
                 // Rafraîchit la liste après suppression
                 refresh()
@@ -246,279 +238,6 @@ class BarrelAdapter(
 
     }
 
-    private fun displayHistories(
-        holder: BarrelViewHolder,
-        barrel: Barrel
-    ) {
-        holder.layoutHistory.removeAllViews()
-
-        if (barrel.histories.isEmpty()) {
-            val emptyText = TextView(context)
-            emptyText.text = context.resources.getString(R.string.no_history)
-            emptyText.setTextColor(Color.GRAY)
-            emptyText.setPadding(16, 8, 16, 8)
-            holder.layoutHistory.addView(emptyText)
-            return
-        }
-
-        for (history in barrel.histories) {
-
-            val view = LayoutInflater.from(context)
-                .inflate(R.layout.item_history, holder.layoutHistory, false)
-
-            val txtName = view.findViewById<TextView>(R.id.txtName)
-            val txtDuration = view.findViewById<TextView>(R.id.txtDuration)
-            val txtDates = view.findViewById<TextView>(R.id.txtDates)
-            val btnMenu = view.findViewById<ImageButton>(R.id.btnMenu)
-            val actionsSection = view.findViewById<LinearLayout>(R.id.actionsSection)
-            val alertsSection = view.findViewById<LinearLayout>(R.id.alertsSection)
-            val alertsContainer: LinearLayout = view.findViewById(R.id.historyAlertsContainer)
-            val actionsContainer: LinearLayout = view.findViewById(R.id.historyActionsContainer)
-            val chipAngels: Chip = view.findViewById(R.id.chipAngels)
-            val chipAlcohol: Chip = view.findViewById(R.id.chipAlcohol)
-            val txtDescription: TextView = view.findViewById(R.id.txtDescription)
-            val txtExpandDescription: TextView = view.findViewById(R.id.txtExpandDescription)
-            val img = view.findViewById<ImageView>(R.id.imgHistory)
-
-            val historyType = getHistoryType(history)
-            txtName.text = "${history.name} · $historyType"
-
-            txtDuration.text = calculateDuration(
-                context,
-                history.beginDate,
-                history.endDate
-            )
-
-            val dateDebut = formatDate(history.beginDate)
-            val dateFin = history.endDate?.let {
-                formatDate(it)
-            } ?: context.resources.getString(R.string.in_progress)
-
-            txtDates.text = context.resources.getString(
-                R.string.begin_and_end_date,
-                dateDebut,
-                dateFin
-            )
-
-            history.angelsShare
-                ?.takeIf { it.isNotBlank() }
-                ?.let {
-                    chipAngels.visibility = View.VISIBLE
-                    chipAngels.text = "👼 ${history.angelsShare}%"
-                }
-
-            history.alcoholicStrength
-                ?.takeIf { it.isNotBlank() }
-                ?.let {
-                    chipAlcohol.visibility = View.VISIBLE
-                    chipAlcohol.text = "🥃 ${history.alcoholicStrength}%"
-                }
-
-            val description = history.description
-
-            if (description.isNullOrBlank()) {
-                txtDescription.visibility = View.GONE
-                txtExpandDescription.visibility = View.GONE
-            } else {
-                txtDescription.text = description
-                txtDescription.visibility = View.INVISIBLE
-                txtExpandDescription.visibility = View.GONE
-
-                txtDescription.maxLines = Integer.MAX_VALUE
-                txtDescription.ellipsize = null
-            }
-
-            txtDescription.afterMeasured {
-
-                val lineCount = txtDescription.lineCount
-
-                if (lineCount <= 1) {
-                    txtExpandDescription.visibility = View.GONE
-                } else {
-                    txtExpandDescription.visibility = View.VISIBLE
-                    txtExpandDescription.text = txtDescription.context.getString(R.string.see_more)
-                    txtDescription.maxLines = 1
-                    txtDescription.ellipsize = TextUtils.TruncateAt.END
-                }
-
-                txtDescription.visibility = View.VISIBLE
-            }
-
-            txtExpandDescription.setOnClickListener {
-
-                val expanded = txtDescription.maxLines > 1
-
-                if (expanded) {
-                    // collapse
-                    val startHeight = txtDescription.height
-
-                    txtDescription.maxLines = 1
-                    txtDescription.ellipsize = TextUtils.TruncateAt.END
-                    txtDescription.measure(
-                        View.MeasureSpec.makeMeasureSpec(
-                            txtDescription.width,
-                            View.MeasureSpec.EXACTLY
-                        ),
-                        View.MeasureSpec.UNSPECIFIED
-                    )
-                    val endHeight = txtDescription.measuredHeight
-
-                    animateTextViewHeight(txtDescription, startHeight, endHeight)
-
-                    txtExpandDescription.text = context.getString(R.string.see_more)
-
-                } else {
-                    // expand
-                    val startHeight = txtDescription.height
-
-                    txtDescription.maxLines = Int.MAX_VALUE
-                    txtDescription.ellipsize = null
-                    txtDescription.measure(
-                        View.MeasureSpec.makeMeasureSpec(
-                            txtDescription.width,
-                            View.MeasureSpec.EXACTLY
-                        ),
-                        View.MeasureSpec.UNSPECIFIED
-                    )
-                    val endHeight = txtDescription.measuredHeight
-
-                    animateTextViewHeight(txtDescription, startHeight, endHeight)
-
-                    txtExpandDescription.text = context.getString(R.string.see_less)
-                }
-            }
-
-            btnMenu.setOnClickListener {
-                val popup = PopupMenu(it.context, it)
-                popup.inflate(R.menu.history_item_menu)
-                popup.setOnMenuItemClickListener { item ->
-                    when (item.itemId) {
-                        R.id.action_edit -> {
-                            onAddHistory(barrel, history.id)
-                            true
-                        }
-
-                        R.id.action_delete -> {
-                            confirmDeleteHistory(history)
-                            true
-                        }
-
-                        R.id.action_take_picture -> {
-                            onTakeHistoryPicture(history)
-                            true
-                        }
-
-                        R.id.action_import_image -> {
-                            onImportHistoryPicture(history)
-                            true
-                        }
-
-                        else -> false
-                    }
-                }
-
-                popup.show()
-            }
-
-            if (!history.imagePath.isNullOrEmpty()) {
-                val file = File(history.imagePath)
-
-                if (file.exists()) {
-                    img.visibility = View.VISIBLE
-                    val bmp = BitmapFactory.decodeFile(file.absolutePath)
-                    img.setImageBitmap(bmp)
-
-                    img.setOnClickListener {
-                        imageService.showImageFullscreen(it.context, history.imagePath)
-                    }
-                } else {
-                    img.visibility = View.GONE
-                }
-            } else {
-                img.visibility = View.GONE
-            }
-
-            // Animation d'apparition
-            view.alpha = 0f
-            view.translationY = 20f
-            view.animate()
-                .alpha(1f)
-                .translationY(0f)
-                .setDuration(200)
-                .start()
-
-            holder.layoutHistory.addView(view)
-            val alerts = AlertDao(DatabaseHelper(context)).getByHistoryId(history.id)
-
-            // Affichage des actions effectuées
-            val doneActions = alerts.filter { it.date < System.currentTimeMillis() }
-            displayAlerts(
-                actionsSection,
-                actionsContainer,
-                doneActions,
-                "✅"
-            )
-
-            // Affichage des alertes à venir
-            val futureAlerts = alerts.filter { it.date >= System.currentTimeMillis() }
-            displayAlerts(
-                alertsSection,
-                alertsContainer,
-                futureAlerts,
-                "📆"
-            )
-        }
-    }
-
-    private fun displayAlerts(
-        section: LinearLayout,
-        container: LinearLayout,
-        alerts: List<Alert>,
-        icon: String
-    ) {
-        container.removeAllViews()
-
-        if (alerts.isEmpty()) {
-            section.visibility = View.GONE
-        } else {
-            section.visibility = View.VISIBLE
-
-            alerts
-                .forEach { alert ->
-                    val alertView = LayoutInflater.from(context).inflate(
-                        R.layout.item_alert,
-                        container,
-                        false
-                    )
-
-                    alertView.findViewById<TextView>(R.id.txtAlertType).text = "$icon ${alert.type}"
-                    alertView.findViewById<TextView>(R.id.txtAlertDate).text =
-                        formatDate(alert.date)
-
-                    container.addView(alertView)
-                }
-        }
-    }
-
-    private fun confirmDeleteHistory(history: History) {
-        MaterialAlertDialogBuilder(context)
-            .setBackground(context, R.color.dialog_bg)
-            .setTitle(context.resources.getString(R.string.remove_history))
-            .setMessage(context.resources.getString(R.string.remove_history_validation))
-            .setPositiveButton(context.resources.getString(R.string.remove)) { _, _ ->
-                val historyId = history.id
-                alertDao.getByHistoryId(historyId).forEach {
-                    alertService.cancelByAlertId(context, it.id)
-                }
-                historyDao.delete(historyId)
-
-                // Recharge les données après suppression
-                refresh()
-            }
-            .setNegativeButton(context.resources.getString(R.string.cancel), null)
-            .show()
-    }
-
     fun addChip(holder: BarrelViewHolder, text: String, icon: String) {
         val chip = Chip(holder.itemView.context).apply {
             this.text = "$icon $text"
@@ -533,46 +252,6 @@ class BarrelAdapter(
             chipStrokeWidth = 0f
         }
         holder.chipGroup.addView(chip)
-    }
-
-    fun TextView.afterMeasured(block: () -> Unit) {
-        if (width > 0) {
-            block()
-            return
-        }
-
-        viewTreeObserver.addOnGlobalLayoutListener(object :
-            ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                if (width > 0) {
-                    viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    block()
-                }
-            }
-        })
-    }
-
-    private fun animateTextViewHeight(view: TextView, start: Int, end: Int, duration: Long = 220) {
-        val animator = ValueAnimator.ofInt(start, end)
-        animator.duration = duration
-        animator.interpolator = android.view.animation.DecelerateInterpolator()
-
-        animator.addUpdateListener {
-            val value = it.animatedValue as Int
-            view.layoutParams.height = value
-            view.requestLayout()
-        }
-
-        animator.start()
-    }
-
-    private fun getHistoryType(history: History): String {
-        return when (history.type) {
-            context.resources.getString(EHistoryType.AGING.historyTypeDescription) -> "${history.type} ⌛"
-            context.resources.getString(EHistoryType.SEASONNING.historyTypeDescription) -> "${history.type} 🪵"
-            context.resources.getString(EHistoryType.MIX.historyTypeDescription) -> "${history.type} 🔄"
-            else -> history.type
-        }
     }
 
     private fun expand(view: View) {

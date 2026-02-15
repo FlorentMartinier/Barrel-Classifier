@@ -38,7 +38,13 @@ class AddBarrelDialog : DialogFragment() {
     private var barrelId: Long? = null
     private var modificationMode = false
 
+    private lateinit var db: DatabaseHelper
+    private lateinit var barrelDao: BarrelDao
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        db = DatabaseHelper.getInstance(requireContext())
+        barrelDao = BarrelDao.getInstance(db)
+
         val view = layoutInflater.inflate(R.layout.dialog_add_barrel, null)
 
         edtBarrelName = view.findViewById(R.id.edtBarrelName)
@@ -100,8 +106,7 @@ class AddBarrelDialog : DialogFragment() {
             ?.let {
                 modificationMode = true
                 barrelId = it
-                val db = DatabaseHelper(requireContext())
-                barrel = BarrelDao(db).getById(it)
+                barrel = barrelDao.findById(it)
                 edtBarrelName.setText(barrel.name)
                 edtVolume.setText(barrel.volume.toString())
                 edtBrand.setText(barrel.brand)
@@ -174,8 +179,6 @@ class AddBarrelDialog : DialogFragment() {
                         histories = emptyList()
                     )
 
-                    val db = DatabaseHelper(requireContext())
-                    val barrelDao = BarrelDao(db)
                     if (modificationMode) {
                         barrelDao.update(barrel)
                     } else {

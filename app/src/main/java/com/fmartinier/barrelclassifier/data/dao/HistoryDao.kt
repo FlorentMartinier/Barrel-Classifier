@@ -15,7 +15,9 @@ import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.NAME_COLUMN
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.TYPE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.model.History
 
-class HistoryDao(private val dbHelper: DatabaseHelper) {
+class HistoryDao private constructor(private val dbHelper: DatabaseHelper) {
+
+    val alertDao = AlertDao.getInstance(dbHelper)
 
     fun insert(history: History): Long {
         val db = dbHelper.writableDatabase
@@ -28,6 +30,110 @@ class HistoryDao(private val dbHelper: DatabaseHelper) {
         val values = getContentValues(history)
 
         return db.update(
+            HISTORY_TABLE_NAME,
+            values,
+            "$ID_COLUMN_NAME = ?",
+            arrayOf(historyId.toString())
+        )
+    }
+
+    fun deleteById(id: Long) {
+        dbHelper.writableDatabase.delete(
+            HISTORY_TABLE_NAME,
+            "$ID_COLUMN_NAME = ?",
+            arrayOf(id.toString())
+        )
+    }
+
+    fun findById(id: Long): History {
+        val db = dbHelper.writableDatabase
+        val list = mutableListOf<History>()
+        val cursor = db.rawQuery(
+            "SELECT * FROM $HISTORY_TABLE_NAME WHERE $ID_COLUMN_NAME = ?",
+            arrayOf(id.toString())
+        )
+
+        while (cursor.moveToNext()) {
+            list.add(
+                History(
+                    id = cursor.getLong(cursor.getColumnIndexOrThrow(ID_COLUMN_NAME)),
+                    barrelId = cursor.getLong(cursor.getColumnIndexOrThrow(BARREL_ID_COLUMN_NAME)),
+                    name = cursor.getString(cursor.getColumnIndexOrThrow(NAME_COLUMN_NAME)),
+                    beginDate = cursor.getLong(cursor.getColumnIndexOrThrow(BEGIN_DATE_COLUMN_NAME)),
+                    type = cursor.getString(cursor.getColumnIndexOrThrow(TYPE_COLUMN_NAME)),
+                    description = cursor.getString(cursor.getColumnIndexOrThrow(DESCRIPTION_COLUMN_NAME)),
+                    angelsShare = cursor.getString(cursor.getColumnIndexOrThrow(ANGEL_SHARE_COLUMN_NAME)),
+                    alcoholicStrength = cursor.getString(cursor.getColumnIndexOrThrow(ALCOHOLIC_STRENGTH_COLUMN_NAME)),
+                    endDate = if (cursor.isNull(cursor.getColumnIndexOrThrow(END_DATE_COLUMN_NAME)))
+                        null
+                    else
+                        cursor.getLong(cursor.getColumnIndexOrThrow(END_DATE_COLUMN_NAME)),
+                    imagePath = cursor.getString(cursor.getColumnIndexOrThrow(IMAGE_PATH_COLUMN_NAME)),
+                    alerts = alertDao.findAllByHistoryId(id),
+                )
+            )
+        }
+
+        cursor.close()
+        if (list.size > 1) {
+            throw Exception("Il y a une incohérence dans le nombre d'historiques (${list.size}) possédant l'id $id")
+        }
+        return list[0]
+    }
+
+    fun findAllByBarrelId(barrelId: Long): List<History> {
+        val db = dbHelper.readableDatabase
+        val list = mutableListOf<History>()
+
+        val cursor = db.rawQuery(
+            "SELECT * FROM $HISTORY_TABLE_NAME WHERE $BARREL_ID_COLUMN_NAME = ? ORDER BY $BEGIN_DATE_COLUMN_NAME",
+            arrayOf(barrelId.toString())
+        )
+
+        while (cursor.moveToNext()) {
+            list.add(
+                History(
+                    id = cursor.getLong(cursor.getColumnIndexOrThrow(ID_COLUMN_NAME)),
+                    barrelId = barrelId,
+                    name = cursor.getString(cursor.getColumnIndexOrThrow(NAME_COLUMN_NAME)),
+                    beginDate = cursor.getLong(cursor.getColumnIndexOrThrow(BEGIN_DATE_COLUMN_NAME)),
+                    endDate = if (cursor.isNull(cursor.getColumnIndexOrThrow(END_DATE_COLUMN_NAME)))
+                        null
+                    else
+                        cursor.getLong(cursor.getColumnIndexOrThrow(END_DATE_COLUMN_NAME)),
+                    type = cursor.getString(cursor.getColumnIndexOrThrow(TYPE_COLUMN_NAME)),
+                    description = cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                            DESCRIPTION_COLUMN_NAME
+                        )
+                    ),
+                    angelsShare = cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                            ANGEL_SHARE_COLUMN_NAME
+                        )
+                    ),
+                    alcoholicStrength = cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                            ALCOHOLIC_STRENGTH_COLUMN_NAME
+                        )
+                    ),
+                    imagePath = cursor.getString(cursor.getColumnIndexOrThrow(IMAGE_PATH_COLUMN_NAME)),
+                    alerts = alertDao.findAllByHistoryId(cursor.getLong(cursor.getColumnIndexOrThrow(ID_COLUMN_NAME)))
+                )
+            )
+        }
+
+        cursor.close()
+        return list
+    }
+
+    fun updateImage(historyId: Long, imagePath: String) {
+        val db = dbHelper.writableDatabase
+        val values = ContentValues().apply {
+            put(IMAGE_PATH_COLUMN_NAME, imagePath)
+        }
+
+        db.update(
             HISTORY_TABLE_NAME,
             values,
             "$ID_COLUMN_NAME = ?",
@@ -54,61 +160,16 @@ class HistoryDao(private val dbHelper: DatabaseHelper) {
         }
     }
 
-    fun delete(id: Long) {
-        dbHelper.writableDatabase.delete(
-            HISTORY_TABLE_NAME,
-            "$ID_COLUMN_NAME = ?",
-            arrayOf(id.toString())
-        )
-    }
+    companion object {
+        @Volatile
+        private var INSTANCE: HistoryDao? = null
 
-    fun getById(id: Long): History {
-        val db = dbHelper.writableDatabase
-        val list = mutableListOf<History>()
-        val cursor = db.rawQuery(
-            "SELECT * FROM $HISTORY_TABLE_NAME WHERE $ID_COLUMN_NAME = ?",
-            arrayOf(id.toString())
-        )
-
-        while (cursor.moveToNext()) {
-            list.add(
-                History(
-                    id = cursor.getLong(cursor.getColumnIndexOrThrow(ID_COLUMN_NAME)),
-                    barrelId = cursor.getLong(cursor.getColumnIndexOrThrow(BARREL_ID_COLUMN_NAME)),
-                    name = cursor.getString(cursor.getColumnIndexOrThrow(NAME_COLUMN_NAME)),
-                    beginDate = cursor.getLong(cursor.getColumnIndexOrThrow(BEGIN_DATE_COLUMN_NAME)),
-                    type = cursor.getString(cursor.getColumnIndexOrThrow(TYPE_COLUMN_NAME)),
-                    description = cursor.getString(cursor.getColumnIndexOrThrow(DESCRIPTION_COLUMN_NAME)),
-                    angelsShare = cursor.getString(cursor.getColumnIndexOrThrow(ANGEL_SHARE_COLUMN_NAME)),
-                    alcoholicStrength = cursor.getString(cursor.getColumnIndexOrThrow(ALCOHOLIC_STRENGTH_COLUMN_NAME)),
-                    endDate = if (cursor.isNull(cursor.getColumnIndexOrThrow(END_DATE_COLUMN_NAME)))
-                        null
-                    else
-                        cursor.getLong(cursor.getColumnIndexOrThrow(END_DATE_COLUMN_NAME)),
-                    imagePath = cursor.getString(cursor.getColumnIndexOrThrow(IMAGE_PATH_COLUMN_NAME)),
-                )
-            )
+        fun getInstance(dbHelper: DatabaseHelper): HistoryDao {
+            return INSTANCE ?: synchronized(this) {
+                val instance = HistoryDao(dbHelper)
+                INSTANCE = instance
+                instance
+            }
         }
-
-        cursor.close()
-        if (list.size > 1) {
-            throw Exception("Il y a une incohérence dans le nombre d'historiques (${list.size}) possédant l'id $id")
-        }
-        return list[0]
     }
-
-    fun updateImage(historyId: Long, imagePath: String) {
-        val db = dbHelper.writableDatabase
-        val values = ContentValues().apply {
-            put(IMAGE_PATH_COLUMN_NAME, imagePath)
-        }
-
-        db.update(
-            HISTORY_TABLE_NAME,
-            values,
-            "$ID_COLUMN_NAME = ?",
-            arrayOf(historyId.toString())
-        )
-    }
-
 }

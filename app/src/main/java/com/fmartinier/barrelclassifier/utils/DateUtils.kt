@@ -48,8 +48,7 @@ class DateUtils {
                 )
             } else if (months == 0) {
                 context.resources.getString(
-                    R.string.month_and_week,
-                    months.toString(),
+                    R.string.week,
                     weeks.toString()
                 )
             } else {

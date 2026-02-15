@@ -2,14 +2,9 @@ package com.fmartinier.barrelclassifier.data.dao
 
 import android.content.ContentValues
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
-import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.ALCOHOLIC_STRENGTH_COLUMN_NAME
-import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.ANGEL_SHARE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.BARREL_ID_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.BARREL_TABLE_NAME
-import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.BEGIN_DATE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.BRAND_COLUMN_NAME
-import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.DESCRIPTION_COLUMN_NAME
-import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.END_DATE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.HEATING_TYPE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.HISTORY_TABLE_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.ID_COLUMN_NAME
@@ -17,13 +12,13 @@ import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.IMAGE_PATH_
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.NAME_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.STORAGE_HYGROMETER_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.STORAGE_TEMPERATURE_COLUMN_NAME
-import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.TYPE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.VOLUME_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.WOOD_TYPE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.model.Barrel
-import com.fmartinier.barrelclassifier.data.model.History
 
-class BarrelDao(private val dbHelper: DatabaseHelper) {
+class BarrelDao private constructor(private val dbHelper: DatabaseHelper) {
+
+    private val historyDao = HistoryDao.getInstance(dbHelper)
 
     fun insert(barrel: Barrel): Long {
         val db = dbHelper.writableDatabase
@@ -40,7 +35,7 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
         return db.insert(BARREL_TABLE_NAME, null, values)
     }
 
-    fun getAllBarrelsWithHistories(): List<Barrel> {
+    fun findAllWithHistories(): List<Barrel> {
         val db = dbHelper.readableDatabase
         val barrels = mutableListOf<Barrel>()
 
@@ -49,7 +44,7 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
         while (cursor.moveToNext()) {
             val barrelId = cursor.getLong(cursor.getColumnIndexOrThrow(ID_COLUMN_NAME))
 
-            val histories = getHistoriesForBarrel(barrelId)
+            val histories = historyDao.findAllByBarrelId(barrelId)
 
             barrels.add(
                 Barrel(
@@ -59,9 +54,21 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
                     brand = cursor.getString(cursor.getColumnIndexOrThrow(BRAND_COLUMN_NAME)),
                     woodType = cursor.getString(cursor.getColumnIndexOrThrow(WOOD_TYPE_COLUMN_NAME)),
                     imagePath = cursor.getString(cursor.getColumnIndexOrThrow(IMAGE_PATH_COLUMN_NAME)),
-                    heatType = cursor.getString(cursor.getColumnIndexOrThrow(HEATING_TYPE_COLUMN_NAME)),
-                    storageHygrometer = cursor.getString(cursor.getColumnIndexOrThrow(STORAGE_HYGROMETER_COLUMN_NAME)),
-                    storageTemperature = cursor.getString(cursor.getColumnIndexOrThrow(STORAGE_TEMPERATURE_COLUMN_NAME)),
+                    heatType = cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                            HEATING_TYPE_COLUMN_NAME
+                        )
+                    ),
+                    storageHygrometer = cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                            STORAGE_HYGROMETER_COLUMN_NAME
+                        )
+                    ),
+                    storageTemperature = cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                            STORAGE_TEMPERATURE_COLUMN_NAME
+                        )
+                    ),
                     histories = histories
                 )
             )
@@ -71,7 +78,7 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
         return barrels
     }
 
-    fun deleteBarrel(barrelId: Long) {
+    fun deleteById(barrelId: Long) {
         dbHelper.writableDatabase.delete(
             HISTORY_TABLE_NAME,
             "$BARREL_ID_COLUMN_NAME = ?",
@@ -119,40 +126,7 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
         )
     }
 
-    private fun getHistoriesForBarrel(barrelId: Long): List<History> {
-        val db = dbHelper.readableDatabase
-        val list = mutableListOf<History>()
-
-        val cursor = db.rawQuery(
-            "SELECT * FROM $HISTORY_TABLE_NAME WHERE $BARREL_ID_COLUMN_NAME = ? ORDER BY $BEGIN_DATE_COLUMN_NAME",
-            arrayOf(barrelId.toString())
-        )
-
-        while (cursor.moveToNext()) {
-            list.add(
-                History(
-                    id = cursor.getLong(cursor.getColumnIndexOrThrow(ID_COLUMN_NAME)),
-                    barrelId = barrelId,
-                    name = cursor.getString(cursor.getColumnIndexOrThrow(NAME_COLUMN_NAME)),
-                    beginDate = cursor.getLong(cursor.getColumnIndexOrThrow(BEGIN_DATE_COLUMN_NAME)),
-                    endDate = if (cursor.isNull(cursor.getColumnIndexOrThrow(END_DATE_COLUMN_NAME)))
-                        null
-                    else
-                        cursor.getLong(cursor.getColumnIndexOrThrow(END_DATE_COLUMN_NAME)),
-                    type = cursor.getString(cursor.getColumnIndexOrThrow(TYPE_COLUMN_NAME)),
-                    description = cursor.getString(cursor.getColumnIndexOrThrow(DESCRIPTION_COLUMN_NAME)),
-                    angelsShare = cursor.getString(cursor.getColumnIndexOrThrow(ANGEL_SHARE_COLUMN_NAME)),
-                    alcoholicStrength = cursor.getString(cursor.getColumnIndexOrThrow(ALCOHOLIC_STRENGTH_COLUMN_NAME)),
-                    imagePath = cursor.getString(cursor.getColumnIndexOrThrow(IMAGE_PATH_COLUMN_NAME))
-                )
-            )
-        }
-
-        cursor.close()
-        return list
-    }
-
-    fun getById(barrelId: Long): Barrel {
+    fun findById(barrelId: Long): Barrel {
         val db = dbHelper.readableDatabase
 
         val cursor = db.query(
@@ -188,13 +162,34 @@ class BarrelDao(private val dbHelper: DatabaseHelper) {
             woodType = cursor.getString(cursor.getColumnIndexOrThrow(WOOD_TYPE_COLUMN_NAME)),
             imagePath = cursor.getString(cursor.getColumnIndexOrThrow(IMAGE_PATH_COLUMN_NAME)),
             heatType = cursor.getString(cursor.getColumnIndexOrThrow(HEATING_TYPE_COLUMN_NAME)),
-            storageHygrometer = cursor.getString(cursor.getColumnIndexOrThrow(STORAGE_HYGROMETER_COLUMN_NAME)),
-            storageTemperature = cursor.getString(cursor.getColumnIndexOrThrow(STORAGE_TEMPERATURE_COLUMN_NAME)),
-            histories = getHistoriesForBarrel(barrelId)
+            storageHygrometer = cursor.getString(
+                cursor.getColumnIndexOrThrow(
+                    STORAGE_HYGROMETER_COLUMN_NAME
+                )
+            ),
+            storageTemperature = cursor.getString(
+                cursor.getColumnIndexOrThrow(
+                    STORAGE_TEMPERATURE_COLUMN_NAME
+                )
+            ),
+            histories = historyDao.findAllByBarrelId(barrelId)
         )
 
         cursor.close()
         return barrel
+    }
+
+    companion object {
+        @Volatile
+        private var INSTANCE: BarrelDao? = null
+
+        fun getInstance(dbHelper: DatabaseHelper): BarrelDao {
+            return INSTANCE ?: synchronized(this) {
+                val instance = BarrelDao(dbHelper)
+                INSTANCE = instance
+                instance
+            }
+        }
     }
 
 }

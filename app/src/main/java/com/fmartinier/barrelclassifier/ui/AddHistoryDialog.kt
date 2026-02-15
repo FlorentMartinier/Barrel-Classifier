@@ -51,15 +51,19 @@ class AddHistoryDialog : DialogFragment() {
     private lateinit var edtAlcohol: TextInputEditText
     private lateinit var edtHistoryType: MaterialAutoCompleteTextView
     private var imagePath: String? = null
+
+
+    private lateinit var db: DatabaseHelper
     private lateinit var alertDao: AlertDao
     private lateinit var historyDao: HistoryDao
-
     private val alertService = AlertService()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        db = DatabaseHelper.getInstance(requireContext())
+        alertDao = AlertDao.getInstance(db)
+        historyDao = HistoryDao.getInstance(db)
+
         val view = layoutInflater.inflate(R.layout.dialog_add_history, null)
-        alertDao = AlertDao(DatabaseHelper(requireContext()))
-        historyDao = HistoryDao(DatabaseHelper(requireContext()))
         historyId = arguments
             ?.takeIf { it.containsKey(ARG_HISTORY_ID) }
             ?.getLong(ARG_HISTORY_ID)
@@ -109,8 +113,7 @@ class AddHistoryDialog : DialogFragment() {
 
         // Cas d'un update, pré remplissage des champs
         historyId?.let {
-            val alerts = alertDao.getByHistoryId(historyId!!)
-            val history = historyDao.getById(historyId!!)
+            val history = historyDao.findById(historyId!!)
             edtName.setText(history.name)
             beginDate = history.beginDate
             endDate = history.endDate
@@ -118,7 +121,7 @@ class AddHistoryDialog : DialogFragment() {
             history.endDate?.let {
                 edtEndDate.setText(formatDate(history.endDate))
             }
-            alerts.forEach { alert ->
+            history.alerts.forEach { alert ->
                 addAlertRow(alert)
             }
             edtHistoryType.setText(history.type, false)
@@ -212,6 +215,7 @@ class AddHistoryDialog : DialogFragment() {
                         alcoholicStrength = alcohol,
                         type = historyType,
                         imagePath = imagePath,
+                        alerts = emptyList()
                     )
 
                     if (this.historyId != null) {

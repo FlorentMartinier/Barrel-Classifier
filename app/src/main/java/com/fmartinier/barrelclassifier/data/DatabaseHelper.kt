@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import androidx.core.database.sqlite.transaction
 import com.fmartinier.barrelclassifier.data.migrations.MigrationRegistry
 
-class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "barrel.db", null, 12) {
+class DatabaseHelper private constructor(private val context: Context) : SQLiteOpenHelper(context, "barrel.db", null, 12) {
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
@@ -90,5 +90,16 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         const val TYPE_COLUMN_NAME: String = "type"
         const val NAME_COLUMN_NAME: String = "name"
         const val ID_COLUMN_NAME: String = "id"
+
+        @Volatile
+        private var INSTANCE: DatabaseHelper? = null
+
+        fun getInstance(context: Context): DatabaseHelper {
+            return INSTANCE ?: synchronized(this) {
+                val instance = DatabaseHelper(context)
+                INSTANCE = instance
+                instance
+            }
+        }
     }
 }
