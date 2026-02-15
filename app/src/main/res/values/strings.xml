@@ -79,10 +79,19 @@
     <string name="rate_popup_description">Soutenez le projet en laissant une note sur le Play Store !</string>
     <string name="note_app">Noter</string>
     <string name="later">Plus tard</string>
-    <string name="import_image">Importer une image</string>
+    <string name="import_image">Importer une photo</string>
     <string name="take_picture">Prendre une photo</string>
     <string name="first_history_date">Date de première mise en fût</string>
     <string name="aging_number">Nombre de vieillissements</string>
+    <string name="statistics">Statistiques</string>
+    <string name="no_stats">Aucune statistique pour le moment</string>
+    <string name="total_duration">Durée Totale d\'activité</string>
+    <string name="record_max">Plus long vieillissement</string>
+    <string name="average_alcohol">Degré d\'alcool moyen</string>
+    <string name="nb_days">%1$s jours</string>
+    <string name="type_repartition">Répartition des types de vieillissements</string>
+    <string name="duration_repartition">Durée de vieillissement moyenne par type (jours)</string>
+    <string name="average_angel_share">Part des anges moyenne</string>
     <string-array name="type_fut_array">
         <item>Vieillissement</item>
         <item>Marquage</item>

@@ -60,6 +60,16 @@ class DateUtils {
             }
         }
 
+        fun calculateNbDaysBetweenDates(dateDebut: Long, dateFin: Long?): Int {
+            val end = dateFin ?: getCurrentDate()
+            val millisDifference = end - dateDebut
+            return if (millisDifference <= 0) {
+                0
+            } else {
+                (millisDifference / (1000 * 60 * 60 * 24)).toInt()
+            }
+        }
+
 
         fun formatDate(timestamp: Long): String {
             return SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE)

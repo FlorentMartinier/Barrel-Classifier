@@ -56,8 +56,8 @@
                 android:id="@+id/btnBarrelMenu"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:layout_margin="12dp"
                 android:layout_gravity="top|end"
+                android:layout_margin="12dp"
                 android:background="@drawable/bg_icon_circle"
                 android:elevation="4dp"
                 android:padding="8dp"
@@ -144,6 +144,233 @@
                 android:background="#1F000000" />
 
             <LinearLayout
+                android:id="@+id/layoutToggleStats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingVertical="4dp">
+
+                <TextView
+                    android:id="@+id/txtStatsTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/statistics"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/imgChevronStats"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:alpha="0.5"
+                    android:src="@drawable/ic_chevron_down" />
+            </LinearLayout>
+
+            <!-- Remplacement du LinearLayout id/layoutStats -->
+            <LinearLayout
+                android:id="@+id/layoutStats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:visibility="gone">
+
+                <!-- Ligne des Records (Durée totale et max) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:id="@+id/textNoStats"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/no_stats"
+                        android:textColor="#808080"
+                        android:textSize="15sp"
+                        android:gravity="start|center_vertical"
+                        android:visibility="visible" />
+
+                    <LinearLayout
+                        android:id="@+id/layoutTotalDuration"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.7"
+                            android:text="@string/total_duration"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/txtTotalDuration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_primary"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layoutRecordDuration"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.7"
+                            android:text="@string/record_max"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/txtRecordDuration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_primary"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Degré Alcool Moyen -->
+                <TextView
+                    android:id="@+id/textProgressStrength"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:alpha="0.7"
+                    android:text="@string/average_alcohol"
+                    android:textSize="12sp" />
+
+                <LinearLayout
+                    android:id="@+id/layoutProgressStrength"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ProgressBar
+                        android:id="@+id/progressAbv"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="0dp"
+                        android:layout_height="8dp"
+                        android:progressDrawable="@drawable/custom_progress_gold"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/txtAvgAlcoholicStrength"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Part des anges Moyenne -->
+                <TextView
+                    android:id="@+id/textProgressAngelShare"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:alpha="0.7"
+                    android:text="@string/average_angel_share"
+                    android:textSize="12sp" />
+
+                <LinearLayout
+                    android:id="@+id/layoutProgressAngelShare"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ProgressBar
+                        android:id="@+id/progressAngelShare"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="0dp"
+                        android:layout_height="8dp"
+                        android:progressDrawable="@drawable/custom_progress_gold"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/txtAvgAngelShare"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/textRepartitionType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:alpha="0.7"
+                    android:text="@string/type_repartition"
+                    android:textSize="12sp" />
+
+                <!-- Graphiques côte à côte -->
+                <LinearLayout
+                    android:id="@+id/layoutPieChartTypes"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <!-- PieChart : Répartition des types -->
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/pieChartTypes"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/textRepartitionDuration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:alpha="0.7"
+                    android:text="@string/duration_repartition"
+                    android:textSize="12sp" />
+
+                <LinearLayout
+                    android:id="@+id/layoutBarChartTypes"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <!-- BarChart : Durée moyenne par type -->
+                    <com.github.mikephil.charting.charts.HorizontalBarChart
+                        android:id="@+id/barChartAvgDuration"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="8dp"
+                android:background="#1F000000" />
+
+            <LinearLayout
                 android:id="@+id/layoutToggleHistory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -167,7 +394,7 @@
                     android:textStyle="bold" />
 
                 <ImageView
-                    android:id="@+id/imgChevron"
+                    android:id="@+id/imgChevronHistory"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:alpha="0.5"
@@ -181,7 +408,6 @@
                 android:layout_marginTop="8dp"
                 android:orientation="vertical"
                 android:visibility="gone" />
-
         </LinearLayout>
     </LinearLayout>
 

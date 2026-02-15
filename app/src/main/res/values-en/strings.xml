@@ -79,10 +79,19 @@
     <string name="rate_popup_description">Support the project with a quick rating on the Play Store!</string>
     <string name="note_app">Rate it</string>
     <string name="later">Later</string>
-    <string name="import_image">Import image</string>
-    <string name="take_picture">Take a picture</string>
+    <string name="import_image">Import photo</string>
+    <string name="take_picture">Add photo</string>
     <string name="first_history_date">First barreling date</string>
     <string name="aging_number">Number of agings</string>
+    <string name="statistics">Statistics</string>
+    <string name="no_stats">No statistics at the moment</string>
+    <string name="total_duration">Total Duration</string>
+    <string name="record_max">Longest ageing</string>
+    <string name="average_alcohol">Average alcohol content</string>
+    <string name="nb_days">%1$s days</string>
+    <string name="type_repartition">Aging types distribution</string>
+    <string name="duration_repartition">Average aging duration by type (days)</string>
+    <string name="average_angel_share">Average angel\'s share</string>
     <string-array name="type_fut_array">
         <item>Aging</item>
         <item>Seasonning</item>

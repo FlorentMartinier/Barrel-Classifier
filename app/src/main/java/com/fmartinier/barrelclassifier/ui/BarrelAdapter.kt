@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupMenu
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
@@ -24,7 +26,19 @@ import com.fmartinier.barrelclassifier.data.model.History
 import com.fmartinier.barrelclassifier.service.BarrelService
 import com.fmartinier.barrelclassifier.service.ImageService
 import com.fmartinier.barrelclassifier.service.PdfService
+import com.fmartinier.barrelclassifier.utils.DateUtils
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.formatDate
+import com.github.mikephil.charting.charts.HorizontalBarChart
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.PercentFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -97,20 +111,39 @@ class BarrelAdapter(
         holder.layoutToggleHistory.setOnClickListener {
 
             val view = holder.layoutHistory
-            holder.isExpanded = !holder.isExpanded
+            holder.isHistoryExpanded = !holder.isHistoryExpanded
 
-            if (holder.isExpanded) {
+            if (holder.isHistoryExpanded) {
                 expand(view)
             } else {
                 collapse(view)
             }
 
             // rotation chevron
-            holder.imgChevron.animate()
-                .rotation(if (holder.isExpanded) 180f else 0f)
+            holder.imgChevronHistory.animate()
+                .rotation(if (holder.isHistoryExpanded) 180f else 0f)
                 .setDuration(250)
                 .start()
         }
+
+        holder.layoutToggleStats.setOnClickListener {
+
+            val view = holder.layoutStats
+            holder.isStatsExpanded = !holder.isStatsExpanded
+
+            if (holder.isStatsExpanded) {
+                expand(view)
+            } else {
+                collapse(view)
+            }
+
+            // rotation chevron
+            holder.imgChevronStats.animate()
+                .rotation(if (holder.isStatsExpanded) 180f else 0f)
+                .setDuration(250)
+                .start()
+        }
+        setupStats(barrel, holder.layoutStats)
 
         holder.btnMenu.setOnClickListener {
             val popup = PopupMenu(it.context, it)
@@ -223,19 +256,21 @@ class BarrelAdapter(
         val txtBarrelDetails: TextView = itemView.findViewById(R.id.txtBarrelDetails)
         val btnMenu: ImageButton = itemView.findViewById(R.id.btnBarrelMenu)
         val btnAddHistory: TextView = itemView.findViewById(R.id.btnAddHistory)
+        val layoutToggleStats: LinearLayout = itemView.findViewById(R.id.layoutToggleStats)
         val layoutToggleHistory: LinearLayout = itemView.findViewById(R.id.layoutToggleHistory)
-        val imgChevron: ImageView = itemView.findViewById(R.id.imgChevron)
+        val imgChevronStats: ImageView = itemView.findViewById(R.id.imgChevronStats)
+        val imgChevronHistory: ImageView = itemView.findViewById(R.id.imgChevronHistory)
         val imgBarrel: ImageView = itemView.findViewById(R.id.imgBarrel)
         val photoOverlay: LinearLayout = itemView.findViewById(R.id.photoOverlay)
+        val layoutStats: LinearLayout = itemView.findViewById(R.id.layoutStats)
         val layoutHistory: LinearLayout = itemView.findViewById(R.id.layoutHistory)
         val chipGroup: ChipGroup = itemView.findViewById<ChipGroup>(R.id.chipGroupAdvanced)
         val txtNextAlertDate: TextView = itemView.findViewById<TextView>(R.id.txtNextAlertDate)
         val layoutNextAlert: LinearLayout =
             itemView.findViewById<LinearLayout>(R.id.layoutNextAlert)
 
-        // Permet de savoir si l’historique est ouvert ou non
-        var isExpanded: Boolean = false
-
+        var isHistoryExpanded: Boolean = false
+        var isStatsExpanded: Boolean = false
     }
 
     fun addChip(holder: BarrelViewHolder, text: String, icon: String) {
@@ -294,5 +329,198 @@ class BarrelAdapter(
         }
 
         animator.start()
+    }
+
+    private fun setupStats(barrel: Barrel, view: LinearLayout) {
+        val layoutRecordDuration = view.findViewById<LinearLayout>(R.id.layoutRecordDuration)
+        val layoutTotalDuration = view.findViewById<LinearLayout>(R.id.layoutTotalDuration)
+        val layoutPieChartTypes = view.findViewById<LinearLayout>(R.id.layoutPieChartTypes)
+        val layoutProgressStrength = view.findViewById<LinearLayout>(R.id.layoutProgressStrength)
+        val layoutBarChartTypes = view.findViewById<LinearLayout>(R.id.layoutBarChartTypes)
+        val textProgressStrength = view.findViewById<TextView>(R.id.textProgressStrength)
+        val txtRecordDuration = view.findViewById<TextView>(R.id.txtRecordDuration)
+        val txtTotalDuration = view.findViewById<TextView>(R.id.txtTotalDuration)
+        val txtAvgAlcoholicStrength = view.findViewById<TextView>(R.id.txtAvgAlcoholicStrength)
+        val progressAbv = view.findViewById<ProgressBar>(R.id.progressAbv)
+        val pieChartTypes = view.findViewById<PieChart>(R.id.pieChartTypes)
+        val textNoStats = view.findViewById<TextView>(R.id.textNoStats)
+        val txtAvgAngelShare = view.findViewById<TextView>(R.id.txtAvgAngelShare)
+        val progressAngelShare = view.findViewById<ProgressBar>(R.id.progressAngelShare)
+        val layoutProgressAngelShare = view.findViewById<LinearLayout>(R.id.layoutProgressAngelShare)
+        val textProgressAngelShare = view.findViewById<TextView>(R.id.textProgressAngelShare)
+        val textRepartitionType = view.findViewById<TextView>(R.id.textRepartitionType)
+        val textRepartitionDuration = view.findViewById<TextView>(R.id.textRepartitionDuration)
+
+        if (barrel.histories.isEmpty()) {
+            textNoStats.visibility = View.VISIBLE
+            layoutRecordDuration.visibility = View.GONE
+            layoutTotalDuration.visibility = View.GONE
+            layoutPieChartTypes.visibility = View.GONE
+            layoutProgressStrength.visibility = View.GONE
+            textProgressStrength.visibility = View.GONE
+            layoutBarChartTypes.visibility = View.GONE
+            textProgressAngelShare.visibility = View.GONE
+            layoutProgressAngelShare.visibility = View.GONE
+            textRepartitionType.visibility = View.GONE
+            textRepartitionDuration.visibility = View.GONE
+        } else {
+            textNoStats.visibility = View.GONE
+            layoutRecordDuration.visibility = View.VISIBLE
+            layoutTotalDuration.visibility = View.VISIBLE
+            layoutPieChartTypes.visibility = View.VISIBLE
+            layoutProgressStrength.visibility = View.VISIBLE
+            textProgressStrength.visibility = View.VISIBLE
+            layoutBarChartTypes.visibility = View.VISIBLE
+            textProgressAngelShare.visibility = View.VISIBLE
+            layoutProgressAngelShare.visibility = View.VISIBLE
+            textRepartitionType.visibility = View.VISIBLE
+            textRepartitionDuration.visibility = View.VISIBLE
+        }
+        val histories = barrel.histories
+
+        // 1. Calculs de base
+        val totalDays = histories.sumOf {
+            DateUtils.calculateNbDaysBetweenDates(it.beginDate, it.endDate)
+        }
+        val recordDays = histories.maxOfOrNull {
+            DateUtils.calculateNbDaysBetweenDates(it.beginDate, it.endDate)
+        } ?: 0
+
+        val averageAlcoholicStrength = histories
+            .mapNotNull { it.alcoholicStrength }
+            .filter { !it.isEmpty() }
+            .map { it.toFloat() }
+            .average()
+
+        val averageAngelsShare = histories
+            .mapNotNull { it.angelsShare }
+            .filter { !it.isEmpty() }
+            .map { it.toFloat() }
+            .average()
+
+        // 2. Affichage textes
+        txtTotalDuration.text = context.resources.getString(R.string.nb_days, totalDays.toString())
+        txtRecordDuration.text =
+            context.resources.getString(R.string.nb_days, recordDays.toString())
+
+        // Degré d'alcool
+        if (averageAlcoholicStrength.isNaN()) {
+            textProgressStrength.visibility = View.GONE
+            layoutProgressStrength.visibility = View.GONE
+        } else {
+            layoutProgressStrength.visibility = View.VISIBLE
+            textProgressStrength.visibility = View.VISIBLE
+            txtAvgAlcoholicStrength.text = "$averageAlcoholicStrength %"
+            progressAbv.progress = averageAlcoholicStrength.toInt()
+        }
+
+        // Part des anges
+        if (averageAngelsShare.isNaN()) {
+            textProgressAngelShare.visibility = View.GONE
+            layoutProgressAngelShare.visibility = View.GONE
+        } else {
+            layoutProgressAngelShare.visibility = View.VISIBLE
+            textProgressAngelShare.visibility = View.VISIBLE
+            txtAvgAngelShare.text = "$averageAngelsShare %"
+            progressAngelShare.progress = averageAngelsShare.toInt()
+        }
+
+        // 3. PieChart (Répartition %)
+        val typeCounts = histories.groupingBy { it.type }.eachCount()
+        val pieEntries = typeCounts.map { PieEntry(it.value.toFloat(), it.key) }
+
+        val colorList = listOf(
+            ContextCompat.getColor(context, R.color.chart_primary),
+            ContextCompat.getColor(context, R.color.chart_secondary),
+            ContextCompat.getColor(context, R.color.chart_tertiary),
+        )
+
+        val pieDataSet = PieDataSet(pieEntries, "").apply {
+            colors = colorList
+            valueTextSize = 10f
+            setDrawValues(true)
+            valueFormatter = PercentFormatter(pieChartTypes)
+        }
+        pieChartTypes.apply {
+            data = PieData(pieDataSet)
+            setDrawEntryLabels(false)
+            setUsePercentValues(true)
+            description.isEnabled = false
+            legend.apply {
+                isEnabled = true
+                horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
+                orientation = Legend.LegendOrientation.HORIZONTAL
+                setDrawInside(false)
+            }
+            isDrawHoleEnabled = true
+            setHoleColor(Color.TRANSPARENT)
+            invalidate()
+        }
+
+        // 4. BarChart Horizontal (Durée moyenne par type)
+        val barChart = view.findViewById<HorizontalBarChart>(R.id.barChartAvgDuration)
+
+        val avgDurations = histories.groupBy { it.type }.mapValues { entry ->
+            entry.value.sumOf { h ->
+                val end = h.endDate ?: System.currentTimeMillis()
+                (end - h.beginDate)
+            } / entry.value.size / (1000 * 60 * 60 * 24)
+        }
+
+        val barEntries = avgDurations.entries.mapIndexed { index, entry ->
+            BarEntry(index.toFloat(), entry.value.toFloat())
+        }
+
+        val barDataSet =
+            BarDataSet(barEntries, "").apply {
+                colors = colorList
+                valueTextColor = Color.RED
+                valueTextSize = 10f
+                setDrawValues(true)
+                valueFormatter = object : ValueFormatter() {
+                    override fun getFormattedValue(value: Float): String {
+                        return "${value.toInt()} j"
+                    }
+                }
+            }
+
+        barChart.apply {
+            setExtraOffsets(0f, 0f, 20f, 0f)
+            description.isEnabled = false
+            legend.isEnabled = false
+            setDrawValueAboveBar(true)
+            setDrawGridBackground(false)
+            data = BarData(barDataSet)
+            setMaxVisibleValueCount(100)
+            clipChildren = false
+            data.setValueTextColor(ContextCompat.getColor(context, R.color.alert_text))
+
+            // Configuration des axes pour un rendu horizontal propre
+            xAxis.apply {
+                isEnabled = true
+                position = com.github.mikephil.charting.components.XAxis.XAxisPosition.BOTTOM
+                setDrawGridLines(false)
+                textColor = ContextCompat.getColor(context, R.color.text_secondary)
+                valueFormatter =
+                    com.github.mikephil.charting.formatter.IndexAxisValueFormatter(avgDurations.keys.toList())
+                granularity = 1f
+            }
+
+            axisLeft.apply {
+                isEnabled = false // Masquer l'axe du bas
+                setDrawGridLines(false)
+            }
+
+            axisRight.apply {
+                isEnabled = true // Afficher l'axe du haut pour l'échelle
+                setDrawGridLines(true)
+                gridColor = Color.LTGRAY
+                textColor = ContextCompat.getColor(context, R.color.chart_primary)
+            }
+
+            setFitBars(true)
+            animateY(1000)
+            invalidate()
+        }
     }
 }

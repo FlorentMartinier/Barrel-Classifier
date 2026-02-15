@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.text.TextUtils
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewTreeObserver
@@ -51,6 +52,7 @@ class HistoryDrawer(
             emptyText.text = context.resources.getString(R.string.no_history)
             emptyText.setTextColor(Color.GRAY)
             emptyText.setPadding(16, 8, 16, 8)
+            emptyText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15.0f)
             holder.layoutHistory.addView(emptyText)
             return
         }

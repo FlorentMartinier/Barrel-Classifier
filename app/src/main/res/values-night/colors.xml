@@ -22,4 +22,7 @@
 
     <color name="dialog_bg">#221E1A</color>
 
+    <color name="chart_primary">#D4B982</color>
+    <color name="chart_secondary">#8D6E63</color>
+    <color name="chart_tertiary">#BCB1A8</color>
 </resources>

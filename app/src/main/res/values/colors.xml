@@ -21,4 +21,7 @@
 
     <color name="dialog_bg">#EFE7DC</color>
 
+    <color name="chart_primary">#C8A96A</color>
+    <color name="chart_secondary">#5D4037</color>
+    <color name="chart_tertiary">#A3968C</color>
 </resources>
