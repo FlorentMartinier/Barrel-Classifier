@@ -2,18 +2,22 @@ package com.fmartinier.barrelclassifier
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.RelativeLayout
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.core.content.edit
 import androidx.core.net.toUri
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
@@ -23,10 +27,20 @@ import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.data.model.History
 import com.fmartinier.barrelclassifier.service.ImageService
 import com.fmartinier.barrelclassifier.service.NotificationService
+import com.fmartinier.barrelclassifier.service.PdfService
+import com.fmartinier.barrelclassifier.service.QrCloudService
 import com.fmartinier.barrelclassifier.ui.AddBarrelDialog
 import com.fmartinier.barrelclassifier.ui.AddHistoryDialog
 import com.fmartinier.barrelclassifier.ui.BarrelAdapter
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
+import com.google.api.services.drive.DriveScopes
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
@@ -40,12 +54,13 @@ class MainActivity : AppCompatActivity() {
 
     private var currentBarrelPhotoPath: String? = null
     private var currentHistoryPhotoPath: String? = null
-    private var barrelForPhoto: Barrel? = null
+    private var barrelForIntent: Barrel? = null
     private var historyForPhoto: History? = null
     private lateinit var barrelCameraLauncher: ActivityResultLauncher<Intent>
     private lateinit var historyCameraLauncher: ActivityResultLauncher<Intent>
     private lateinit var pickHistoryImageLauncher: ActivityResultLauncher<String>
     private lateinit var pickBarrelImageLauncher: ActivityResultLauncher<String>
+    private lateinit var importQrLauncher: ActivityResultLauncher<Intent>
 
     // DAO
     private lateinit var db: DatabaseHelper
@@ -55,7 +70,7 @@ class MainActivity : AppCompatActivity() {
     // Services
     private val notificationService = NotificationService()
     private val imageService = ImageService()
-
+    private var progressDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         db = DatabaseHelper.getInstance(this)
@@ -82,7 +97,7 @@ class MainActivity : AppCompatActivity() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 if (it.resultCode == RESULT_OK) {
                     currentBarrelPhotoPath?.let { path ->
-                        barrelForPhoto?.let { barrel ->
+                        barrelForIntent?.let { barrel ->
                             val oldImagePath = barrel.imagePath
                             barrelDao.updateImage(barrel.id, path)
                             imageService.deleteImageIfExist(oldImagePath)
@@ -126,13 +141,28 @@ class MainActivity : AppCompatActivity() {
             uri?.let {
                 val path = imageService.copyImageToInternalStorage(it, this)
                 currentBarrelPhotoPath = path
-                barrelForPhoto?.let { barrel ->
+                barrelForIntent?.let { barrel ->
                     val oldImagePath = barrel.imagePath
                     barrelDao.updateImage(barrel.id, path)
                     imageService.deleteImageIfExist(oldImagePath)
                 }
             }
             loadBarrels()
+        }
+
+        importQrLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            val account = task.result
+            if (account != null) {
+                barrelForIntent?.let { barrel ->
+                    processCloudQR(account, barrel)
+                }
+            } else {
+                Toast.makeText(this, getString(R.string.error_google_connexion), Toast.LENGTH_SHORT)
+                    .show()
+            }
         }
 
         // Views
@@ -158,11 +188,15 @@ class MainActivity : AppCompatActivity() {
                 takePhotoForBarrel(barrel)
             },
             onImportBarrelPicture = { barrel ->
-                barrelForPhoto = barrel
+                barrelForIntent = barrel
                 pickBarrelImageLauncher.launch("image/*")
             },
             onTakeHistoryPicture = { history ->
                 takePhotoForHistory(history)
+            },
+            onExportQrCloud = { intent, barrel ->
+                barrelForIntent = barrel
+                importQrLauncher.launch(intent)
             },
             onImportHistoryPicture = { history ->
                 historyForPhoto = history
@@ -179,6 +213,86 @@ class MainActivity : AppCompatActivity() {
 
         // Chargement initial
         loadBarrels()
+    }
+
+    // Exemple simplifié du processus après acceptation
+    private fun processCloudQR(account: GoogleSignInAccount, barrel: Barrel) {
+        showLoadingDialog(getString(R.string.google_drive_import))
+        lifecycleScope.launch(Dispatchers.IO) {
+            val credential = GoogleAccountCredential.usingOAuth2(
+                this@MainActivity, listOf(DriveScopes.DRIVE_FILE)
+            ).setSelectedAccount(account.account)
+
+            val manager = QrCloudService(this@MainActivity)
+            val pdfFile = PdfService(this@MainActivity).export(barrel)
+
+            val publicUrl = manager.uploadPdfToDrive(credential, pdfFile)
+
+            withContext(Dispatchers.Main) {
+                if (publicUrl != null) {
+                    val qrBitmap = manager.generateQRCode(publicUrl)
+                    hideLoadingDialog()
+                    shareQrCodeDirectly(qrBitmap)
+                } else {
+                    hideLoadingDialog()
+                    Toast.makeText(
+                        this@MainActivity,
+                        getString(R.string.error_upload), Toast.LENGTH_SHORT
+                    )
+                        .show()
+                }
+            }
+        }
+    }
+
+    private fun shareQrCodeDirectly(qrBitmap: Bitmap) {
+        val manager = QrCloudService(this)
+        val file = manager.saveBitmapToCache(qrBitmap)
+
+        if (file != null) {
+            val uri = FileProvider.getUriForFile(
+                this,
+                "${applicationContext.packageName}.fileprovider",
+                file
+            )
+
+            val viewIntent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, "image/png")
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                // Optionnel : force l'affichage du sélecteur d'applis si plusieurs visionneuses existent
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+
+            try {
+                startActivity(viewIntent)
+            } catch (_: Exception) {
+                Toast.makeText(this, getString(R.string.no_image_viewer_error), Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+    }
+
+    private fun showLoadingDialog(message: String) {
+        val builder = MaterialAlertDialogBuilder(this)
+        val padding = 50
+
+        val progressBar = ProgressBar(this).apply {
+            setPadding(padding, padding, padding, padding)
+        }
+
+        builder.apply {
+            setTitle(message)
+            setView(progressBar)
+            setCancelable(false) // Empêche de fermer en cliquant à côté
+        }
+
+        progressDialog = builder.create()
+        progressDialog?.show()
+    }
+
+    private fun hideLoadingDialog() {
+        progressDialog?.dismiss()
+        progressDialog = null
     }
 
     /**
@@ -205,7 +319,6 @@ class MainActivity : AppCompatActivity() {
      * Ouvre le dialog d'ajout de fût
      */
     private fun openAddBarrelDialog() {
-        Log.d("MainActivity, this.theme.toString()", this.theme.toString())
         AddBarrelDialog
             .newInstance()
             .show(supportFragmentManager, AddBarrelDialog.TAG)
@@ -231,7 +344,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun takePhotoForBarrel(barrel: Barrel) {
-        barrelForPhoto = barrel
+        barrelForIntent = barrel
         val photoFile = imageService.createImageFile(this)
         currentBarrelPhotoPath = photoFile.absolutePath
         barrelCameraLauncher.launch(imageService.takePhoto(this, photoFile))

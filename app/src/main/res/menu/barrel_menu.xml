@@ -25,4 +25,9 @@
         android:title="@string/export_pdf"
         android:icon="@drawable/ic_delete"/>
 
+    <item
+        android:id="@+id/action_qr_export"
+        android:title="@string/export_qr"
+        android:icon="@drawable/ic_delete"/>
+
 </menu>

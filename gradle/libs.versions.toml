@@ -12,6 +12,10 @@ constraintlayout = "2.2.1"
 workRuntime = "2.9.0"
 coil = "2.5.0"
 mpandroidchart = "v3.1.0"
+playserviceauth = "20.7.0"
+googleapiservicesdrive = "v3-rev20230822-2.0.0"
+googleapiclientandroid = "2.2.0"
+zxingcore = "3.5.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -25,6 +29,10 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 androidx-work-runtime = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntime" }
 coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 mpandroidchart = { group = "com.github.PhilJay", name = "MPAndroidChart", version.ref = "mpandroidchart" }
+playserviceauth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playserviceauth" }
+googleapiservicesdrive = { group = "com.google.apis", name = "google-api-services-drive", version.ref = "googleapiservicesdrive" }
+googleapiclientandroid = { group = "com.google.api-client", name = "google-api-client-android", version.ref = "googleapiclientandroid" }
+zxingcore = { group = "com.google.zxing", name = "core", version.ref = "zxingcore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

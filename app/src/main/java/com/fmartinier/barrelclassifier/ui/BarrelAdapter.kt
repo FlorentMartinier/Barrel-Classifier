@@ -39,9 +39,14 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.Scope
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.api.services.drive.DriveScopes
 
 class BarrelAdapter(
     private val context: Context,
@@ -51,6 +56,7 @@ class BarrelAdapter(
     private val onEditBarrel: (Barrel) -> Unit,
     private val onTakeBarrelPicture: (Barrel) -> Unit,
     private val onImportBarrelPicture: (Barrel) -> Unit,
+    private val onExportQrCloud: (Intent, Barrel) -> Unit,
     onTakeHistoryPicture: (History) -> Unit,
     onImportHistoryPicture: (History) -> Unit,
 ) : RecyclerView.Adapter<BarrelAdapter.BarrelViewHolder>() {
@@ -61,9 +67,17 @@ class BarrelAdapter(
     val historyDrawer =
         HistoryDrawer(context, refresh, onAddHistory, onTakeHistoryPicture, onImportHistoryPicture)
 
+    private lateinit var googleSignInClient: GoogleSignInClient
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BarrelViewHolder {
         val view = LayoutInflater.from(context)
             .inflate(R.layout.item_barrel, parent, false)
+        val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail()
+            .requestScopes(Scope(DriveScopes.DRIVE_FILE)) // Permission d'écrire des fichiers
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(context, options)
+
         return BarrelViewHolder(view)
     }
 
@@ -184,6 +198,11 @@ class BarrelAdapter(
                         }
 
                         context.startActivity(intent)
+                        true
+                    }
+
+                    R.id.action_qr_export -> {
+                        onGenerateCloudQRClicked(barrel)
                         true
                     }
 
@@ -346,7 +365,8 @@ class BarrelAdapter(
         val textNoStats = view.findViewById<TextView>(R.id.textNoStats)
         val txtAvgAngelShare = view.findViewById<TextView>(R.id.txtAvgAngelShare)
         val progressAngelShare = view.findViewById<ProgressBar>(R.id.progressAngelShare)
-        val layoutProgressAngelShare = view.findViewById<LinearLayout>(R.id.layoutProgressAngelShare)
+        val layoutProgressAngelShare =
+            view.findViewById<LinearLayout>(R.id.layoutProgressAngelShare)
         val textProgressAngelShare = view.findViewById<TextView>(R.id.textProgressAngelShare)
         val textRepartitionType = view.findViewById<TextView>(R.id.textRepartitionType)
         val textRepartitionDuration = view.findViewById<TextView>(R.id.textRepartitionDuration)
@@ -522,5 +542,21 @@ class BarrelAdapter(
             animateY(1000)
             invalidate()
         }
+    }
+
+    private fun onGenerateCloudQRClicked(barrel: Barrel) {
+        MaterialAlertDialogBuilder(context)
+            .setTitle(context.getString(R.string.generate_qr_cloud))
+            .setMessage(context.getString(R.string.generate_qr_cloud_confirm))
+            .setNegativeButton(context.getString(R.string.refuse)) { dialog, _ -> dialog.dismiss() }
+            .setPositiveButton(context.getString(R.string.accept)) { _, _ ->
+                startGoogleAuthProcess(barrel) // Lance la connexion Google puis l'upload
+            }
+            .show()
+    }
+
+    private fun startGoogleAuthProcess(barrel: Barrel) {
+        val signInIntent = googleSignInClient.signInIntent
+        onExportQrCloud(signInIntent, barrel)
     }
 }
