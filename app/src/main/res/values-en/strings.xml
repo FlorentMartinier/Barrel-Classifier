@@ -101,6 +101,7 @@
     <string name="refuse">Decline</string>
     <string name="accept">Accept</string>
     <string name="google_drive_import">Uploading to Google Drive…</string>
+    <string name="error_google_authent">Error Google authentication (Code %1$s)</string>
     <string-array name="type_fut_array">
         <item>Aging</item>
         <item>Seasonning</item>

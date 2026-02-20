@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "856483474283",
+    "project_id": "barrel-manager-3f00d",
+    "storage_bucket": "barrel-manager-3f00d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:856483474283:android:b72ff52654b34625883a2e",
+        "android_client_info": {
+          "package_name": "com.fmartinier.barrelclassifier"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmMsBGSvBDYR0juJ7D-9_zFpB9pXzI-As"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

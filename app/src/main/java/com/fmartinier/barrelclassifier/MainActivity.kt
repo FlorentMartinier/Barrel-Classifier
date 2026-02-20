@@ -153,15 +153,27 @@ class MainActivity : AppCompatActivity() {
         importQrLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            val account = task.result
-            if (account != null) {
-                barrelForIntent?.let { barrel ->
-                    processCloudQR(account, barrel)
+            try {
+
+                val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+                val account = task.result
+                if (account != null) {
+                    barrelForIntent?.let { barrel ->
+                        processCloudQR(account, barrel)
+                    }
+                } else {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.error_google_connexion),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-            } else {
-                Toast.makeText(this, getString(R.string.error_google_connexion), Toast.LENGTH_SHORT)
-                    .show()
+            } catch (e: com.google.android.gms.common.api.ApiException) {
+                Toast.makeText(
+                    this,
+                    getString(R.string.error_google_authent, e.statusCode.toString()),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
 

@@ -101,6 +101,7 @@
     <string name="refuse">Refuser</string>
     <string name="accept">Accepter</string>
     <string name="google_drive_import">Importation vers Google Drive…</string>
+    <string name="error_google_authent">Erreur d\'authentification Google (Code %1$s)</string>
     <string-array name="type_fut_array">
         <item>Vieillissement</item>
         <item>Marquage</item>
