@@ -14,9 +14,23 @@
     <string name="remove_barrel">Supprimer le fût</string>
     <string name="modify_barrel">Modifier le fût</string>
     <string name="remove_barrel_validation">Voulez-vous vraiment supprimer ce fût ? \n \nTous les historiques associés seront définitivement supprimés.</string>
-    <string name="month_and_week">%1$s mois et %2$s semaines</string>
-    <string name="month">%1$s mois</string>
-    <string name="week">%1$s semaines</string>
+    <plurals name="year">
+        <item quantity="one">%d an</item>
+        <item quantity="other">%d ans</item>
+    </plurals>
+    <plurals name="month">
+        <item quantity="one">%d mois</item>
+        <item quantity="other">%d mois</item>
+    </plurals>
+    <plurals name="week">
+        <item quantity="one">%d semaine</item>
+        <item quantity="other">%d semaines</item>
+    </plurals>
+    <plurals name="day">
+        <item quantity="one">%d jour</item>
+        <item quantity="other">%d jours</item>
+    </plurals>
+    <string name="element_and_element">%1$s et %2$s</string>
     <string name="no_barrel_saved">Vous n\'avez pas encore enregistré de fût</string>
     <string name="barrel_name">Nom du fût</string>
     <string name="ex_barrel_name">Ex : Fût n°12</string>
@@ -102,6 +116,8 @@
     <string name="accept">Accepter</string>
     <string name="google_drive_import">Importation vers Google Drive…</string>
     <string name="error_google_authent">Erreur d\'authentification Google (Code %1$s)</string>
+    <string name="equivalence_228">Équivalence fut standard : %1$s</string>
+    <string name="duration_equivalence_tooltip">Grâce au format %1$sL, le contact bois/liquide est %2$sx plus intense que dans un fût standard (228L).</string>
     <string-array name="type_fut_array">
         <item>Vieillissement</item>
         <item>Marquage</item>

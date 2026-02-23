@@ -1,5 +1,6 @@
 [versions]
 agp = "8.9.2"
+balloonCompose = "1.6.3"
 firebaseBom = "34.9.0"
 kotlin = "2.0.21"
 coreKtx = "1.16.0"
@@ -20,8 +21,8 @@ zxingcore = "3.5.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+balloon-compose = { module = "com.github.skydoves:balloon-compose", version.ref = "balloonCompose" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
-firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

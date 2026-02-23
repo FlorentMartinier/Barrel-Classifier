@@ -4,7 +4,10 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.text.TextUtils
+import android.text.style.ImageSpan
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +17,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.enums.EHistoryType
@@ -23,8 +27,13 @@ import com.fmartinier.barrelclassifier.data.model.History
 import com.fmartinier.barrelclassifier.service.HistoryService
 import com.fmartinier.barrelclassifier.service.ImageService
 import com.fmartinier.barrelclassifier.ui.BarrelAdapter.BarrelViewHolder
-import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.calculateDuration
+import com.fmartinier.barrelclassifier.utils.DateUtils
+import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.calculate228lEquivalentAge
+import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.calculateNbDaysBetweenDates
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.formatDate
+import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.formatDaysToDurationString
+import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.getEquivalenceRatio
+import com.fmartinier.barrelclassifier.utils.TooltipUtils.Companion.createTooltip
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.File
@@ -64,6 +73,7 @@ class HistoryDrawer(
 
             val txtName = view.findViewById<TextView>(R.id.txtName)
             val txtDuration = view.findViewById<TextView>(R.id.txtDuration)
+            val txtDurationEquivalent = view.findViewById<TextView>(R.id.txtDurationEquivalent)
             val txtDates = view.findViewById<TextView>(R.id.txtDates)
             val btnMenu = view.findViewById<ImageButton>(R.id.btnMenu)
             val actionsSection = view.findViewById<LinearLayout>(R.id.actionsSection)
@@ -79,11 +89,9 @@ class HistoryDrawer(
             val historyType = getHistoryType(history)
             txtName.text = "${history.name} · $historyType"
 
-            txtDuration.text = calculateDuration(
-                context,
-                history.beginDate,
-                history.endDate
-            )
+            val nbDays = calculateNbDaysBetweenDates(history.beginDate, history.endDate)
+            txtDuration.text = formatDaysToDurationString(context, nbDays)
+            manageDurationEquivalence(nbDays, barrel.volume.toDouble(), txtDurationEquivalent)
 
             val dateDebut = formatDate(history.beginDate)
             val dateFin = history.endDate?.let {
@@ -254,6 +262,52 @@ class HistoryDrawer(
                 futureAlerts,
                 "📆"
             )
+        }
+    }
+
+    private fun manageDurationEquivalence(nbDays: Int, barrelVolume: Double, txtDurationEquivalent: TextView) {
+        if (barrelVolume >= 228) {
+            txtDurationEquivalent.visibility = View.GONE
+            return
+        }
+        val daysEquivalent = calculate228lEquivalentAge(nbDays, barrelVolume)
+        val durationString = formatDaysToDurationString(context, daysEquivalent)
+        val message = context.resources.getString(R.string.equivalence_228, durationString) + "  "
+        val spannable = SpannableStringBuilder(message)
+        val typedValue = TypedValue()
+        context.theme.resolveAttribute(androidx.appcompat.R.attr.colorPrimary, typedValue, true)
+        val infoIcon = ContextCompat.getDrawable(context, R.drawable.ic_info_outline)?.apply {
+            val size = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                10f,
+                context.resources.displayMetrics
+            ).toInt()
+            setBounds(0, 0, size, size)
+            setTint(typedValue.data)
+        }
+        if (infoIcon != null) {
+            val imageSpan = ImageSpan(infoIcon, ImageSpan.ALIGN_BASELINE)
+            // On attache l'image sur le dernier caractère (l'espace)
+            spannable.setSpan(
+                imageSpan,
+                message.length - 1,
+                message.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        txtDurationEquivalent.text = spannable
+        val ratio = getEquivalenceRatio(barrelVolume)
+
+        val tooltipMessage = context.getString(
+            R.string.duration_equivalence_tooltip,
+            barrelVolume.toString(),
+            String.format("%.1f", ratio)
+        )
+
+        val tooltip = createTooltip(context, tooltipMessage)
+
+        txtDurationEquivalent.setOnClickListener { view ->
+            tooltip.showAlignTop(view)
         }
     }
 

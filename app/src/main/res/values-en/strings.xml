@@ -14,9 +14,23 @@
     <string name="remove_barrel">Delete barrel</string>
     <string name="modify_barrel">Edit barrel</string>
     <string name="remove_barrel_validation">Do you really want to delete this barrel?\n\nAll associated histories will be permanently deleted.</string>
-    <string name="month_and_week">%1$s months and %2$s weeks</string>
-    <string name="month">%1$s months</string>
-    <string name="week">%1$s weeks</string>
+    <plurals name="year">
+        <item quantity="one">%d year</item>
+        <item quantity="other">%d years</item>
+    </plurals>
+    <plurals name="month">
+        <item quantity="one">%d month</item>
+        <item quantity="other">%d months</item>
+    </plurals>
+    <plurals name="week">
+        <item quantity="one">%d week</item>
+        <item quantity="other">%d weeks</item>
+    </plurals>
+    <plurals name="day">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <string name="element_and_element">%1$s and %2$s</string>
     <string name="no_barrel_saved">You have not saved any barrels yet</string>
     <string name="barrel_name">Barrel name</string>
     <string name="ex_barrel_name">e.g.: Barrel #12</string>
@@ -102,6 +116,8 @@
     <string name="accept">Accept</string>
     <string name="google_drive_import">Uploading to Google Drive…</string>
     <string name="error_google_authent">Error Google authentication (Code %1$s)</string>
+    <string name="equivalence_228">Standard barrel equivalence: %1$s</string>
+    <string name="duration_equivalence_tooltip">Thanks to the %1$sL format, the wood-to-liquid contact is %2$sx more intense than in a standard barrel (228L).</string>
     <string-array name="type_fut_array">
         <item>Aging</item>
         <item>Seasonning</item>

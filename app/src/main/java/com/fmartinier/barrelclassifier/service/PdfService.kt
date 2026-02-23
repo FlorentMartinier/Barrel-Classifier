@@ -231,7 +231,8 @@ class PdfService(private val context: Context) {
         paint.textSize = 26f
         paint.typeface = Typeface.DEFAULT_BOLD
 
-        val calculationTime = DateUtils.calculateDuration(context, history.beginDate, history.endDate ?: DateUtils.getCurrentDate())
+        val ndDays = DateUtils.calculateNbDaysBetweenDates(history.beginDate, history.endDate)
+        val calculationTime = DateUtils.formatDaysToDurationString(context, ndDays)
         val dateRange = if (history.endDate != null)
             "${dateFormat.format(Date(history.beginDate))} — ${dateFormat.format(Date(history.endDate))} ($calculationTime)"
         else

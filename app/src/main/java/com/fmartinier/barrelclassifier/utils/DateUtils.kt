@@ -7,56 +7,77 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlin.math.pow
+import kotlin.math.roundToInt
 
 class DateUtils {
     companion object {
-        fun calculateDuration(context: Context, dateDebut: Long, dateFin: Long?): String {
-            val endMillis = dateFin ?: System.currentTimeMillis()
+        fun formatDaysToDurationString(context: Context, totalDays: Int): String {
+            if (totalDays <= 0) return "0"
 
-            val startCal = Calendar.getInstance().apply { timeInMillis = dateDebut }
-            val endCal = Calendar.getInstance().apply { timeInMillis = endMillis }
+            val startCal = Calendar.getInstance()
+            val endCal = Calendar.getInstance().apply {
+                add(Calendar.DAY_OF_YEAR, totalDays)
+            }
 
-            var months = (endCal.get(Calendar.YEAR) - startCal.get(Calendar.YEAR)) * 12 +
+            // Calcul du nombre total de mois
+            var totalMonths = (endCal.get(Calendar.YEAR) - startCal.get(Calendar.YEAR)) * 12 +
                     (endCal.get(Calendar.MONTH) - startCal.get(Calendar.MONTH))
 
-            // Calcul du reliquat de jours pour trouver les semaines
             val dayOfMonthStart = startCal.get(Calendar.DAY_OF_MONTH)
             val dayOfMonthEnd = endCal.get(Calendar.DAY_OF_MONTH)
 
-            var daysRemaining = dayOfMonthEnd - dayOfMonthStart
+            var daysRemainingInMonth = dayOfMonthEnd - dayOfMonthStart
 
-            // Si le jour de fin est inférieur au jour de début, on retire un mois
-            // et on calcule les jours sur le mois précédent
-            if (daysRemaining < 0) {
-                months -= 1
+            // Ajustement si le jour de fin est inférieur au jour de début
+            if (daysRemainingInMonth < 0) {
+                totalMonths -= 1
                 val lastMonthMaxDays = startCal.getActualMaximum(Calendar.DAY_OF_MONTH)
-                daysRemaining += lastMonthMaxDays
+                daysRemainingInMonth += lastMonthMaxDays
             }
 
-            var weeks = daysRemaining / 7
+            // Calcul des années et mois restants
+            val years = totalMonths / 12
+            val remainingMonths = totalMonths % 12
 
-            // Logique d'arrondi : 4 semaines = 1 mois de plus
-            if (weeks >= 4) {
-                months += 1
-                weeks = 0
-            }
+            return when {
+                // Règle 1 : Si > 13 mois (ou exactement 13 mois) => "x ans et x mois"
+                totalMonths >= 13 -> {
+                    if (remainingMonths > 0) {
+                        val formattedYears = context.resources.getQuantityString(R.plurals.year, years, years)
+                        val formattedMonths = context.resources.getQuantityString(R.plurals.month, remainingMonths, remainingMonths)
+                        context.resources.getString(R.string.element_and_element, formattedYears, formattedMonths)
+                    } else {
+                        context.resources.getQuantityString(R.plurals.year, years, years)
+                    }
+                }
 
-            return if (weeks == 0) {
-                context.resources.getString(
-                    R.string.month,
-                    months.toString(),
-                )
-            } else if (months == 0) {
-                context.resources.getString(
-                    R.string.week,
-                    weeks.toString()
-                )
-            } else {
-                context.resources.getString(
-                    R.string.month_and_week,
-                    months.toString(),
-                    weeks.toString()
-                )
+                // Règle 2 : Si entre 12 et 13 mois (exclu) => "x ans"
+                totalMonths == 12 -> {
+                    context.resources.getQuantityString(R.plurals.year, years, years)
+                }
+
+                // Règle 3 : Si < 12 mois => Ancienne logique (Mois / Semaines / Jours)
+                else -> {
+                    var weeks = daysRemainingInMonth / 7
+                    var finalMonths = totalMonths
+
+                    if (weeks >= 4) {
+                        finalMonths += 1
+                        weeks = 0
+                    }
+
+                    when {
+                        finalMonths > 0 && weeks > 0 -> {
+                            val formattedMonths = context.resources.getQuantityString(R.plurals.month, finalMonths, finalMonths)
+                            val formattedWeeks = context.resources.getQuantityString(R.plurals.week, weeks, weeks)
+                            context.resources.getString(R.string.element_and_element, formattedMonths, formattedWeeks)
+                        }
+                        finalMonths > 0 -> context.resources.getQuantityString(R.plurals.month, finalMonths, finalMonths)
+                        weeks > 0 -> context.resources.getQuantityString(R.plurals.week, weeks, weeks)
+                        else -> context.resources.getQuantityString(R.plurals.day, totalDays, totalDays)
+                    }
+                }
             }
         }
 
@@ -103,6 +124,17 @@ class DateUtils {
 
         fun getCurrentDate(): Long {
             return System.currentTimeMillis()
+        }
+
+        fun calculate228lEquivalentAge(days: Int, barrelVolume: Double): Int {
+            if (barrelVolume <= 0) return days
+            val accelerationRatio = getEquivalenceRatio(barrelVolume)
+            return (days * accelerationRatio).roundToInt()
+        }
+
+        fun getEquivalenceRatio(barrelVolume: Double): Double {
+            val referenceVolume = 228.0
+            return (referenceVolume / barrelVolume).pow(0.327)
         }
     }
 }

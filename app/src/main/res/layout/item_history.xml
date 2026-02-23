@@ -102,6 +102,18 @@
             android:textSize="14sp"
             app:drawableStartCompat="@drawable/ic_timer" />
 
+        <TextView
+            android:id="@+id/txtDurationEquivalent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="14sp"
+            android:lineSpacingExtra="2dp"
+            android:gravity="center_vertical"
+            app:drawableStartCompat="@drawable/ic_auto_fix_high"
+            android:drawablePadding="6dp" />
+
         <!-- Dates -->
         <TextView
             android:id="@+id/txtDates"
