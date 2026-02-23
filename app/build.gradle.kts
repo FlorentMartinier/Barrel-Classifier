@@ -12,8 +12,8 @@ android {
         applicationId = "com.fmartinier.barrelclassifier"
         minSdk = 24
         targetSdk = 35
-        versionCode = 17
-        versionName = "2.3.1"
+        versionCode = 18
+        versionName = "2.3.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -70,9 +70,8 @@ dependencies {
     implementation(libs.zxingcore)
 
     // Firebase
-    implementation(libs.firebase.bom)
+    implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
-    implementation(libs.firebase.auth.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
