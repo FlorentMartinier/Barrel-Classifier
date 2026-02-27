@@ -118,6 +118,15 @@
     <string name="error_google_authent">Error Google authentication (Code %1$s)</string>
     <string name="equivalence_228">Standard barrel equivalence: %1$s</string>
     <string name="duration_equivalence_tooltip">Thanks to the %1$sL format, the wood-to-liquid contact is %2$sx more intense than in a standard barrel (228L).</string>
+    <string name="wood">Wood</string>
+    <string name="oxydation">Oxidation</string>
+    <string name="current_ageing">📍 Current ageing</string>
+    <string name="verdict">💡 Verdict: %1$s</string>
+    <string name="start_phase">Early stage - The wood is just beginning to infuse.</string>
+    <string name="ageing_phase">Extraction phase - Wood-dominant. Wait for oxidation to bring roundness.</string>
+    <string name="maturation_phase">Noble maturation - Oxidation has taken over, the profile is refining.</string>
+    <string name="harmony_phase">Harmony - Wood and air are in balance. Ready for tasting!</string>
+    <string name="tannin_chart_title">Maturation profile (%1$sL barrel - %2$s days history)</string>
     <string-array name="type_fut_array">
         <item>Aging</item>
         <item>Seasonning</item>

@@ -3,6 +3,8 @@ package com.fmartinier.barrelclassifier.utils
 import android.app.DatePickerDialog
 import android.content.Context
 import com.fmartinier.barrelclassifier.R
+import com.fmartinier.barrelclassifier.data.model.History
+import com.fmartinier.barrelclassifier.utils.BarrelUtils.Companion.STANDARD_BARREL_VOLUME
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -81,6 +83,10 @@ class DateUtils {
             }
         }
 
+        fun calculateNbDaysHistory(history: History): Int {
+            return calculateNbDaysBetweenDates(history.beginDate, history.endDate)
+        }
+
         fun calculateNbDaysBetweenDates(dateDebut: Long, dateFin: Long?): Int {
             val end = dateFin ?: getCurrentDate()
             val millisDifference = end - dateDebut
@@ -133,8 +139,7 @@ class DateUtils {
         }
 
         fun getEquivalenceRatio(barrelVolume: Double): Double {
-            val referenceVolume = 228.0
-            return (referenceVolume / barrelVolume).pow(0.327)
+            return (STANDARD_BARREL_VOLUME / barrelVolume).pow(0.327)
         }
     }
 }

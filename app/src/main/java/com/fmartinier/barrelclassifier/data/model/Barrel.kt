@@ -11,4 +11,14 @@ data class Barrel(
     val storageHygrometer: String?,
     val storageTemperature: String?,
     val histories: List<History>
-)
+) {
+
+    fun getCurrentHistory(): History? {
+        val notEndedHistory = histories.filter { it.endDate == null }
+        return if (notEndedHistory.isNotEmpty()) {
+            notEndedHistory.first()
+        } else {
+            null
+        }
+    }
+}

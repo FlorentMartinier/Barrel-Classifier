@@ -1,0 +1,430 @@
+package com.fmartinier.barrelclassifier.ui
+
+import android.content.Context
+import android.graphics.Color
+import android.view.View
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.TextView
+import androidx.core.content.ContextCompat
+import com.fmartinier.barrelclassifier.R
+import com.fmartinier.barrelclassifier.data.model.Barrel
+import com.fmartinier.barrelclassifier.data.model.History
+import com.fmartinier.barrelclassifier.ui.BarrelAdapter.BarrelViewHolder
+import com.fmartinier.barrelclassifier.utils.DateUtils
+import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.calculateNbDaysHistory
+import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.getEquivalenceRatio
+import com.github.mikephil.charting.charts.HorizontalBarChart
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.formatter.PercentFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
+import kotlin.math.exp
+import kotlin.math.pow
+import com.fmartinier.barrelclassifier.utils.BarrelUtils.Companion.STANDARD_BARREL_VOLUME
+
+class StatisticsDrawer(
+    val context: Context,
+) {
+    private lateinit var layoutRecordDuration: LinearLayout
+    private lateinit var layoutTotalDuration: LinearLayout
+    private lateinit var layoutPieChartTypes: LinearLayout
+    private lateinit var layoutProgressStrength: LinearLayout
+    private lateinit var layoutBarChartTypes: LinearLayout
+    private lateinit var textProgressStrength: TextView
+    private lateinit var txtRecordDuration: TextView
+    private lateinit var txtTotalDuration: TextView
+    private lateinit var txtAvgAlcoholicStrength: TextView
+    private lateinit var progressAbv: ProgressBar
+    private lateinit var pieChartTypes: PieChart
+    private lateinit var textNoStats: TextView
+    private lateinit var txtAvgAngelShare: TextView
+    private lateinit var progressAngelShare: ProgressBar
+    private lateinit var layoutProgressAngelShare: LinearLayout
+    private lateinit var textProgressAngelShare: TextView
+    private lateinit var textRepartitionType: TextView
+    private lateinit var textRepartitionDuration: TextView
+    private lateinit var barChart: HorizontalBarChart
+    private lateinit var tanninChart: LineChart
+    private lateinit var verdictText: TextView
+    private lateinit var tanninChartTitle: TextView
+
+    val colorList = listOf(
+        ContextCompat.getColor(context, R.color.chart_primary),
+        ContextCompat.getColor(context, R.color.chart_secondary),
+        ContextCompat.getColor(context, R.color.chart_tertiary),
+    )
+
+    fun displayAllForBarrel(holder: BarrelViewHolder, barrel: Barrel) {
+        val view = holder.layoutStats
+        layoutRecordDuration = view.findViewById<LinearLayout>(R.id.layoutRecordDuration)
+        layoutTotalDuration = view.findViewById<LinearLayout>(R.id.layoutTotalDuration)
+        layoutPieChartTypes = view.findViewById<LinearLayout>(R.id.layoutPieChartTypes)
+        layoutProgressStrength = view.findViewById<LinearLayout>(R.id.layoutProgressStrength)
+        layoutBarChartTypes = view.findViewById<LinearLayout>(R.id.layoutBarChartTypes)
+        textProgressStrength = view.findViewById<TextView>(R.id.textProgressStrength)
+        txtRecordDuration = view.findViewById<TextView>(R.id.txtRecordDuration)
+        txtTotalDuration = view.findViewById<TextView>(R.id.txtTotalDuration)
+        txtAvgAlcoholicStrength = view.findViewById<TextView>(R.id.txtAvgAlcoholicStrength)
+        progressAbv = view.findViewById<ProgressBar>(R.id.progressAbv)
+        pieChartTypes = view.findViewById<PieChart>(R.id.pieChartTypes)
+        textNoStats = view.findViewById<TextView>(R.id.textNoStats)
+        txtAvgAngelShare = view.findViewById<TextView>(R.id.txtAvgAngelShare)
+        progressAngelShare = view.findViewById<ProgressBar>(R.id.progressAngelShare)
+        layoutProgressAngelShare = view.findViewById<LinearLayout>(R.id.layoutProgressAngelShare)
+        textProgressAngelShare = view.findViewById<TextView>(R.id.textProgressAngelShare)
+        textRepartitionType = view.findViewById<TextView>(R.id.textRepartitionType)
+        textRepartitionDuration = view.findViewById<TextView>(R.id.textRepartitionDuration)
+        barChart = view.findViewById<HorizontalBarChart>(R.id.barChartAvgDuration)
+        tanninChart = view.findViewById<LineChart>(R.id.tanninChart)
+        verdictText = view.findViewById<TextView>(R.id.verdictText)
+        tanninChartTitle = view.findViewById<TextView>(R.id.tanninChartTitle)
+
+        val histories = barrel.histories
+        if (histories.isEmpty()) {
+            textNoStats.visibility = View.VISIBLE
+            layoutRecordDuration.visibility = View.GONE
+            layoutTotalDuration.visibility = View.GONE
+            layoutPieChartTypes.visibility = View.GONE
+            layoutProgressStrength.visibility = View.GONE
+            textProgressStrength.visibility = View.GONE
+            layoutBarChartTypes.visibility = View.GONE
+            textProgressAngelShare.visibility = View.GONE
+            layoutProgressAngelShare.visibility = View.GONE
+            textRepartitionType.visibility = View.GONE
+            textRepartitionDuration.visibility = View.GONE
+        } else {
+            textNoStats.visibility = View.GONE
+            layoutRecordDuration.visibility = View.VISIBLE
+            layoutTotalDuration.visibility = View.VISIBLE
+            layoutPieChartTypes.visibility = View.VISIBLE
+            layoutProgressStrength.visibility = View.VISIBLE
+            textProgressStrength.visibility = View.VISIBLE
+            layoutBarChartTypes.visibility = View.VISIBLE
+            textProgressAngelShare.visibility = View.VISIBLE
+            layoutProgressAngelShare.visibility = View.VISIBLE
+            textRepartitionType.visibility = View.VISIBLE
+            textRepartitionDuration.visibility = View.VISIBLE
+        }
+
+        // 1. Calculs de base
+        val totalDays = histories.sumOf {
+            DateUtils.calculateNbDaysBetweenDates(it.beginDate, it.endDate)
+        }
+        val recordDays = histories.maxOfOrNull {
+            DateUtils.calculateNbDaysBetweenDates(it.beginDate, it.endDate)
+        } ?: 0
+
+        // 2. Affichage textes
+        txtTotalDuration.text = context.resources.getString(R.string.nb_days, totalDays.toString())
+        txtRecordDuration.text =
+            context.resources.getString(R.string.nb_days, recordDays.toString())
+
+        setupAlcohol(histories)
+        setupAngelShare(histories)
+        setupAgeingDistribution(histories)
+        setupAverageAgeingDuration(histories)
+        setupTanninChart(barrel.volume.toDouble(), barrel)
+    }
+
+    private fun setupAlcohol(histories: List<History>) {
+        val averageAlcoholicStrength = histories
+            .mapNotNull { it.alcoholicStrength }
+            .filter { !it.isEmpty() }
+            .map { it.toFloat() }
+            .average()
+
+        if (averageAlcoholicStrength.isNaN()) {
+            textProgressStrength.visibility = View.GONE
+            layoutProgressStrength.visibility = View.GONE
+        } else {
+            layoutProgressStrength.visibility = View.VISIBLE
+            textProgressStrength.visibility = View.VISIBLE
+            txtAvgAlcoholicStrength.text = "$averageAlcoholicStrength %"
+            progressAbv.progress = averageAlcoholicStrength.toInt()
+        }
+    }
+
+    private fun setupAngelShare(histories: List<History>) {
+        val averageAngelsShare = histories
+            .mapNotNull { it.angelsShare }
+            .filter { !it.isEmpty() }
+            .map { it.toFloat() }
+            .average()
+
+        if (averageAngelsShare.isNaN()) {
+            textProgressAngelShare.visibility = View.GONE
+            layoutProgressAngelShare.visibility = View.GONE
+        } else {
+            layoutProgressAngelShare.visibility = View.VISIBLE
+            textProgressAngelShare.visibility = View.VISIBLE
+            txtAvgAngelShare.text = "$averageAngelsShare %"
+            progressAngelShare.progress = averageAngelsShare.toInt()
+        }
+    }
+
+    private fun setupAgeingDistribution(histories: List<History>) {
+        val typeCounts = histories.groupingBy { it.type }.eachCount()
+        val pieEntries = typeCounts.map { PieEntry(it.value.toFloat(), it.key) }
+
+        val pieDataSet = PieDataSet(pieEntries, "").apply {
+            colors = colorList
+            valueTextSize = 10f
+            setDrawValues(true)
+            valueFormatter = PercentFormatter(pieChartTypes)
+        }
+        pieChartTypes.apply {
+            data = PieData(pieDataSet)
+            setDrawEntryLabels(false)
+            setUsePercentValues(true)
+            description.isEnabled = false
+            legend.apply {
+                isEnabled = true
+                horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
+                orientation = Legend.LegendOrientation.HORIZONTAL
+                setDrawInside(false)
+            }
+            isDrawHoleEnabled = true
+            setHoleColor(Color.TRANSPARENT)
+            invalidate()
+        }
+    }
+
+    private fun setupAverageAgeingDuration(histories: List<History>) {
+        val avgDurations = histories.groupBy { it.type }.mapValues { entry ->
+            entry.value.sumOf { h ->
+                val end = h.endDate ?: System.currentTimeMillis()
+                (end - h.beginDate)
+            } / entry.value.size / (1000 * 60 * 60 * 24)
+        }
+
+        val barEntries = avgDurations.entries.mapIndexed { index, entry ->
+            BarEntry(index.toFloat(), entry.value.toFloat())
+        }
+
+        val barDataSet =
+            BarDataSet(barEntries, "").apply {
+                colors = colorList
+                valueTextColor = Color.RED
+                valueTextSize = 10f
+                setDrawValues(true)
+                valueFormatter = object : ValueFormatter() {
+                    override fun getFormattedValue(value: Float): String {
+                        return "${value.toInt()} j"
+                    }
+                }
+            }
+
+        barChart.apply {
+            setExtraOffsets(0f, 0f, 20f, 0f)
+            description.isEnabled = false
+            legend.isEnabled = false
+            setDrawValueAboveBar(true)
+            setDrawGridBackground(false)
+            data = BarData(barDataSet)
+            setMaxVisibleValueCount(100)
+            clipChildren = false
+            data.setValueTextColor(ContextCompat.getColor(context, R.color.alert_text))
+
+            // Configuration des axes pour un rendu horizontal propre
+            xAxis.apply {
+                isEnabled = true
+                position = XAxis.XAxisPosition.BOTTOM
+                setDrawGridLines(false)
+                textColor = ContextCompat.getColor(context, R.color.text_secondary)
+                valueFormatter =
+                    IndexAxisValueFormatter(avgDurations.keys.toList())
+                granularity = 1f
+            }
+
+            axisLeft.apply {
+                isEnabled = false // Masquer l'axe du bas
+                setDrawGridLines(false)
+            }
+
+            axisRight.apply {
+                isEnabled = true // Afficher l'axe du haut pour l'échelle
+                setDrawGridLines(true)
+                gridColor = Color.LTGRAY
+                textColor = ContextCompat.getColor(context, R.color.chart_primary)
+            }
+
+            setFitBars(true)
+            animateY(1000)
+            invalidate()
+        }
+    }
+
+    private fun setupTanninChart(barrelVolume: Double, barrel: Barrel) {
+        val histories = barrel.histories
+        val historyNdDays = histories.sumOf { calculateNbDaysHistory(it) }
+
+        tanninChartTitle.text =
+            context.getString(R.string.tannin_chart_title, barrelVolume.toInt().toString(), historyNdDays.toString())
+
+        val maxMonths = when {
+            barrelVolume <= 5 -> 24f
+            barrelVolume <= 20 -> 60f
+            barrelVolume <= 100 -> 120f
+            else -> 240f
+        }
+
+        // Calculs de base
+        val barrelPotency = calculatePotency(historyNdDays, barrelVolume)
+        val accelFactor = (STANDARD_BARREL_VOLUME / barrelVolume).pow(0.33).toFloat()
+        val speedFast = 0.4f * accelFactor
+        val speedSlow = 0.005f
+        val oxidationAccel = (STANDARD_BARREL_VOLUME / barrelVolume).pow(0.2).toFloat()
+        val oxidationSpeed = 0.02f * oxidationAccel
+
+        val extractionEntries = ArrayList<Entry>()
+        val oxidationEntries = ArrayList<Entry>()
+
+        for (month in 0..maxMonths.toInt()) {
+            val x = month.toFloat()
+            val extractionY = (100 * barrelPotency * (1 - exp(-speedFast * x)) +
+                    100 * (1 - barrelPotency) * (1 - exp(-speedSlow * x))).toFloat()
+            val oxidationY = (100 * (1 - exp(-oxidationSpeed * x))).toFloat()
+
+            extractionEntries.add(Entry(x, extractionY))
+            oxidationEntries.add(Entry(x, oxidationY))
+        }
+
+        // Sets de données
+        val extractionSet = LineDataSet(extractionEntries, context.getString(R.string.wood)).apply {
+            color = ContextCompat.getColor(context, R.color.chart_primary)
+            setDrawCircles(false)
+            lineWidth = 3f
+            mode = LineDataSet.Mode.CUBIC_BEZIER
+            setDrawValues(false)
+        }
+
+        val oxidationSet = LineDataSet(oxidationEntries, context.getString(R.string.oxydation)).apply {
+            color = ContextCompat.getColor(context, R.color.chart_secondary)
+            setDrawCircles(false)
+            lineWidth = 3f
+            enableDashedLine(10f, 5f, 0f)
+            setDrawValues(false)
+        }
+
+        var currentSet: LineDataSet? = null
+
+        barrel.getCurrentHistory()?.let {
+            val currentDays = calculateNbDaysHistory(it)
+            val currentMonths = currentDays / 30.44f
+            val currentY = (100 * barrelPotency * (1 - exp(-speedFast * currentMonths)) +
+                    100 * (1 - barrelPotency) * (1 - exp(-speedSlow * currentMonths))).toFloat()
+
+            currentSet = LineDataSet(listOf(Entry(currentMonths, currentY)), "").apply {
+                setDrawCircles(true)
+                circleRadius = 8f
+                circleHoleRadius = 5f
+                setCircleColor(ContextCompat.getColor(context, R.color.chart_primary))
+                circleHoleColor = Color.WHITE
+                setDrawValues(true)
+                valueTextSize = 11f
+                valueTextColor = ContextCompat.getColor(context, R.color.chart_primary)
+                valueFormatter = object : ValueFormatter() {
+                    override fun getPointLabel(entry: Entry?): String =
+                        context.getString(R.string.current_ageing)
+                }
+                form = Legend.LegendForm.NONE
+                lineWidth = 0f
+            }
+
+            // Mise à jour du verdict avec style
+            this.verdictText.visibility = View.VISIBLE
+            val verdict = generateVerdict(currentMonths, currentY, (100 * (1 - exp(-oxidationSpeed * currentMonths))).toFloat())
+            this.verdictText.text = context.getString(R.string.verdict, verdict)
+        }
+
+        tanninChart.apply {
+            data = if (currentSet != null) LineData(extractionSet, oxidationSet, currentSet)
+            else LineData(extractionSet, oxidationSet)
+
+            axisRight.isEnabled = false
+            description.isEnabled = false
+            setExtraOffsets(5f, 15f, 5f, 20f)
+            clipChildren = false
+
+            xAxis.apply {
+                position = XAxis.XAxisPosition.BOTTOM
+                textColor = ContextCompat.getColor(context, R.color.chart_primary)
+                setDrawGridLines(false)
+                axisMinimum = 0f
+                axisMaximum = maxMonths
+                valueFormatter = object : ValueFormatter() {
+                    override fun getFormattedValue(value: Float): String = "${value.toInt()}m"
+                }
+            }
+
+            axisLeft.apply {
+                textColor = ContextCompat.getColor(context, R.color.chart_primary)
+                axisMinimum = 0f
+                axisMaximum = 100f
+                setLabelCount(5, true)
+                valueFormatter = object : ValueFormatter() {
+                    override fun getFormattedValue(value: Float): String = "${value.toInt()}%"
+                }
+            }
+
+            legend.apply {
+                textColor = ContextCompat.getColor(context, R.color.chart_primary)
+                verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
+                horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
+                orientation = Legend.LegendOrientation.HORIZONTAL
+                setDrawInside(false)
+                xEntrySpace = 20f
+            }
+
+            // Animation douce pour rendre le résultat moins "brut"
+            animateX(1000)
+            invalidate()
+        }
+    }
+
+    private fun generateVerdict(months: Float, extraction: Float, oxidation: Float): String {
+        return when {
+            months < 3 -> context.getString(R.string.start_phase)
+            extraction > oxidation + 10 -> context.getString(R.string.ageing_phase)
+            oxidation > extraction -> context.getString(R.string.maturation_phase)
+            else -> context.getString(R.string.harmony_phase)
+        }
+    }
+
+    fun calculatePotency(previousDaysTotal: Int, barrelVolume: Double): Double {
+        if (barrelVolume <= 0.0) return 1.0
+
+        // 1. On récupère le ratio d'accélération (ex: 4.54 pour 2L)
+        val accelerationRatio = getEquivalenceRatio(barrelVolume)
+
+        // 2. On calcule l'usure équivalente
+        // 100 jours dans un 2L usent le bois autant que ~450 jours dans un 200L
+        val equivalentDaysOfWear = previousDaysTotal * accelerationRatio
+
+        // 2. Calcul du point d'épuisement dynamique
+        // Un petit fût a moins de "réserve" de bois (douelles plus fines).
+        // On peut estimer que la réserve croît avec la racine cubique du volume.
+        val baseExhaustionStandard = 1825.0 // 5 ans pour un 200L
+        val volumeCorrection = (barrelVolume / STANDARD_BARREL_VOLUME).pow(0.2) // Facteur d'épaisseur/réserve
+        val dynamicExhaustionPoint = baseExhaustionStandard * volumeCorrection
+
+        // 4. Calcul de la puissance restante (décroissance exponentielle)
+        // On part de 1.0 (neuf) et on descend vers 0.1 (épuisé)
+        val potency = exp(-1.0 * (equivalentDaysOfWear / dynamicExhaustionPoint))
+
+        return potency.coerceAtLeast(0.1)
+    }
+}

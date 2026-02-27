@@ -195,10 +195,10 @@
                         android:id="@+id/textNoStats"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="start|center_vertical"
                         android:text="@string/no_stats"
                         android:textColor="#808080"
                         android:textSize="15sp"
-                        android:gravity="start|center_vertical"
                         android:visibility="visible" />
 
                     <LinearLayout
@@ -270,8 +270,8 @@
                         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                         android:layout_width="0dp"
                         android:layout_height="8dp"
-                        android:progressDrawable="@drawable/custom_progress_gold"
-                        android:layout_weight="1"/>
+                        android:layout_weight="1"
+                        android:progressDrawable="@drawable/custom_progress_gold" />
 
                     <TextView
                         android:id="@+id/txtAvgAlcoholicStrength"
@@ -303,8 +303,8 @@
                         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                         android:layout_width="0dp"
                         android:layout_height="8dp"
-                        android:progressDrawable="@drawable/custom_progress_gold"
-                        android:layout_weight="1"/>
+                        android:layout_weight="1"
+                        android:progressDrawable="@drawable/custom_progress_gold" />
 
                     <TextView
                         android:id="@+id/txtAvgAngelShare"
@@ -323,7 +323,6 @@
                     android:text="@string/type_repartition"
                     android:textSize="12sp" />
 
-                <!-- Graphiques côte à côte -->
                 <LinearLayout
                     android:id="@+id/layoutPieChartTypes"
                     android:layout_width="match_parent"
@@ -362,6 +361,32 @@
                         android:layout_height="match_parent"
                         android:layout_weight="2" />
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tanninChartTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:alpha="0.7"
+                    android:textSize="13sp" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/tanninChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp"
+                    android:layout_marginTop="8dp" />
+
+                <TextView
+                    android:id="@+id/verdictText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_verdict_light"
+                    android:lineSpacingExtra="4dp"
+                    android:padding="12dp"
+                    android:textSize="13sp"
+                    android:textStyle="italic"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <View

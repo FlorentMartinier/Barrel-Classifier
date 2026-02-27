@@ -27,7 +27,7 @@ import com.fmartinier.barrelclassifier.data.model.History
 import com.fmartinier.barrelclassifier.service.HistoryService
 import com.fmartinier.barrelclassifier.service.ImageService
 import com.fmartinier.barrelclassifier.ui.BarrelAdapter.BarrelViewHolder
-import com.fmartinier.barrelclassifier.utils.DateUtils
+import com.fmartinier.barrelclassifier.utils.BarrelUtils.Companion.STANDARD_BARREL_VOLUME
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.calculate228lEquivalentAge
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.calculateNbDaysBetweenDates
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.formatDate
@@ -266,7 +266,7 @@ class HistoryDrawer(
     }
 
     private fun manageDurationEquivalence(nbDays: Int, barrelVolume: Double, txtDurationEquivalent: TextView) {
-        if (barrelVolume >= 228) {
+        if (barrelVolume >= STANDARD_BARREL_VOLUME) {
             txtDurationEquivalent.visibility = View.GONE
             return
         }
@@ -279,7 +279,7 @@ class HistoryDrawer(
         val infoIcon = ContextCompat.getDrawable(context, R.drawable.ic_info_outline)?.apply {
             val size = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
-                10f,
+                14f,
                 context.resources.displayMetrics
             ).toInt()
             setBounds(0, 0, size, size)
