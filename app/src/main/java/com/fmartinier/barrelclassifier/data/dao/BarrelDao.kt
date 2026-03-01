@@ -5,6 +5,7 @@ import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.BARREL_ID_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.BARREL_TABLE_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.BRAND_COLUMN_NAME
+import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.DESCRIPTION_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.HEATING_TYPE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.HISTORY_TABLE_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.ID_COLUMN_NAME
@@ -31,6 +32,7 @@ class BarrelDao private constructor(private val dbHelper: DatabaseHelper) {
             put(HEATING_TYPE_COLUMN_NAME, barrel.heatType)
             put(STORAGE_HYGROMETER_COLUMN_NAME, barrel.storageHygrometer)
             put(STORAGE_TEMPERATURE_COLUMN_NAME, barrel.storageTemperature)
+            put(DESCRIPTION_COLUMN_NAME, barrel.description)
         }
         return db.insert(BARREL_TABLE_NAME, null, values)
     }
@@ -69,6 +71,7 @@ class BarrelDao private constructor(private val dbHelper: DatabaseHelper) {
                             STORAGE_TEMPERATURE_COLUMN_NAME
                         )
                     ),
+                    description = cursor.getString(cursor.getColumnIndexOrThrow(DESCRIPTION_COLUMN_NAME)),
                     histories = histories
                 )
             )
@@ -102,6 +105,7 @@ class BarrelDao private constructor(private val dbHelper: DatabaseHelper) {
             put(HEATING_TYPE_COLUMN_NAME, barrel.heatType)
             put(STORAGE_HYGROMETER_COLUMN_NAME, barrel.storageHygrometer)
             put(STORAGE_TEMPERATURE_COLUMN_NAME, barrel.storageTemperature)
+            put(DESCRIPTION_COLUMN_NAME, barrel.description)
         }
 
         db.update(
@@ -140,7 +144,8 @@ class BarrelDao private constructor(private val dbHelper: DatabaseHelper) {
                 IMAGE_PATH_COLUMN_NAME,
                 HEATING_TYPE_COLUMN_NAME,
                 STORAGE_HYGROMETER_COLUMN_NAME,
-                STORAGE_TEMPERATURE_COLUMN_NAME
+                STORAGE_TEMPERATURE_COLUMN_NAME,
+                DESCRIPTION_COLUMN_NAME
             ),
             "$ID_COLUMN_NAME = ?",
             arrayOf(barrelId.toString()),
@@ -172,6 +177,7 @@ class BarrelDao private constructor(private val dbHelper: DatabaseHelper) {
                     STORAGE_TEMPERATURE_COLUMN_NAME
                 )
             ),
+            description = cursor.getString(cursor.getColumnIndexOrThrow(DESCRIPTION_COLUMN_NAME)),
             histories = historyDao.findAllByBarrelId(barrelId)
         )
 

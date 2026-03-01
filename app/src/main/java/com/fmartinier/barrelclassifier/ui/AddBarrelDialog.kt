@@ -34,6 +34,7 @@ class AddBarrelDialog : DialogFragment() {
     private lateinit var edtHeatType: MaterialAutoCompleteTextView
     private lateinit var edtHumidity: EditText
     private lateinit var edtTemperature: EditText
+    private lateinit var edtDescription: EditText
     private lateinit var barrel: Barrel
     private var barrelId: Long? = null
     private var modificationMode = false
@@ -56,6 +57,7 @@ class AddBarrelDialog : DialogFragment() {
         edtHeatType = view.findViewById<MaterialAutoCompleteTextView>(R.id.edtHeatType)
         edtHumidity = view.findViewById(R.id.edtHumidity)
         edtTemperature = view.findViewById(R.id.edtTemperature)
+        edtDescription = view.findViewById(R.id.edtBarrelDescription)
 
         val brandAdapter = ArrayAdapter(
             requireContext(),
@@ -114,6 +116,7 @@ class AddBarrelDialog : DialogFragment() {
                 edtHeatType.setText(barrel.heatType)
                 edtHumidity.setText(barrel.storageHygrometer)
                 edtTemperature.setText(barrel.storageTemperature)
+                edtDescription.setText(barrel.description)
             }
 
         val dialogTitle = if (modificationMode) R.string.modify_barrel else R.string.add_barrel
@@ -145,6 +148,7 @@ class AddBarrelDialog : DialogFragment() {
             val heatType = edtHeatType.text?.toString()?.trim()
             val humidity = edtHumidity.text?.toString()?.trim()
             val temperature = edtTemperature.text?.toString()?.trim()
+            val description = edtDescription.text?.toString()?.trim()
 
             // ❌ Validation
             when {
@@ -176,6 +180,7 @@ class AddBarrelDialog : DialogFragment() {
                         heatType = heatType,
                         storageHygrometer = humidity,
                         storageTemperature = temperature,
+                        description = description,
                         histories = emptyList()
                     )
 

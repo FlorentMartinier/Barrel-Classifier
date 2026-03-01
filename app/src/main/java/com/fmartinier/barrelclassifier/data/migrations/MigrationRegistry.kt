@@ -11,6 +11,7 @@ object MigrationRegistry {
             MigrationV10(),
             MigrationV11(),
             MigrationV12(context),
+            MigrationV13()
         )
 
         return migrations

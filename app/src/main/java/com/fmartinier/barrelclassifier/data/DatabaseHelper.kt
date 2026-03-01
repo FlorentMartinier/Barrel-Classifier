@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import androidx.core.database.sqlite.transaction
 import com.fmartinier.barrelclassifier.data.migrations.MigrationRegistry
 
-class DatabaseHelper private constructor(private val context: Context) : SQLiteOpenHelper(context, "barrel.db", null, 12) {
+class DatabaseHelper private constructor(private val context: Context) : SQLiteOpenHelper(context, "barrel.db", null, 13) {
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
@@ -77,7 +77,6 @@ class DatabaseHelper private constructor(private val context: Context) : SQLiteO
         const val BEGIN_DATE_COLUMN_NAME: String = "begin_date"
         const val END_DATE_COLUMN_NAME: String = "end_date"
         const val BARREL_ID_COLUMN_NAME: String = "barrel_id"
-        const val DESCRIPTION_COLUMN_NAME: String = "description"
         const val ANGEL_SHARE_COLUMN_NAME: String = "angel_share_id"
         const val ALCOHOLIC_STRENGTH_COLUMN_NAME: String = "alcoholic_strength_id"
 
@@ -90,6 +89,7 @@ class DatabaseHelper private constructor(private val context: Context) : SQLiteO
         const val TYPE_COLUMN_NAME: String = "type"
         const val NAME_COLUMN_NAME: String = "name"
         const val ID_COLUMN_NAME: String = "id"
+        const val DESCRIPTION_COLUMN_NAME: String = "description"
 
         @Volatile
         private var INSTANCE: DatabaseHelper? = null

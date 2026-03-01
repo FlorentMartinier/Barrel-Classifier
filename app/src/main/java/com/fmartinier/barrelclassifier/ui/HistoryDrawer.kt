@@ -33,6 +33,7 @@ import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.calculateNbDays
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.formatDate
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.formatDaysToDurationString
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.getEquivalenceRatio
+import com.fmartinier.barrelclassifier.utils.TextViewUtils
 import com.fmartinier.barrelclassifier.utils.TooltipUtils.Companion.createTooltip
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -120,77 +121,7 @@ class HistoryDrawer(
 
             val description = history.description
 
-            if (description.isNullOrBlank()) {
-                txtDescription.visibility = View.GONE
-                txtExpandDescription.visibility = View.GONE
-            } else {
-                txtDescription.text = description
-                txtDescription.visibility = View.INVISIBLE
-                txtExpandDescription.visibility = View.GONE
-
-                txtDescription.maxLines = Integer.MAX_VALUE
-                txtDescription.ellipsize = null
-            }
-
-            txtDescription.afterMeasured {
-
-                val lineCount = txtDescription.lineCount
-
-                if (lineCount <= 1) {
-                    txtExpandDescription.visibility = View.GONE
-                } else {
-                    txtExpandDescription.visibility = View.VISIBLE
-                    txtExpandDescription.text = txtDescription.context.getString(R.string.see_more)
-                    txtDescription.maxLines = 1
-                    txtDescription.ellipsize = TextUtils.TruncateAt.END
-                }
-
-                txtDescription.visibility = View.VISIBLE
-            }
-
-            txtExpandDescription.setOnClickListener {
-
-                val expanded = txtDescription.maxLines > 1
-
-                if (expanded) {
-                    // collapse
-                    val startHeight = txtDescription.height
-
-                    txtDescription.maxLines = 1
-                    txtDescription.ellipsize = TextUtils.TruncateAt.END
-                    txtDescription.measure(
-                        View.MeasureSpec.makeMeasureSpec(
-                            txtDescription.width,
-                            View.MeasureSpec.EXACTLY
-                        ),
-                        View.MeasureSpec.UNSPECIFIED
-                    )
-                    val endHeight = txtDescription.measuredHeight
-
-                    animateTextViewHeight(txtDescription, startHeight, endHeight)
-
-                    txtExpandDescription.text = context.getString(R.string.see_more)
-
-                } else {
-                    // expand
-                    val startHeight = txtDescription.height
-
-                    txtDescription.maxLines = Int.MAX_VALUE
-                    txtDescription.ellipsize = null
-                    txtDescription.measure(
-                        View.MeasureSpec.makeMeasureSpec(
-                            txtDescription.width,
-                            View.MeasureSpec.EXACTLY
-                        ),
-                        View.MeasureSpec.UNSPECIFIED
-                    )
-                    val endHeight = txtDescription.measuredHeight
-
-                    animateTextViewHeight(txtDescription, startHeight, endHeight)
-
-                    txtExpandDescription.text = context.getString(R.string.see_less)
-                }
-            }
+            TextViewUtils.convertToDetailedDescription(context, txtDescription, txtExpandDescription, description)
 
             btnMenu.setOnClickListener {
                 val popup = PopupMenu(it.context, it)
@@ -331,37 +262,6 @@ class HistoryDrawer(
             }
             .setNegativeButton(context.resources.getString(R.string.cancel), null)
             .show()
-    }
-
-    fun TextView.afterMeasured(block: () -> Unit) {
-        if (width > 0) {
-            block()
-            return
-        }
-
-        viewTreeObserver.addOnGlobalLayoutListener(object :
-            ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                if (width > 0) {
-                    viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    block()
-                }
-            }
-        })
-    }
-
-    private fun animateTextViewHeight(view: TextView, start: Int, end: Int, duration: Long = 220) {
-        val animator = ValueAnimator.ofInt(start, end)
-        animator.duration = duration
-        animator.interpolator = android.view.animation.DecelerateInterpolator()
-
-        animator.addUpdateListener {
-            val value = it.animatedValue as Int
-            view.layoutParams.height = value
-            view.requestLayout()
-        }
-
-        animator.start()
     }
 
     private fun displayAlerts(

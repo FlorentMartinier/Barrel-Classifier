@@ -151,6 +151,7 @@ class PdfService(private val context: Context) {
             dateFormat.format(Date(firstHistory))
         )
         drawField(context.getString(R.string.aging_number), barrel.histories.size.toString())
+        drawField(context.getString(R.string.detailed_description), barrel.description)
     }
 
     private fun drawHistoryEntry(

@@ -10,6 +10,7 @@ data class Barrel(
     val heatType: String?,
     val storageHygrometer: String?,
     val storageTemperature: String?,
+    val description: String?,
     val histories: List<History>
 ) {
 

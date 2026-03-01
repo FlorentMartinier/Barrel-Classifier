@@ -25,6 +25,7 @@ import com.fmartinier.barrelclassifier.service.BarrelService
 import com.fmartinier.barrelclassifier.service.ImageService
 import com.fmartinier.barrelclassifier.service.PdfService
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.formatDate
+import com.fmartinier.barrelclassifier.utils.TextViewUtils
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -73,6 +74,8 @@ class BarrelAdapter(
 
         holder.txtBarrelName.text = barrel.name
         holder.txtBarrelDetails.text = "${barrel.brand} • ${barrel.woodType} • ${barrel.volume}L"
+
+        TextViewUtils.convertToDetailedDescription(context, holder.txtDescription, holder.txtExpandDescription, barrel.description)
         holder.chipGroup.removeAllViews()
 
         barrel.histories
@@ -277,6 +280,8 @@ class BarrelAdapter(
 
         var isHistoryExpanded: Boolean = false
         var isStatsExpanded: Boolean = false
+        val txtDescription: TextView = itemView.findViewById(R.id.txtBarrelDescription)
+        val txtExpandDescription: TextView = itemView.findViewById(R.id.txtBarrelExpandDescription)
     }
 
     fun addChip(holder: BarrelViewHolder, text: String, icon: String) {
