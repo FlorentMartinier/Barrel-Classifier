@@ -137,7 +137,7 @@
     <string name="estimated_loss">📍 Perte estimée</string>
     <string name="evaporation">Évaporation (%)</string>
     <string name="angels_share_estimation">Estimation de la Part des Anges \u24D8</string>
-    <string name="tannin_estimation_tooltip">Cette simulation modélise l\'équilibre entre l\'apport aromatique du bois et son assouplissement au fil du temps (oxydation). Elle prend en compte le volume du fût (%1$sL), et son usage actuel (%2$s jours).</string>
+    <string name="tannin_estimation_tooltip">Cette simulation modélise l\'équilibre entre l\'apport aromatique du bois et son assouplissement au fil du temps (oxydation). Elle prend en compte le volume du fût (%1$sL), et son usage précédent (%2$s jours).</string>
     <string name="angels_share_estimation_tooltip">L\'estimation de la part des anges prend en compte le volume du fût (%1$sL), la température (%2$s°C) et l\'hygrométrie de stockage (%3$s%%).\nNote : En l\'absence de saisie, les valeurs standard de conservation sont appliquées.</string>
     <string-array name="type_fut_array">
         <item>Vieillissement</item>

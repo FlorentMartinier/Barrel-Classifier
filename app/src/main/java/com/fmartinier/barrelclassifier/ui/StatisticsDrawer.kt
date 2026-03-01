@@ -280,7 +280,9 @@ class StatisticsDrawer(
 
     private fun setupTanninEstimation(barrelVolume: Double, barrel: Barrel) {
         val histories = barrel.histories
-        val historyNdDays = histories.sumOf { calculateNbDaysHistory(it) }
+        val historyNdDays = histories
+            .filter { it.endDate != null } // Le calcul doit sur faire uniquement sur les historiques précédents. Sinon la courbe va bouger tous les jours.
+            .sumOf { calculateNbDaysHistory(it) }
 
         tanninChartTitle.setOnClickListener {
             TooltipUtils.createTooltip(context, context.getString(R.string.tannin_estimation_tooltip, barrelVolume.toInt().toString(), historyNdDays.toString())).showAlignTop(it)

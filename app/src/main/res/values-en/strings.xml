@@ -137,7 +137,7 @@
     <string name="estimated_loss">📍 Estimated loss</string>
     <string name="evaporation">Evaporation (%)</string>
     <string name="angels_share_estimation">Angels\' Share Estimation \u24D8</string>
-    <string name="tannin_estimation_tooltip">This simulation models the balance between aromatic wood extraction and mellowing over time (oxidation). It accounts for barrel volume (%1$sL) and current usage (%2$s days).</string>
+    <string name="tannin_estimation_tooltip">This simulation models the balance between aromatic wood extraction and mellowing over time (oxidation). It accounts for barrel volume (%1$sL) and previous usage (%2$s days).</string>
     <string name="angels_share_estimation_tooltip">The angels\' share estimation accounts for barrel volume (%1$sL), storage temperature (%2$s°C), and humidity (%3$s%%).\nNote: Standard conservation values are applied if no data is provided.</string>
     <string-array name="type_fut_array">
         <item>Aging</item>
