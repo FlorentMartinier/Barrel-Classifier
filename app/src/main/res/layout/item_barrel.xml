@@ -368,6 +368,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:alpha="0.7"
+                    android:text="@string/tannin_chart_title"
                     android:textSize="13sp" />
 
                 <com.github.mikephil.charting.charts.LineChart

@@ -22,6 +22,7 @@ class TooltipUtils {
                 .setAlpha(0.9f)
                 .setBalloonAnimation(BalloonAnimation.FADE)
                 .setLifecycleOwner(null)
+                .setPadding(5)
                 .build()
         }
     }

@@ -126,7 +126,7 @@
     <string name="ageing_phase">Extraction phase - Wood-dominant. Wait for oxidation to bring roundness.</string>
     <string name="maturation_phase">Noble maturation - Oxidation has taken over, the profile is refining.</string>
     <string name="harmony_phase">Harmony - Wood and air are in balance. Ready for tasting!</string>
-    <string name="tannin_chart_title">Maturation profile (%1$sL barrel - %2$s days history)</string>
+    <string name="tannin_chart_title">Maturation profile \u24D8</string>
     <string name="high_evaporation">High evaporation rate due to heat.</string>
     <string name="slow_and_preserved_ageing">Slow and preserved ageing (cool cellar).</string>
     <string name="controlled_evaporation">Steady and controlled evaporation.</string>
@@ -136,7 +136,9 @@
     <string name="significant_volume_loss">\n⚠️ Significant volume loss: monitor your barrel closely!</string>
     <string name="estimated_loss">📍 Estimated loss</string>
     <string name="evaporation">Evaporation (%)</string>
-    <string name="angels_share_estimation">Angels\' Share Estimation</string>
+    <string name="angels_share_estimation">Angels\' Share Estimation \u24D8</string>
+    <string name="tannin_estimation_tooltip">This simulation models the balance between aromatic wood extraction and mellowing over time (oxidation). It accounts for barrel volume (%1$sL) and current usage (%2$s days).</string>
+    <string name="angels_share_estimation_tooltip">The angels\' share estimation accounts for barrel volume (%1$sL), storage temperature (%2$s°C), and humidity (%3$s%%).\nNote: Standard conservation values are applied if no data is provided.</string>
     <string-array name="type_fut_array">
         <item>Aging</item>
         <item>Seasonning</item>

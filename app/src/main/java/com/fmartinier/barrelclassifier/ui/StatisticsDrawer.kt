@@ -35,6 +35,7 @@ import com.github.mikephil.charting.formatter.ValueFormatter
 import kotlin.math.exp
 import kotlin.math.pow
 import com.fmartinier.barrelclassifier.utils.BarrelUtils.Companion.STANDARD_BARREL_VOLUME
+import com.fmartinier.barrelclassifier.utils.TooltipUtils
 
 class StatisticsDrawer(
     val context: Context,
@@ -63,6 +64,7 @@ class StatisticsDrawer(
     private lateinit var tanninChartTitle: TextView
     private lateinit var angelsVerdictText: TextView
     private lateinit var angelsChart: LineChart
+    private lateinit var angelsChartTitle: TextView
 
     val colorList = listOf(
         ContextCompat.getColor(context, R.color.chart_primary),
@@ -96,6 +98,7 @@ class StatisticsDrawer(
         tanninChartTitle = view.findViewById<TextView>(R.id.tanninChartTitle)
         angelsVerdictText = view.findViewById<TextView>(R.id.angelsVerdictText)
         angelsChart = view.findViewById<LineChart>(R.id.angelsChart)
+        angelsChartTitle = view.findViewById<TextView>(R.id.angelsChartTitle)
 
         val histories = barrel.histories
         if (histories.isEmpty()) {
@@ -279,8 +282,9 @@ class StatisticsDrawer(
         val histories = barrel.histories
         val historyNdDays = histories.sumOf { calculateNbDaysHistory(it) }
 
-        tanninChartTitle.text =
-            context.getString(R.string.tannin_chart_title, barrelVolume.toInt().toString(), historyNdDays.toString())
+        tanninChartTitle.setOnClickListener {
+            TooltipUtils.createTooltip(context, context.getString(R.string.tannin_estimation_tooltip, barrelVolume.toInt().toString(), historyNdDays.toString())).showAlignTop(it)
+        }
 
         val maxMonths = when {
             barrelVolume <= 5 -> 24f
@@ -449,6 +453,15 @@ class StatisticsDrawer(
         val humidity = if (!storageHygrometer.isNullOrEmpty()) {
             storageHygrometer.toDouble()
         } else 70.0
+
+        angelsChartTitle.setOnClickListener {
+            TooltipUtils.createTooltip(context, context.getString(
+                R.string.angels_share_estimation_tooltip,
+                barrelVolume.toString(),
+                temp.toString(),
+                humidity.toString()
+            )).showAlignTop(it)
+        }
 
         val maxMonths = when {
             barrelVolume <= 5 -> 24f
