@@ -11,6 +11,7 @@ import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.data.model.History
 import com.fmartinier.barrelclassifier.ui.BarrelAdapter.BarrelViewHolder
+import com.fmartinier.barrelclassifier.ui.model.CustomMarkerView
 import com.fmartinier.barrelclassifier.utils.DateUtils
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.calculateNbDaysHistory
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.getEquivalenceRatio
@@ -240,7 +241,7 @@ class StatisticsDrawer(
             setDrawValueAboveBar(true)
             setDrawGridBackground(false)
             data = BarData(barDataSet)
-            setMaxVisibleValueCount(100)
+            setMaxVisibleValueCount(1000)
             clipChildren = false
             data.setValueTextColor(ContextCompat.getColor(context, R.color.chart_primary))
 
@@ -356,8 +357,10 @@ class StatisticsDrawer(
             val verdict = generateVerdict(currentMonths, currentY, (100 * (1 - exp(-oxidationSpeed * currentMonths))).toFloat())
             this.verdictText.text = context.getString(R.string.verdict, verdict)
         }
-
+        val markerMaturation = CustomMarkerView(context, R.layout.layout_marker_view, "%")
         tanninChart.apply {
+            setMaxVisibleValueCount(1000)
+            marker = markerMaturation
             data = if (currentSet != null) LineData(extractionSet, oxidationSet, currentSet)
             else LineData(extractionSet, oxidationSet)
 
@@ -400,6 +403,7 @@ class StatisticsDrawer(
             animateX(1000)
             invalidate()
         }
+        markerMaturation.chartView = tanninChart
     }
 
     private fun generateVerdict(months: Float, extraction: Float, oxidation: Float): String {
@@ -500,7 +504,10 @@ class StatisticsDrawer(
         }
 
         // 4. Configuration du Chart
+        val markerAngels = CustomMarkerView(context, R.layout.layout_marker_view, "%")
         angelsChart.apply {
+            setMaxVisibleValueCount(1000)
+            marker = markerAngels
             data = if (currentSet != null) LineData(angelsSet, currentSet) else LineData(angelsSet)
 
             description.isEnabled = false
@@ -535,6 +542,7 @@ class StatisticsDrawer(
 
             invalidate()
         }
+        markerAngels.chartView = angelsChart
     }
 
     private fun generateAngelsVerdict(temp: Double, humidity: Double, loss: Double): String {
