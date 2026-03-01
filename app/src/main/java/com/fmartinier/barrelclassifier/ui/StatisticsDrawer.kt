@@ -60,6 +60,8 @@ class StatisticsDrawer(
     private lateinit var tanninChart: LineChart
     private lateinit var verdictText: TextView
     private lateinit var tanninChartTitle: TextView
+    private lateinit var angelsVerdictText: TextView
+    private lateinit var angelsChart: LineChart
 
     val colorList = listOf(
         ContextCompat.getColor(context, R.color.chart_primary),
@@ -91,6 +93,8 @@ class StatisticsDrawer(
         tanninChart = view.findViewById<LineChart>(R.id.tanninChart)
         verdictText = view.findViewById<TextView>(R.id.verdictText)
         tanninChartTitle = view.findViewById<TextView>(R.id.tanninChartTitle)
+        angelsVerdictText = view.findViewById<TextView>(R.id.angelsVerdictText)
+        angelsChart = view.findViewById<LineChart>(R.id.angelsChart)
 
         val histories = barrel.histories
         if (histories.isEmpty()) {
@@ -136,7 +140,8 @@ class StatisticsDrawer(
         setupAngelShare(histories)
         setupAgeingDistribution(histories)
         setupAverageAgeingDuration(histories)
-        setupTanninChart(barrel.volume.toDouble(), barrel)
+        setupTanninEstimation(barrel.volume.toDouble(), barrel)
+        setupAngelsShareEstimation(barrel, barrel.volume.toDouble())
     }
 
     private fun setupAlcohol(histories: List<History>) {
@@ -195,6 +200,7 @@ class StatisticsDrawer(
                 horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
                 orientation = Legend.LegendOrientation.HORIZONTAL
                 setDrawInside(false)
+                textColor = ContextCompat.getColor(context, R.color.chart_primary)
             }
             isDrawHoleEnabled = true
             setHoleColor(Color.TRANSPARENT)
@@ -217,7 +223,7 @@ class StatisticsDrawer(
         val barDataSet =
             BarDataSet(barEntries, "").apply {
                 colors = colorList
-                valueTextColor = Color.RED
+                valueTextColor = ContextCompat.getColor(context, R.color.chart_primary)
                 valueTextSize = 10f
                 setDrawValues(true)
                 valueFormatter = object : ValueFormatter() {
@@ -236,29 +242,30 @@ class StatisticsDrawer(
             data = BarData(barDataSet)
             setMaxVisibleValueCount(100)
             clipChildren = false
-            data.setValueTextColor(ContextCompat.getColor(context, R.color.alert_text))
+            data.setValueTextColor(ContextCompat.getColor(context, R.color.chart_primary))
 
             // Configuration des axes pour un rendu horizontal propre
             xAxis.apply {
                 isEnabled = true
                 position = XAxis.XAxisPosition.BOTTOM
                 setDrawGridLines(false)
-                textColor = ContextCompat.getColor(context, R.color.text_secondary)
+                textColor = ContextCompat.getColor(context, R.color.chart_primary)
                 valueFormatter =
                     IndexAxisValueFormatter(avgDurations.keys.toList())
                 granularity = 1f
             }
 
             axisLeft.apply {
-                isEnabled = false // Masquer l'axe du bas
-                setDrawGridLines(false)
+                isEnabled = false
+                axisMinimum = 0f
             }
 
             axisRight.apply {
-                isEnabled = true // Afficher l'axe du haut pour l'échelle
+                isEnabled = true
                 setDrawGridLines(true)
                 gridColor = Color.LTGRAY
                 textColor = ContextCompat.getColor(context, R.color.chart_primary)
+                axisMinimum = 0f
             }
 
             setFitBars(true)
@@ -267,7 +274,7 @@ class StatisticsDrawer(
         }
     }
 
-    private fun setupTanninChart(barrelVolume: Double, barrel: Barrel) {
+    private fun setupTanninEstimation(barrelVolume: Double, barrel: Barrel) {
         val histories = barrel.histories
         val historyNdDays = histories.sumOf { calculateNbDaysHistory(it) }
 
@@ -426,5 +433,162 @@ class StatisticsDrawer(
         val potency = exp(-1.0 * (equivalentDaysOfWear / dynamicExhaustionPoint))
 
         return potency.coerceAtLeast(0.1)
+    }
+
+    private fun setupAngelsShareEstimation(barrel: Barrel, barrelVolume: Double) {
+        // 1. Récupération des données environnementales (ou valeurs par défaut)
+        val storageTemperature = barrel.storageTemperature
+        val storageHygrometer = barrel.storageHygrometer
+        val temp = if(!storageTemperature.isNullOrEmpty()) {
+            storageTemperature.toDouble()
+        } else 15.0
+        val humidity = if (!storageHygrometer.isNullOrEmpty()) {
+            storageHygrometer.toDouble()
+        } else 70.0
+
+        val maxMonths = when {
+            barrelVolume <= 5 -> 24f
+            barrelVolume <= 20 -> 60f
+            barrelVolume <= 100 -> 120f
+            else -> 240f
+        }
+
+        val entries = ArrayList<Entry>()
+
+        // 2. Génération de la courbe
+        for (month in 0..maxMonths.toInt()) {
+            val loss = calculateAngelsShare(month.toFloat(), barrelVolume, temp, humidity)
+            entries.add(Entry(month.toFloat(), loss.toFloat()))
+        }
+
+        val angelsSet = LineDataSet(entries, context.getString(R.string.evaporation)).apply {
+            color = ContextCompat.getColor(context, R.color.chart_primary)
+            setDrawCircles(false)
+            lineWidth = 3f
+            mode = LineDataSet.Mode.CUBIC_BEZIER
+            setDrawFilled(true)
+            fillColor = ContextCompat.getColor(context, R.color.chart_primary)
+            fillAlpha = 40
+            setDrawValues(false)
+        }
+
+        // 3. Point Actuel
+        var currentSet: LineDataSet? = null
+        barrel.getCurrentHistory()?.let {
+            val currentMonths = calculateNbDaysHistory(it) / 30.44f
+            val currentLoss = calculateAngelsShare(currentMonths, barrelVolume, temp, humidity)
+
+            currentSet = LineDataSet(listOf(Entry(currentMonths, currentLoss.toFloat())), "").apply {
+                setDrawCircles(true)
+                circleRadius = 8f
+                circleHoleRadius = 5f
+                setCircleColor(ContextCompat.getColor(context, R.color.chart_primary))
+                circleHoleColor = Color.WHITE
+                setDrawValues(true)
+                valueTextSize = 11f
+                valueTextColor = ContextCompat.getColor(context, R.color.chart_primary)
+                valueFormatter = object : ValueFormatter() {
+                    override fun getPointLabel(entry: Entry?): String =
+                        context.getString(R.string.estimated_loss)
+                }
+                form = Legend.LegendForm.NONE
+            }
+
+            // Affichage du verdict
+            angelsVerdictText.visibility = View.VISIBLE
+            angelsVerdictText.text = generateAngelsVerdict(temp, humidity, currentLoss)
+        }
+
+        // 4. Configuration du Chart
+        angelsChart.apply {
+            data = if (currentSet != null) LineData(angelsSet, currentSet) else LineData(angelsSet)
+
+            description.isEnabled = false
+            axisRight.isEnabled = false
+            setExtraOffsets(5f, 15f, 5f, 25f)
+
+            xAxis.apply {
+                position = XAxis.XAxisPosition.BOTTOM
+                axisMinimum = 0f
+                axisMaximum = maxMonths
+                valueFormatter = object : ValueFormatter() {
+                    override fun getFormattedValue(value: Float): String = "${value.toInt()}m"
+                }
+                textColor = ContextCompat.getColor(context, R.color.chart_primary)
+            }
+
+            axisLeft.apply {
+                axisMinimum = 0f
+                axisMaximum = if (entries.maxOf { it.y } > 15f) entries.maxOf { it.y } + 5f else 20f
+                valueFormatter = object : ValueFormatter() {
+                    override fun getFormattedValue(value: Float): String = "${value.toInt()}%"
+                }
+                textColor = ContextCompat.getColor(context, R.color.chart_primary)
+            }
+
+            legend.apply {
+                verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
+                horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
+                yOffset = 10f
+                textColor = ContextCompat.getColor(context, R.color.chart_primary)
+            }
+
+            invalidate()
+        }
+    }
+
+    private fun generateAngelsVerdict(temp: Double, humidity: Double, loss: Double): String {
+        // 1. Analyse de l'intensité (Vitesse)
+        val intensity = when {
+            temp > 22 -> context.getString(R.string.high_evaporation)
+            temp < 12 -> context.getString(R.string.slow_and_preserved_ageing)
+            else -> context.getString(R.string.controlled_evaporation)
+        }
+
+        // 2. Analyse du profil (Eau vs Alcool)
+        val profile = when {
+            humidity < 55 -> context.getString(R.string.dry_environment)
+            humidity > 75 -> context.getString(R.string.damp_environment)
+            else -> context.getString(R.string.balanced_humidity)
+        }
+
+        // 3. Alerte spécifique sur le volume (si la perte est déjà importante)
+        val warning = if (loss > 20) context.getString(R.string.significant_volume_loss) else ""
+
+        return "💡 $intensity\n💡 $profile$warning"
+    }
+
+    private fun calculateAngelsShare(
+        months: Float,
+        volume: Double,
+        temp: Double? = 15.0, // Facultatif
+        humidity: Double? = 70.0 // Facultatif
+    ): Double {
+        val t = temp ?: 15.0
+        val h = humidity ?: 70.0
+
+        // 1. Taux de base annuel (environ 2.5%)
+        var annualRate = 0.025
+
+        // 2. Ajustement selon le volume (Effet d'échelle)
+        // Un 2L évapore environ 3 à 4 fois plus vite qu'un 200L
+        val volumeFactor = (STANDARD_BARREL_VOLUME / volume).pow(0.25)
+        annualRate *= volumeFactor
+
+        // 3. Ajustement Température (loi simplifiée : +0.1% de perte par degré au dessus de 15°C)
+        val tempFactor = 1.0 + (t - 15.0) * 0.05
+        annualRate *= tempFactor
+
+        // 4. Ajustement Hygrométrie
+        // Plus c'est sec (< 70%), plus l'évaporation totale augmente légèrement
+        val humidityFactor = 1.0 + (70.0 - h) * 0.005
+        annualRate *= humidityFactor
+
+        // 5. Calcul final composé (mois par mois)
+        // Formule : Valeur * (1 - taux_mensuel)^nb_mois
+        val monthlyRate = annualRate / 12.0
+        val totalLossPercentage = (1.0 - (1.0 - monthlyRate).pow(months.toDouble())) * 100.0
+
+        return totalLossPercentage
     }
 }

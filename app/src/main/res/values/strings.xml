@@ -121,12 +121,22 @@
     <string name="wood">Bois</string>
     <string name="oxydation">Oxydation</string>
     <string name="current_ageing">📍 Vieillissement actuel</string>
-    <string name="verdict">💡 Verdict : %1$s</string>
+    <string name="verdict">💡 %1$s</string>
     <string name="start_phase">Phase de démarrage - Le bois commence à peine à s\'infuser.</string>
     <string name="ageing_phase">Phase d\'élevage - Dominance boisée. Attendez que l\'oxydation apporte de la rondeur.</string>
     <string name="maturation_phase">Maturation noble - L\'oxydation a pris le dessus, le profil s\'affine.</string>
     <string name="harmony_phase">Équilibre - Le bois et l\'air sont en harmonie. Prêt pour dégustation !</string>
     <string name="tannin_chart_title">Profil de maturation (%1$sL - %2$s jours d\'historique)</string>
+    <string name="high_evaporation">Taux d\'évaporation élevé dû à la chaleur.</string>
+    <string name="slow_and_preserved_ageing">Vieillissement lent et préservé (chai frais).</string>
+    <string name="controlled_evaporation">Évaporation régulière et contrôlée.</string>
+    <string name="dry_environment">Environnement sec : l\'eau s\'évapore plus vite, le taux d\'alcool va probablement augmenter.</string>
+    <string name="damp_environment">Environnement humide : l\'alcool s\'évapore plus vite, votre vieillissement gagnera en souplesse.</string>
+    <string name="balanced_humidity">Humidité équilibrée : évolution stable du profil.</string>
+    <string name="significant_volume_loss">\n⚠️ Perte de volume importante : surveillez votre fût de près !</string>
+    <string name="estimated_loss">📍 Perte estimée</string>
+    <string name="evaporation">Évaporation (%)</string>
+    <string name="angels_share_estimation">Estimation de la Part des Anges</string>
     <string-array name="type_fut_array">
         <item>Vieillissement</item>
         <item>Marquage</item>

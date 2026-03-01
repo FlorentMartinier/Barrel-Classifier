@@ -121,12 +121,22 @@
     <string name="wood">Wood</string>
     <string name="oxydation">Oxidation</string>
     <string name="current_ageing">📍 Current ageing</string>
-    <string name="verdict">💡 Verdict: %1$s</string>
+    <string name="verdict">💡 %1$s</string>
     <string name="start_phase">Early stage - The wood is just beginning to infuse.</string>
     <string name="ageing_phase">Extraction phase - Wood-dominant. Wait for oxidation to bring roundness.</string>
     <string name="maturation_phase">Noble maturation - Oxidation has taken over, the profile is refining.</string>
     <string name="harmony_phase">Harmony - Wood and air are in balance. Ready for tasting!</string>
     <string name="tannin_chart_title">Maturation profile (%1$sL barrel - %2$s days history)</string>
+    <string name="high_evaporation">High evaporation rate due to heat.</string>
+    <string name="slow_and_preserved_ageing">Slow and preserved ageing (cool cellar).</string>
+    <string name="controlled_evaporation">Steady and controlled evaporation.</string>
+    <string name="dry_environment">Dry environment: water evaporates faster, ABV will likely increase.</string>
+    <string name="damp_environment">Damp environment: alcohol evaporates faster, your ageing will become mellower.</string>
+    <string name="balanced_humidity">Balanced humidity: stable profile evolution.</string>
+    <string name="significant_volume_loss">\n⚠️ Significant volume loss: monitor your barrel closely!</string>
+    <string name="estimated_loss">📍 Estimated loss</string>
+    <string name="evaporation">Evaporation (%)</string>
+    <string name="angels_share_estimation">Angels\' Share Estimation</string>
     <string-array name="type_fut_array">
         <item>Aging</item>
         <item>Seasonning</item>
