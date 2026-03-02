@@ -37,7 +37,7 @@ import com.google.api.services.drive.DriveScopes
 
 class BarrelAdapter(
     private val context: Context,
-    private var barrels: List<Barrel>,
+    var barrels: List<Barrel>,
     private val refresh: () -> Unit,
     private val onAddHistory: (Barrel, Long?) -> Unit,
     private val onEditBarrel: (Barrel) -> Unit,
@@ -75,7 +75,6 @@ class BarrelAdapter(
         holder.txtBarrelName.text = barrel.name
         holder.txtBarrelDetails.text = "${barrel.brand} • ${barrel.woodType} • ${barrel.volume}L"
 
-        TextViewUtils.convertToDetailedDescription(context, holder.txtDescription, holder.txtExpandDescription, barrel.description)
         holder.chipGroup.removeAllViews()
 
         barrel.histories
@@ -223,6 +222,7 @@ class BarrelAdapter(
                 BitmapFactory.decodeFile(barrel.imagePath)
             )
         }
+        TextViewUtils.convertToDetailedDescription(context, holder.txtDescription, holder.txtExpandDescription, barrel.description)
 
         historyDrawer.displayAllForBarrel(holder, barrel)
         statisticsDrawer.displayAllForBarrel(holder, barrel)

@@ -15,30 +15,28 @@ class TextViewUtils {
             if (text.isNullOrBlank()) {
                 textView.visibility = View.GONE
                 expand.visibility = View.GONE
-            } else {
-                textView.text = text
-                textView.visibility = View.INVISIBLE
+                return
+            }
+            textView.text = text
+            textView.maxLines = Integer.MAX_VALUE
+            textView.ellipsize = null
+
+            textView.measure(
+                View.MeasureSpec.makeMeasureSpec(textView.width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            )
+            val lineCount = textView.lineCount
+
+            if (lineCount <= 1) {
                 expand.visibility = View.GONE
-
-                textView.maxLines = Integer.MAX_VALUE
-                textView.ellipsize = null
+            } else {
+                expand.visibility = View.VISIBLE
+                expand.text = textView.context.getString(R.string.see_more)
+                textView.maxLines = 1
+                textView.ellipsize = TextUtils.TruncateAt.END
             }
 
-            textView.afterMeasured {
-
-                val lineCount = textView.lineCount
-
-                if (lineCount <= 1) {
-                    expand.visibility = View.GONE
-                } else {
-                    expand.visibility = View.VISIBLE
-                    expand.text = textView.context.getString(R.string.see_more)
-                    textView.maxLines = 1
-                    textView.ellipsize = TextUtils.TruncateAt.END
-                }
-
-                textView.visibility = View.VISIBLE
-            }
+            textView.visibility = View.VISIBLE
 
             expand.setOnClickListener {
 
@@ -83,23 +81,6 @@ class TextViewUtils {
                     expand.text = context.getString(R.string.see_less)
                 }
             }
-        }
-
-        private fun TextView.afterMeasured(block: () -> Unit) {
-            if (width > 0) {
-                block()
-                return
-            }
-
-            viewTreeObserver.addOnGlobalLayoutListener(object :
-                ViewTreeObserver.OnGlobalLayoutListener {
-                override fun onGlobalLayout() {
-                    if (width > 0) {
-                        viewTreeObserver.removeOnGlobalLayoutListener(this)
-                        block()
-                    }
-                }
-            })
         }
 
         private fun animateTextViewHeight(view: TextView, start: Int, end: Int, duration: Long = 220) {
