@@ -19,6 +19,7 @@ class DatabaseHelper private constructor(private val context: Context) : SQLiteO
                     "    $HEATING_TYPE_COLUMN_NAME TEXT," +
                     "    $STORAGE_HYGROMETER_COLUMN_NAME TEXT," +
                     "    $STORAGE_TEMPERATURE_COLUMN_NAME TEXT," +
+                    "    $DESCRIPTION_COLUMN_NAME TEXT," +
                     "    $IMAGE_PATH_COLUMN_NAME TEXT" +
                     ");"
         )
