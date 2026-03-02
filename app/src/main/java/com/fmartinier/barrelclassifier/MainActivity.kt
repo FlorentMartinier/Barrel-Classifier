@@ -312,26 +312,19 @@ class MainActivity : AppCompatActivity() {
      * et met à jour l'UI
      */
     private fun loadBarrels() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            // 1. Lecture en base de données (Thread IO)
-            val barrels = barrelDao.findAllWithHistories()
+        val barrels = barrelDao.findAllWithHistories()
+        if (adapter.barrels != barrels) {
+            adapter.updateData(barrels)
+        }
 
-            // 2. Retour sur le Thread Main pour toucher aux vues
-            withContext(Dispatchers.Main) {
-                if (adapter.barrels != barrels) {
-                    adapter.updateData(barrels)
-                }
-
-                if (barrels.isEmpty()) {
-                    emptyStateLayout.visibility = View.VISIBLE
-                    recyclerView.visibility = View.GONE
-                    startArrowAnimation()
-                } else {
-                    emptyStateLayout.visibility = View.GONE
-                    recyclerView.visibility = View.VISIBLE
-                    stopArrowAnimation()
-                }
-            }
+        if (barrels.isEmpty()) {
+            emptyStateLayout.visibility = View.VISIBLE
+            recyclerView.visibility = View.GONE
+            startArrowAnimation()
+        } else {
+            emptyStateLayout.visibility = View.GONE
+            recyclerView.visibility = View.VISIBLE
+            stopArrowAnimation()
         }
     }
 
