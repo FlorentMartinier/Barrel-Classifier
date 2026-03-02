@@ -8,6 +8,9 @@ import android.graphics.Path
 import android.graphics.RectF
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
+import android.text.Layout
+import android.text.StaticLayout
+import android.text.TextPaint
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
 import androidx.core.graphics.withClip
@@ -20,6 +23,7 @@ import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.core.graphics.withSave
 
 class PdfService(private val context: Context) {
 
@@ -64,7 +68,7 @@ class PdfService(private val context: Context) {
                 typeface = Typeface.DEFAULT
             }
 
-            val blockHeight = measureHistoryHeight(history, paintText, pageWidth - 260f)
+            val blockHeight = measureHistoryHeight(history, paintText)
 
             // Vérification saut de page
             if (currentY + blockHeight > pageHeight - 120f) {
@@ -120,22 +124,50 @@ class PdfService(private val context: Context) {
 
         // Infos
         var y = 1040f
-        val lineSpace = 55f
 
         paint.color = dark
         paint.textSize = 54f
         paint.typeface = Typeface.DEFAULT_BOLD
         y = drawMultilineText(canvas, barrel.name, margin, 970f, paint)
 
-        fun drawField(label: String, value: String?) {
+        fun drawField(
+            label: String,
+            value: String?
+        ) {
             if (value.isNullOrBlank() || listOf(" L", "°C", "%").contains(value)) return
             paint.textSize = 32f
             paint.typeface = Typeface.DEFAULT_BOLD
+            val maxWidth = pageWidth - margin
             canvas.drawText("$label :", margin, y, paint)
 
             paint.typeface = Typeface.DEFAULT
-            canvas.drawText(value, margin + 600f, y, paint)
-            y += lineSpace
+            val valueX = 600f
+            val availableWidth = maxWidth - valueX // Largeur restante sur la page
+
+            // 3. Utiliser StaticLayout pour dessiner la valeur avec retour à la ligne
+            val textPaint = TextPaint(paint) // StaticLayout nécessite un TextPaint
+
+            val staticLayout = StaticLayout.Builder.obtain(
+                value,
+                0,
+                value.length,
+                textPaint,
+                availableWidth.toInt()
+            )
+                .setAlignment(Layout.Alignment.ALIGN_NORMAL)
+                .setLineSpacing(0f, 1f)
+                .setIncludePad(false)
+                .build()
+
+            // 4. Dessiner le texte structuré sur le canvas
+            canvas.withSave {
+                val yAdjustment = y + paint.fontMetrics.ascent
+                translate(valueX, yAdjustment)
+                staticLayout.draw(this)
+            }
+
+            // 5. Retourner la hauteur totale consommée pour savoir où écrire le champ suivant
+            y += staticLayout.height.toFloat() + 12f
         }
 
         val firstHistory: Long = barrel.histories.minOfOrNull { it.beginDate } ?: 0
@@ -146,10 +178,7 @@ class PdfService(private val context: Context) {
         drawField(context.getString(R.string.heating_type), barrel.heatType)
         drawField(context.getString(R.string.storage_temperature), "${barrel.storageTemperature}°C")
         drawField(context.getString(R.string.storage_hygrometer), "${barrel.storageHygrometer}%")
-        drawField(
-            context.getString(R.string.first_history_date),
-            dateFormat.format(Date(firstHistory))
-        )
+        drawField(context.getString(R.string.first_history_date),dateFormat.format(Date(firstHistory)))
         drawField(context.getString(R.string.aging_number), barrel.histories.size.toString())
         drawField(context.getString(R.string.detailed_description), barrel.description)
     }
@@ -190,23 +219,26 @@ class PdfService(private val context: Context) {
                 val clipPath = Path().apply {
                     addCircle(rect.centerX(), rect.centerY(), imageSize / 2f, Path.Direction.CW)
                 }
-                canvas.save()
-                canvas.clipPath(clipPath)
+                canvas.withClip(clipPath) {
+                    // Logique Center Crop
+                    val bitmapRatio = bmp.width.toFloat() / bmp.height.toFloat()
+                    val drawRect = if (bitmapRatio > 1f) {
+                        val scaledWidth = imageSize * bitmapRatio
+                        val sideMargin = (scaledWidth - imageSize) / 2
+                        RectF(
+                            rect.left - sideMargin,
+                            rect.top,
+                            rect.right + sideMargin,
+                            rect.bottom
+                        )
+                    } else {
+                        val scaledHeight = imageSize / bitmapRatio
+                        val topMargin = (scaledHeight - imageSize) / 2
+                        RectF(rect.left, rect.top - topMargin, rect.right, rect.bottom + topMargin)
+                    }
 
-                // Logique Center Crop
-                val bitmapRatio = bmp.width.toFloat() / bmp.height.toFloat()
-                val drawRect = if (bitmapRatio > 1f) {
-                    val scaledWidth = imageSize * bitmapRatio
-                    val sideMargin = (scaledWidth - imageSize) / 2
-                    RectF(rect.left - sideMargin, rect.top, rect.right + sideMargin, rect.bottom)
-                } else {
-                    val scaledHeight = imageSize / bitmapRatio
-                    val topMargin = (scaledHeight - imageSize) / 2
-                    RectF(rect.left, rect.top - topMargin, rect.right, rect.bottom + topMargin)
+                    drawBitmap(bmp, null, drawRect, Paint(Paint.FILTER_BITMAP_FLAG))
                 }
-
-                canvas.drawBitmap(bmp, null, drawRect, Paint(Paint.FILTER_BITMAP_FLAG))
-                canvas.restore()
                 bmp.recycle()
 
                 // Petite bordure dorée pour finir le contour de la photo
@@ -300,7 +332,7 @@ class PdfService(private val context: Context) {
         return currentY + paint.textSize
     }
 
-    private fun measureHistoryHeight(history: History, paintText: Paint, maxWidth: Float): Float {
+    private fun measureHistoryHeight(history: History, paintText: Paint): Float {
         val imageSize = 80f
         val textMarginX = 140f + (imageSize / 2f) + 40f
         val textMaxWidth = pageWidth - textMarginX - 80f // 80f est la marge droite
