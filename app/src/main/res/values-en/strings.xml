@@ -99,7 +99,6 @@
     <string name="first_history_date">First barreling date</string>
     <string name="aging_number">Number of agings</string>
     <string name="statistics">Statistics</string>
-    <string name="no_stats">No statistics at the moment</string>
     <string name="total_duration">Total Duration</string>
     <string name="record_max">Longest ageing</string>
     <string name="average_alcohol">Average alcohol content</string>
@@ -137,7 +136,7 @@
     <string name="estimated_loss">📍 Estimated loss</string>
     <string name="evaporation">Evaporation (%)</string>
     <string name="angels_share_estimation">Angels\' Share Estimation \u24D8</string>
-    <string name="tannin_estimation_tooltip">This simulation models the balance between aromatic wood extraction and mellowing over time (oxidation). It accounts for barrel volume (%1$sL) and previous usage (%2$s days).</string>
+    <string name="tannin_estimation_tooltip">This simulation models the balance between aromatic wood extraction and mellowing over time (oxidation). It accounts for barrel volume (%1$sL) and previous usage (%2$s days).\nAllow for a 10–20%% margin of error.</string>
     <string name="angels_share_estimation_tooltip">The angels\' share estimation accounts for barrel volume (%1$sL), storage temperature (%2$s°C), and humidity (%3$s%%).\nNote: Standard conservation values are applied if no data is provided.</string>
     <string-array name="type_fut_array">
         <item>Aging</item>

@@ -213,16 +213,6 @@
                     android:orientation="horizontal"
                     android:weightSum="2">
 
-                    <TextView
-                        android:id="@+id/textNoStats"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="start|center_vertical"
-                        android:text="@string/no_stats"
-                        android:textColor="#808080"
-                        android:textSize="15sp"
-                        android:visibility="visible" />
-
                     <LinearLayout
                         android:id="@+id/layoutTotalDuration"
                         android:layout_width="0dp"
@@ -437,7 +427,7 @@
                     android:padding="12dp"
                     android:textSize="13sp"
                     android:textStyle="italic"
-                    android:visibility="visible" />
+                    android:visibility="gone" />
             </LinearLayout>
 
             <View

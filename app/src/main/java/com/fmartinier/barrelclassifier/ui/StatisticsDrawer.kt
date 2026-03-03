@@ -51,7 +51,6 @@ class StatisticsDrawer(
     private lateinit var txtAvgAlcoholicStrength: TextView
     private lateinit var progressAbv: ProgressBar
     private lateinit var pieChartTypes: PieChart
-    private lateinit var textNoStats: TextView
     private lateinit var txtAvgAngelShare: TextView
     private lateinit var progressAngelShare: ProgressBar
     private lateinit var layoutProgressAngelShare: LinearLayout
@@ -85,7 +84,6 @@ class StatisticsDrawer(
         txtAvgAlcoholicStrength = view.findViewById<TextView>(R.id.txtAvgAlcoholicStrength)
         progressAbv = view.findViewById<ProgressBar>(R.id.progressAbv)
         pieChartTypes = view.findViewById<PieChart>(R.id.pieChartTypes)
-        textNoStats = view.findViewById<TextView>(R.id.textNoStats)
         txtAvgAngelShare = view.findViewById<TextView>(R.id.txtAvgAngelShare)
         progressAngelShare = view.findViewById<ProgressBar>(R.id.progressAngelShare)
         layoutProgressAngelShare = view.findViewById<LinearLayout>(R.id.layoutProgressAngelShare)
@@ -102,7 +100,6 @@ class StatisticsDrawer(
 
         val histories = barrel.histories
         if (histories.isEmpty()) {
-            textNoStats.visibility = View.VISIBLE
             layoutRecordDuration.visibility = View.GONE
             layoutTotalDuration.visibility = View.GONE
             layoutPieChartTypes.visibility = View.GONE
@@ -114,7 +111,6 @@ class StatisticsDrawer(
             textRepartitionType.visibility = View.GONE
             textRepartitionDuration.visibility = View.GONE
         } else {
-            textNoStats.visibility = View.GONE
             layoutRecordDuration.visibility = View.VISIBLE
             layoutTotalDuration.visibility = View.VISIBLE
             layoutPieChartTypes.visibility = View.VISIBLE

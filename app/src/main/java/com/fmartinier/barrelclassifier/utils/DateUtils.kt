@@ -15,8 +15,6 @@ import kotlin.math.roundToInt
 class DateUtils {
     companion object {
         fun formatDaysToDurationString(context: Context, totalDays: Int): String {
-            if (totalDays <= 0) return "0"
-
             val startCal = Calendar.getInstance()
             val endCal = Calendar.getInstance().apply {
                 add(Calendar.DAY_OF_YEAR, totalDays)
