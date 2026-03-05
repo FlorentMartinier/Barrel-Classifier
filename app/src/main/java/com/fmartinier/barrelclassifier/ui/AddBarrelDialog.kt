@@ -125,13 +125,16 @@ class AddBarrelDialog : DialogFragment() {
 
         val dialogTitle = if (modificationMode) R.string.modify_barrel else R.string.add_barrel
         val positiveButtonTitle = if (modificationMode) R.string.modify else R.string.add
-        return MaterialAlertDialogBuilder(requireActivity())
+        val dialog = MaterialAlertDialogBuilder(requireActivity())
             .setTitle(getString(dialogTitle))
             .setView(view)
             .setPositiveButton(getString(positiveButtonTitle), null)
             .setNegativeButton(getString(R.string.cancel), null)
             .setBackground(requireContext(), R.color.dialog_bg)
             .create()
+
+        dialog.setCanceledOnTouchOutside(false)
+        return dialog
     }
 
     override fun onStart() {

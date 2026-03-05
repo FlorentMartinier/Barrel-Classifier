@@ -133,13 +133,16 @@ class AddHistoryDialog : DialogFragment() {
 
         val positiveButtonText = if (historyId == null) R.string.add else R.string.modify
 
-        return MaterialAlertDialogBuilder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.add_history))
             .setView(view)
             .setPositiveButton(getString(positiveButtonText), null) // IMPORTANT
             .setNegativeButton(getString(R.string.cancel), null)
             .setBackground(requireContext(), R.color.dialog_bg)
             .create()
+
+        dialog.setCanceledOnTouchOutside(false)
+        return dialog
     }
 
     override fun onStart() {
