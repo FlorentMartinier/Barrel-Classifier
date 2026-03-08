@@ -16,12 +16,14 @@ import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.STORAGE_TEM
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.VOLUME_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.WOOD_TYPE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.model.Barrel
+import com.fmartinier.barrelclassifier.service.AnalyticsService
 
 class BarrelDao private constructor(private val dbHelper: DatabaseHelper) {
 
     private val historyDao = HistoryDao.getInstance(dbHelper)
 
     fun insert(barrel: Barrel): Long {
+        AnalyticsService.logBarrelAdded(barrel.woodType, barrel.volume.toString())
         val db = dbHelper.writableDatabase
         val values = ContentValues().apply {
             put(NAME_COLUMN_NAME, barrel.name)

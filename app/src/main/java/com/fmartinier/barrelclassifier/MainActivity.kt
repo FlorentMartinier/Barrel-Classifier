@@ -25,6 +25,7 @@ import com.fmartinier.barrelclassifier.data.dao.BarrelDao
 import com.fmartinier.barrelclassifier.data.dao.HistoryDao
 import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.data.model.History
+import com.fmartinier.barrelclassifier.service.AnalyticsService
 import com.fmartinier.barrelclassifier.service.ImageService
 import com.fmartinier.barrelclassifier.service.NotificationService
 import com.fmartinier.barrelclassifier.service.PdfService
@@ -276,6 +277,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             try {
+                AnalyticsService.logQrShared()
                 startActivity(viewIntent)
             } catch (_: Exception) {
                 Toast.makeText(this, getString(R.string.no_image_viewer_error), Toast.LENGTH_SHORT)

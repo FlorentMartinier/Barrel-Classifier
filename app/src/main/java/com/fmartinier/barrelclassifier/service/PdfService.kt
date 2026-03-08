@@ -40,6 +40,7 @@ class PdfService(private val context: Context) {
     private val dateFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
 
     fun export(barrel: Barrel): File {
+        AnalyticsService.logPdfExport()
         val pdf = PdfDocument()
         var pageNumber = 1
 
