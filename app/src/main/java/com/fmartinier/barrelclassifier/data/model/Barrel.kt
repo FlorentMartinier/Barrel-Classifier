@@ -1,5 +1,7 @@
 package com.fmartinier.barrelclassifier.data.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+
 data class Barrel(
     val id: Long = 0,
     val name: String,
@@ -14,6 +16,7 @@ data class Barrel(
     val histories: List<History>
 ) {
 
+    @JsonIgnore
     fun getCurrentHistory(): History? {
         val notEndedHistory = histories.filter { it.endDate == null }
         return if (notEndedHistory.isNotEmpty()) {

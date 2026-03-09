@@ -138,6 +138,13 @@
     <string name="angels_share_estimation">Estimation de la Part des Anges \u24D8</string>
     <string name="tannin_estimation_tooltip">Cette simulation modélise l\'équilibre entre l\'apport aromatique du bois et son assouplissement au fil du temps (oxydation). Elle prend en compte le volume du fût (%1$sL), et son usage précédent (%2$s jours).\nCompter une marge d\'erreur de 10–20%%.</string>
     <string name="angels_share_estimation_tooltip">L\'estimation de la part des anges prend en compte le volume du fût (%1$sL), la température (%2$s°C) et l\'hygrométrie de stockage (%3$s%%).\nNote : En l\'absence de saisie, les valeurs standard de conservation sont appliquées.</string>
+    <string name="zip_export">Exporter un ZIP</string>
+    <string name="zip_import">Importer un ZIP</string>
+    <string name="zip_export_success">Archive ZIP exportée avec succès !</string>
+    <string name="data_json_missing">Le fichier data.json est manquant dans l\'archive</string>
+    <string name="zip_import_success">Import réussi !</string>
+    <string name="zip_import_error">Erreur lors de l\'import !</string>
+    <string name="imported_file_incompatible">Le fichier importé n\'est pas compatible</string>
     <string-array name="type_fut_array">
         <item>Vieillissement</item>
         <item>Marquage</item>

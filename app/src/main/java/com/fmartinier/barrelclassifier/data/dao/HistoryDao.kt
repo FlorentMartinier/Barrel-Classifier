@@ -14,14 +14,12 @@ import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.IMAGE_PATH_
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.NAME_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.DatabaseHelper.Companion.TYPE_COLUMN_NAME
 import com.fmartinier.barrelclassifier.data.model.History
-import com.fmartinier.barrelclassifier.service.AnalyticsService
 
 class HistoryDao private constructor(private val dbHelper: DatabaseHelper) {
 
     val alertDao = AlertDao.getInstance(dbHelper)
 
     fun insert(history: History): Long {
-        AnalyticsService.logHistoryAdded()
         val db = dbHelper.writableDatabase
         val values = getContentValues(history)
         return db.insert(HISTORY_TABLE_NAME, null, values)

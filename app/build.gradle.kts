@@ -77,6 +77,11 @@ dependencies {
     // Tooltip
     implementation(libs.balloon.compose)
 
+    // Jackson
+    implementation(libs.jackson.module.kotlin)
+
+    implementation(libs.speed.dial)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

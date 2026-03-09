@@ -44,15 +44,15 @@
     </RelativeLayout>
 
     <!-- FAB -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAddBarrel"
+    <com.leinardi.android.speeddial.SpeedDialView
+        android:id="@+id/speedDial"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="24dp"
-        android:contentDescription="@string/add_barrel"
-        app:srcCompat="@drawable/ic_add"
-        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"/>
-
+        app:sdMainFabClosedBackgroundColor="@color/accent_whisky"
+        app:sdMainFabOpenedBackgroundColor="@color/accent_whisky"
+        app:sdMainFabClosedSrc="@drawable/ic_add"
+        app:sdMainFabOpenedSrc="@drawable/ic_close"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -19,6 +19,7 @@ import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.dao.BarrelDao
 import com.fmartinier.barrelclassifier.data.model.Barrel
+import com.fmartinier.barrelclassifier.service.AnalyticsService
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
@@ -196,6 +197,7 @@ class AddBarrelDialog : DialogFragment() {
                             if (modificationMode) {
                                 barrelDao.update(barrel)
                             } else {
+                                AnalyticsService.logBarrelAdded(barrel.woodType, barrel.volume.toString())
                                 barrelDao.insert(barrel)
                             }
                         }

@@ -25,6 +25,7 @@ import com.fmartinier.barrelclassifier.service.BarrelService
 import com.fmartinier.barrelclassifier.service.ImageService
 import com.fmartinier.barrelclassifier.service.PdfService
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.formatDate
+import com.fmartinier.barrelclassifier.utils.FileUtils
 import com.fmartinier.barrelclassifier.utils.TextViewUtils
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -174,18 +175,7 @@ class BarrelAdapter(
 
                     R.id.action_pdf_export -> {
                         val file = PdfService(context).export(barrel)
-                        val uri = FileProvider.getUriForFile(
-                            context,
-                            "${context.packageName}.fileprovider",
-                            file
-                        )
-                        val intent = Intent(Intent.ACTION_VIEW).apply {
-                            setDataAndType(uri, "application/pdf")
-                            flags =
-                                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NO_HISTORY
-                        }
-
-                        context.startActivity(intent)
+                        FileUtils.viewFile(context, file, FileUtils.PDF_TYPE)
                         true
                     }
 

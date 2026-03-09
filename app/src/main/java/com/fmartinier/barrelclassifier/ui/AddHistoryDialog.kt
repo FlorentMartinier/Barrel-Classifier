@@ -23,6 +23,7 @@ import com.fmartinier.barrelclassifier.data.model.Alert
 import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.data.model.History
 import com.fmartinier.barrelclassifier.service.AlertService
+import com.fmartinier.barrelclassifier.service.AnalyticsService
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.formatDate
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.openDatePicker
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.parseDate
@@ -226,6 +227,7 @@ class AddHistoryDialog : DialogFragment() {
                         alertService.cancelByHistoryId(requireContext(), historyId!!)
                         alertDao.deleteByHistoryId(historyId!!)
                     } else {
+                        AnalyticsService.logHistoryAdded()
                         historyId = historyDao
                             .insert(history)
                     }

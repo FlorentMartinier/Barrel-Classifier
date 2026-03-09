@@ -138,6 +138,13 @@
     <string name="angels_share_estimation">Angels\' Share Estimation \u24D8</string>
     <string name="tannin_estimation_tooltip">This simulation models the balance between aromatic wood extraction and mellowing over time (oxidation). It accounts for barrel volume (%1$sL) and previous usage (%2$s days).\nAllow for a 10–20%% margin of error.</string>
     <string name="angels_share_estimation_tooltip">The angels\' share estimation accounts for barrel volume (%1$sL), storage temperature (%2$s°C), and humidity (%3$s%%).\nNote: Standard conservation values are applied if no data is provided.</string>
+    <string name="zip_export">Export ZIP</string>
+    <string name="zip_import">Import ZIP</string>
+    <string name="zip_export_success">ZIP archive exported successfully!</string>
+    <string name="data_json_missing">The data.json file is missing from the archive</string>
+    <string name="zip_import_success">Import successful!</string>
+    <string name="zip_import_error">Error during import!</string>
+    <string name="imported_file_incompatible">The imported file is incompatible</string>
     <string-array name="type_fut_array">
         <item>Aging</item>
         <item>Seasonning</item>

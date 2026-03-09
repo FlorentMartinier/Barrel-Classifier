@@ -3,6 +3,7 @@ package com.fmartinier.barrelclassifier
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AnimationUtils
@@ -20,11 +21,15 @@ import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
+import com.fmartinier.barrelclassifier.data.dao.AlertDao
 import com.fmartinier.barrelclassifier.data.dao.BarrelDao
 import com.fmartinier.barrelclassifier.data.dao.HistoryDao
 import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.data.model.History
+import com.fmartinier.barrelclassifier.service.AlertService
 import com.fmartinier.barrelclassifier.service.AnalyticsService
 import com.fmartinier.barrelclassifier.service.ImageService
 import com.fmartinier.barrelclassifier.service.NotificationService
@@ -33,20 +38,26 @@ import com.fmartinier.barrelclassifier.service.QrCloudService
 import com.fmartinier.barrelclassifier.ui.AddBarrelDialog
 import com.fmartinier.barrelclassifier.ui.AddHistoryDialog
 import com.fmartinier.barrelclassifier.ui.BarrelAdapter
+import com.fmartinier.barrelclassifier.utils.FileUtils
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.services.drive.DriveScopes
+import com.leinardi.android.speeddial.SpeedDialActionItem
+import com.leinardi.android.speeddial.SpeedDialView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var fabAddBarrel: FloatingActionButton
+    private lateinit var speedDial: SpeedDialView
     private lateinit var emptyStateLayout: RelativeLayout
 
     private lateinit var adapter: BarrelAdapter
@@ -62,11 +73,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var pickHistoryImageLauncher: ActivityResultLauncher<String>
     private lateinit var pickBarrelImageLauncher: ActivityResultLauncher<String>
     private lateinit var importQrLauncher: ActivityResultLauncher<Intent>
+    private lateinit var exportZipLauncher: ActivityResultLauncher<String>
+    private lateinit var importZipLauncher: ActivityResultLauncher<String>
 
     // DAO
     private lateinit var db: DatabaseHelper
     private lateinit var barrelDao: BarrelDao
     private lateinit var historyDao: HistoryDao
+    private lateinit var alertDao: AlertDao
 
     // Services
     private val notificationService = NotificationService()
@@ -77,6 +91,7 @@ class MainActivity : AppCompatActivity() {
         db = DatabaseHelper.getInstance(this)
         barrelDao = BarrelDao.getInstance(db)
         historyDao = HistoryDao.getInstance(db)
+        alertDao = AlertDao.getInstance(db)
 
         val ta = theme.obtainStyledAttributes(intArrayOf(android.R.attr.textColorPrimary))
         managePopupRate()
@@ -178,10 +193,21 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        exportZipLauncher = registerForActivityResult(
+            ActivityResultContracts.CreateDocument(FileUtils.ZIP_TYPE)
+        ) { uri: Uri? ->
+            uri?.let { exportToZip(it) }
+        }
+
+        importZipLauncher =
+            registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+                uri?.let { importZipArchive(it) }
+            }
+
         // Views
         imgArrow = findViewById(R.id.imgArrow)
         recyclerView = findViewById(R.id.recyclerView)
-        fabAddBarrel = findViewById(R.id.fabAddBarrel)
+        speedDial = findViewById(R.id.speedDial)
         emptyStateLayout = findViewById(R.id.layoutEmptyState)
 
         // RecyclerView
@@ -220,8 +246,43 @@ class MainActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
 
         // FAB - ajout fût
-        fabAddBarrel.setOnClickListener {
-            openAddBarrelDialog()
+        speedDial.addActionItem(
+            SpeedDialActionItem.Builder(R.id.fab_add_barrel, R.drawable.ic_add)
+                .setLabel(R.string.add_barrel)
+                .create()
+        )
+        speedDial.addActionItem(
+            SpeedDialActionItem.Builder(R.id.fab_export, R.drawable.ic_export)
+                .setLabel(getString(R.string.zip_export))
+                .create()
+        )
+        speedDial.addActionItem(
+            SpeedDialActionItem.Builder(R.id.fab_import, R.drawable.ic_import)
+                .setLabel(getString(R.string.zip_import))
+                .create()
+        )
+        speedDial.setOnActionSelectedListener { actionItem ->
+            when (actionItem.id) {
+                R.id.fab_export -> {
+                    exportZipLauncher.launch("barrel_manager_export.json")
+                    speedDial.close()
+                    true
+                }
+
+                R.id.fab_import -> {
+                    importZipLauncher.launch(FileUtils.ZIP_TYPE)
+                    speedDial.close()
+                    true
+                }
+
+                R.id.fab_add_barrel -> {
+                    openAddBarrelDialog()
+                    speedDial.close()
+                    true
+                }
+
+                else -> false
+            }
         }
 
         // Chargement initial
@@ -420,5 +481,133 @@ class MainActivity : AppCompatActivity() {
             }
             .setNegativeButton(getString(R.string.later), null)
             .show()
+    }
+
+    fun exportToZip(uri: Uri) {
+        val (jsonString, imagePaths) = exportBarrelsWithImages()
+        val zipFile = File(applicationContext.cacheDir, "barrel_manager_export.zip")
+        ZipOutputStream(FileOutputStream(zipFile)).use { out ->
+            // 1. Ajouter le JSON
+            val entry = ZipEntry("data.json")
+            out.putNextEntry(entry)
+            out.write(jsonString.toByteArray())
+            out.closeEntry()
+
+            // 2. Ajouter les images
+            imagePaths.forEach { path ->
+                val file = File(path)
+                if (file.exists()) {
+                    out.putNextEntry(ZipEntry("images/${file.name}"))
+                    file.inputStream().use { it.copyTo(out) }
+                    out.closeEntry()
+                }
+            }
+        }
+        contentResolver.openOutputStream(uri)?.use { outputStream ->
+            zipFile.inputStream().use { inputStream ->
+                inputStream.copyTo(outputStream)
+            }
+            zipFile.delete()
+
+            Toast.makeText(this, getString(R.string.zip_export_success), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun importZipArchive(zipUri: Uri) {
+        val tempDir = File(applicationContext.cacheDir, "import_temp_${System.currentTimeMillis()}")
+        tempDir.mkdirs()
+
+        try {
+            FileUtils.unzip(applicationContext, zipUri, tempDir)
+
+            // 2. Chercher le fichier JSON dans les fichiers extraits
+            val jsonFile = File(tempDir, "data.json")
+            if (!jsonFile.exists()) throw Exception(getString(R.string.data_json_missing))
+
+            val jsonString = jsonFile.readText()
+            val importedData = importJson(jsonString)
+
+            // 4. Traiter et déplacer les images
+            val finalImageDir = File(applicationContext.filesDir, "")
+            if (!finalImageDir.exists()) finalImageDir.mkdirs()
+
+            importedData.flatMap { barrel ->
+                val fileName = File(barrel.imagePath ?: "").name
+                if (fileName.isNullOrEmpty()) {
+                    return@flatMap emptyList<History>()
+                }
+                val tempImage = File(tempDir, "images/$fileName")
+
+                if (tempImage.exists()) {
+                    val permanentImage = File(finalImageDir, fileName)
+                    tempImage.copyTo(permanentImage, overwrite = true)
+                    barrelDao.updateImage(barrel.id, permanentImage.absolutePath)
+                }
+                barrel.histories
+            }.forEach { history ->
+                val fileName = File(history.imagePath ?: "").name
+                if (fileName.isNullOrEmpty()) {
+                    return@forEach
+                }
+                val tempImage = File(tempDir, "images/$fileName")
+                if (tempImage.exists()) {
+                    val permanentImage = File(finalImageDir, fileName)
+                    tempImage.copyTo(permanentImage, overwrite = true)
+                    historyDao.updateImage(history.id, permanentImage.absolutePath)
+                }
+            }
+
+            Toast.makeText(applicationContext,
+                getString(R.string.zip_import_success), Toast.LENGTH_SHORT).show()
+            AnalyticsService.logImportSuccess()
+            loadBarrels()
+        } catch (_: Exception) {
+            Toast.makeText(applicationContext,
+                getString(R.string.zip_import_error), Toast.LENGTH_SHORT).show()
+        } finally {
+            tempDir.deleteRecursively()
+        }
+    }
+
+    private fun exportBarrelsWithImages(): Pair<String, List<String>> {
+        barrelDao.findAllWithHistories().let {
+            val barrelImages = it.mapNotNull { barrel -> barrel.imagePath }
+            val historyImages = it
+                .flatMap { barrel -> barrel.histories }
+                .mapNotNull { history -> history.imagePath }
+            val allImages = barrelImages + historyImages
+
+            return Pair(jacksonObjectMapper().writeValueAsString(it), allImages)
+        }
+    }
+
+    private fun importJson(jsonString: String): List<Barrel> {
+        try {
+            val mapper = jacksonObjectMapper()
+            val importedData = mapper.readValue(jsonString, jacksonTypeRef<List<Barrel>>())
+
+            // 3. Injecter dans la BDD
+            importedData.forEach { barrel ->
+                val barrelId = barrelDao.insert(barrel)
+                barrel.histories.forEach { history ->
+                    val historyToSave = history.copy(barrelId = barrelId)
+                    val historyId = historyDao.insert(historyToSave)
+                    val alertsToSave = history.alerts.map { alert ->
+                        alert.copy(historyId = historyId)
+                    }
+                    alertDao.insert(alertsToSave, historyId)
+                        .forEach {
+                            AlertService().schedule(applicationContext, it, barrel.name, historyId)
+                        }
+                }
+            }
+
+            return importedData
+        } catch (e: Exception) {
+            Toast.makeText(this@MainActivity,
+                getString(R.string.imported_file_incompatible), Toast.LENGTH_LONG).show()
+            AnalyticsService.logImportError(e.message.toString())
+        }
+        return listOf()
     }
 }

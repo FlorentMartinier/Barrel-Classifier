@@ -26,5 +26,20 @@ class AnalyticsService {
         fun logPdfExport() {
             Firebase.analytics.logEvent("pdf_export", Bundle())
         }
+
+        fun logGeneralExport() {
+            Firebase.analytics.logEvent("general_export", Bundle())
+        }
+
+        fun logImportSuccess() {
+            Firebase.analytics.logEvent("data_import_success", Bundle())
+        }
+
+        fun logImportError(error: String) {
+            val parameters = Bundle().apply {
+                this.putString("error", error)
+            }
+            Firebase.analytics.logEvent("data_import_error", parameters)
+        }
     }
 }
