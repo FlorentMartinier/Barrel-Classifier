@@ -2,27 +2,28 @@ package com.fmartinier.barrelclassifier.data.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
+
 data class History(
-    @JsonProperty("id")
+    @field:JsonProperty("id")
     val id: Long = 0,
-    @JsonProperty("barrelId")
+    @field:JsonProperty("barrelId")
     val barrelId: Long, // clé étrangère
-    @JsonProperty("name")
+    @field:JsonProperty("name")
     val name: String,
-    @JsonProperty("beginDate")
+    @field:JsonProperty("beginDate")
     val beginDate: Long, // timestamp
-    @JsonProperty("endDate")
+    @field:JsonProperty("endDate")
     val endDate: Long? = null, // timestamp
-    @JsonProperty("type")
+    @field:JsonProperty("type")
     val type: String,
-    @JsonProperty("description")
+    @field:JsonProperty("description")
     val description: String? = null,
-    @JsonProperty("angelsShare")
+    @field:JsonProperty("angelsShare")
     val angelsShare: String? = null,
-    @JsonProperty("alcoholicStrength")
+    @field:JsonProperty("alcoholicStrength")
     val alcoholicStrength: String? = null,
-    @JsonProperty("imagePath")
+    @field:JsonProperty("imagePath")
     val imagePath: String? = null,
-    @JsonProperty("alerts")
+    @field:JsonProperty("alerts")
     val alerts: List<Alert>
 )

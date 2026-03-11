@@ -3,12 +3,12 @@ package com.fmartinier.barrelclassifier.data.model
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class Alert(
-    @JsonProperty("id")
+    @field:JsonProperty("id")
     val id: Long = 0,
-    @JsonProperty("historyId")
+    @field:JsonProperty("historyId")
     val historyId: Long, // clé étrangère
-    @JsonProperty("type")
+    @field:JsonProperty("type")
     var type: String,
-    @JsonProperty("date")
+    @field:JsonProperty("date")
     var date: Long
 )

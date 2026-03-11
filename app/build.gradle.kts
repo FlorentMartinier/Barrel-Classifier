@@ -12,8 +12,8 @@ android {
         applicationId = "com.fmartinier.barrelclassifier"
         minSdk = 24
         targetSdk = 35
-        versionCode = 31
-        versionName = "2.7.1"
+        versionCode = 32
+        versionName = "2.7.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
