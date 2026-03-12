@@ -7,15 +7,15 @@ data class History(
     @field:JsonProperty("id")
     val id: Long = 0,
     @field:JsonProperty("barrelId")
-    val barrelId: Long, // clé étrangère
+    val barrelId: Long = 0, // clé étrangère
     @field:JsonProperty("name")
-    val name: String,
+    val name: String = "",
     @field:JsonProperty("beginDate")
-    val beginDate: Long, // timestamp
+    val beginDate: Long = 0, // timestamp
     @field:JsonProperty("endDate")
     val endDate: Long? = null, // timestamp
     @field:JsonProperty("type")
-    val type: String,
+    val type: String = "",
     @field:JsonProperty("description")
     val description: String? = null,
     @field:JsonProperty("angelsShare")
@@ -25,5 +25,5 @@ data class History(
     @field:JsonProperty("imagePath")
     val imagePath: String? = null,
     @field:JsonProperty("alerts")
-    val alerts: List<Alert>
+    val alerts: List<Alert> = emptyList()
 )

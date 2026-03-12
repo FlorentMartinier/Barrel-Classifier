@@ -28,6 +28,7 @@ import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.dao.AlertDao
 import com.fmartinier.barrelclassifier.data.dao.BarrelDao
 import com.fmartinier.barrelclassifier.data.dao.HistoryDao
+import com.fmartinier.barrelclassifier.data.exception.ImportFileNotCompatibleException
 import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.data.model.History
 import com.fmartinier.barrelclassifier.service.AlertService
@@ -563,9 +564,14 @@ class MainActivity : AppCompatActivity() {
                 getString(R.string.zip_import_success), Toast.LENGTH_SHORT).show()
             AnalyticsService.logImportSuccess()
             loadBarrels()
-        } catch (_: Exception) {
+        } catch(e: ImportFileNotCompatibleException) {
+            Toast.makeText(this@MainActivity,
+                getString(R.string.imported_file_incompatible), Toast.LENGTH_LONG).show()
+            AnalyticsService.logImportError(e.e.message.toString())
+        } catch (e: Exception) {
             Toast.makeText(applicationContext,
                 getString(R.string.zip_import_error), Toast.LENGTH_SHORT).show()
+            AnalyticsService.logImportError(e.message.toString())
         } finally {
             tempDir.deleteRecursively()
         }
@@ -586,7 +592,8 @@ class MainActivity : AppCompatActivity() {
     private fun importJson(jsonString: String): List<Barrel> {
         try {
             val mapper = jacksonObjectMapper()
-            val importedData = mapper.readValue(jsonString, jacksonTypeRef<List<Barrel>>())
+            val listType = mapper.typeFactory.constructCollectionType(List::class.java, Barrel::class.java)
+            val importedData: List<Barrel> = mapper.readValue(jsonString, listType)
 
             // 3. Injecter dans la BDD
             importedData.forEach { barrel ->
@@ -606,9 +613,7 @@ class MainActivity : AppCompatActivity() {
 
             return importedData
         } catch (e: Exception) {
-            Toast.makeText(this@MainActivity,
-                getString(R.string.imported_file_incompatible), Toast.LENGTH_LONG).show()
-            AnalyticsService.logImportError(e.message.toString())
+            throw ImportFileNotCompatibleException(e)
         }
         return listOf()
     }

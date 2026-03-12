@@ -6,9 +6,9 @@ data class Alert(
     @field:JsonProperty("id")
     val id: Long = 0,
     @field:JsonProperty("historyId")
-    val historyId: Long, // clé étrangère
+    val historyId: Long = 0, // clé étrangère
     @field:JsonProperty("type")
-    var type: String,
+    var type: String = "",
     @field:JsonProperty("date")
-    var date: Long
+    var date: Long = 0
 )

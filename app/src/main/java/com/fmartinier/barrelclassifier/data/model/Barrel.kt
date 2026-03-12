@@ -7,25 +7,25 @@ data class Barrel(
     @field:JsonProperty("id")
     val id: Long = 0,
     @field:JsonProperty("name")
-    val name: String,
+    val name: String = "",
     @field:JsonProperty("volume")
-    val volume: Int, // en litres
+    val volume: Int = 1, // en litres
     @field:JsonProperty("brand")
-    val brand: String,
+    val brand: String = "",
     @field:JsonProperty("woodType")
-    val woodType: String,
+    val woodType: String = "",
     @field:JsonProperty("imagePath")
-    val imagePath: String?, // chemin local de la photo
+    val imagePath: String? = null, // chemin local de la photo
     @field:JsonProperty("heatType")
-    val heatType: String?,
+    val heatType: String? = null,
     @field:JsonProperty("storageHygrometer")
-    val storageHygrometer: String?,
+    val storageHygrometer: String? = null,
     @field:JsonProperty("storageTemperature")
-    val storageTemperature: String?,
+    val storageTemperature: String? = null,
     @field:JsonProperty("description")
-    val description: String?,
+    val description: String? = null,
     @field:JsonProperty("histories")
-    val histories: List<History>
+    val histories: List<History> = emptyList()
 ) {
 
     @JsonIgnore
