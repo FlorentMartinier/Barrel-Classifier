@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.fmartinier.barrelclassifier.R
+import com.google.android.material.chip.ChipGroup
 
 class BarrelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val txtBarrelName: TextView = itemView.findViewById(R.id.txtBarrelName)
@@ -24,6 +25,9 @@ class BarrelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val btnAddHistory: TextView? = itemView.findViewById(R.id.btnAddHistory)
     val txtDescription: TextView? = itemView.findViewById(R.id.txtBarrelDescription)
     val txtExpandDescription: TextView? = itemView.findViewById(R.id.txtBarrelExpandDescription)
+    val chipGroup: ChipGroup? = itemView.findViewById<ChipGroup>(R.id.chipGroupAdvanced)
+    val txtNextAlertDate: TextView? = itemView.findViewById<TextView>(R.id.txtNextAlertDate)
+    val layoutNextAlert: LinearLayout? = itemView.findViewById<LinearLayout>(R.id.layoutNextAlert)
 
     var isHistoryExpanded: Boolean = false
     var isStatsExpanded: Boolean = false

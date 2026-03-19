@@ -3,6 +3,7 @@ package com.fmartinier.barrelclassifier.ui
 import android.animation.ValueAnimator
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.animation.doOnEnd
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import com.fmartinier.barrelclassifier.R
@@ -26,12 +28,14 @@ import com.fmartinier.barrelclassifier.service.ImageService
 import com.fmartinier.barrelclassifier.service.PdfService
 import com.fmartinier.barrelclassifier.service.QrCloudService
 import com.fmartinier.barrelclassifier.ui.model.BarrelViewHolder
+import com.fmartinier.barrelclassifier.utils.DateUtils
 import com.fmartinier.barrelclassifier.utils.FileUtils
 import com.fmartinier.barrelclassifier.utils.TextViewUtils
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.Scope
+import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.api.services.drive.DriveScopes
 import kotlinx.coroutines.Dispatchers
@@ -175,6 +179,39 @@ class BarrelFullViewBinder(
             ?: BitmapFactory.decodeResource(activity.resources, R.drawable.ic_barrel_placeholder))
 
         holder.txtBarrelDetails?.text = "${barrel.brand} • ${barrel.woodType} • ${barrel.volume}L"
+        holder.chipGroup?.removeAllViews()
+        var hasAdvanced = false
+
+        barrel.heatType?.takeIf { it.isNotBlank() }?.let {
+            addChip(holder, it, "🔥")
+            hasAdvanced = true
+        }
+
+        barrel.storageHygrometer?.takeIf { it.isNotBlank() }?.let {
+            addChip(holder, "$it%", "💧")
+            hasAdvanced = true
+        }
+
+        barrel.storageTemperature?.takeIf { it.isNotBlank() }?.let {
+            addChip(holder, "${it}°C", "🌡️")
+            hasAdvanced = true
+        }
+        holder.chipGroup?.visibility = if (hasAdvanced) View.VISIBLE else View.GONE
+
+        barrel.histories
+            .flatMap { it.alerts }
+            .filter { it.date > System.currentTimeMillis() }
+            .minByOrNull { it.date }
+            ?.let {
+                holder.layoutNextAlert?.visibility = View.VISIBLE
+                val nextAlertDate = DateUtils.formatDate(it.date)
+                holder.txtNextAlertDate?.text = activity.resources.getString(
+                    R.string.next_alert,
+                    it.type,
+                    nextAlertDate
+                )
+            }
+
         holder.btnMenu?.setOnClickListener { view ->
             val popup = PopupMenu(view.context, view)
             popup.inflate(R.menu.barrel_menu)
@@ -191,7 +228,7 @@ class BarrelFullViewBinder(
                         true
                     }
                     R.id.barrel_take_picture -> {
-                        onTakeBarrelPicture(barrel);
+                        onTakeBarrelPicture(barrel)
                         true
                     }
                     R.id.barrel_import_image -> { onImportBarrelPicture(barrel); true }
@@ -334,5 +371,21 @@ class BarrelFullViewBinder(
     private fun onImportHistoryPicture(history: History) {
         historyForPhoto = history
         pickHistoryImageLauncher.launch("image/*")
+    }
+
+    private fun addChip(holder: BarrelViewHolder, text: String, icon: String) {
+        val chip = Chip(holder.itemView.context).apply {
+            this.text = "$icon $text"
+            isChipIconVisible = true
+            isClickable = false
+            isCheckable = false
+            setEnsureMinTouchTargetSize(false)
+            chipBackgroundColor = ColorStateList.valueOf(
+                ContextCompat.getColor(context, R.color.chip_bg)
+            )
+            setTextColor(ContextCompat.getColor(context, R.color.chip_text))
+            chipStrokeWidth = 0f
+        }
+        holder.chipGroup?.addView(chip)
     }
 }

@@ -145,6 +145,9 @@
     <string name="zip_import_success">Import successful!</string>
     <string name="zip_import_error">Error during import!</string>
     <string name="imported_file_incompatible">The imported file is incompatible</string>
+    <string name="barrel_image">Barrel image</string>
+    <string name="camera_icon">Camera icon</string>
+    <string name="barrel_button_description">Button to manage barrel addition</string>
     <string-array name="type_fut_array">
         <item>Aging</item>
         <item>Seasonning</item>

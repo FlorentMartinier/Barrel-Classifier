@@ -2,6 +2,7 @@ package com.fmartinier.barrelclassifier
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.transition.AutoTransition
@@ -31,6 +32,8 @@ import com.fmartinier.barrelclassifier.ui.AddBarrelDialog
 import com.fmartinier.barrelclassifier.ui.BarrelAdapter
 import com.fmartinier.barrelclassifier.ui.BarrelFullViewBinder
 import com.fmartinier.barrelclassifier.utils.FileUtils
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.button.MaterialButtonToggleGroup
 import com.leinardi.android.speeddial.SpeedDialActionItem
 import com.leinardi.android.speeddial.SpeedDialView
 
@@ -39,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var speedDial: SpeedDialView
     private lateinit var emptyStateLayout: RelativeLayout
-    private lateinit var btnSwitchLayout: ImageButton
+    private lateinit var toggleGroup: MaterialButtonToggleGroup
 
     private lateinit var adapter: BarrelAdapter
 
@@ -110,10 +113,27 @@ class MainActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerView)
         speedDial = findViewById(R.id.speedDial)
         emptyStateLayout = findViewById(R.id.layoutEmptyState)
-        btnSwitchLayout = findViewById(R.id.btnSwitchLayout)
+        toggleGroup = findViewById(R.id.toggleGroupView)
 
-        btnSwitchLayout.setOnClickListener {
-            toggleLayout()
+        toggleGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
+            if (isChecked) {
+                val transition = AutoTransition()
+                transition.duration = 300
+                TransitionManager.beginDelayedTransition(recyclerView, transition)
+                recyclerView.layoutManager = when (checkedId) {
+                    R.id.btnGrid -> {
+                        isGridView = true
+                        GridLayoutManager(this, 2)
+                    }
+                    R.id.btnList -> {
+                        isGridView = false
+                        LinearLayoutManager(this)
+                    }
+
+                    else -> null
+                }
+                adapter.updateLayout(isGridView)
+            }
         }
 
         // RecyclerView
@@ -140,16 +160,19 @@ class MainActivity : AppCompatActivity() {
         // FAB - ajout fût
         speedDial.addActionItem(
             SpeedDialActionItem.Builder(R.id.fab_add_barrel, R.drawable.ic_add)
+                .setFabImageTintColor(getColor(R.color.text_primary))
                 .setLabel(R.string.add_barrel)
                 .create()
         )
         speedDial.addActionItem(
             SpeedDialActionItem.Builder(R.id.fab_export, R.drawable.ic_export)
+                .setFabImageTintColor(getColor(R.color.text_primary))
                 .setLabel(getString(R.string.zip_export))
                 .create()
         )
         speedDial.addActionItem(
             SpeedDialActionItem.Builder(R.id.fab_import, R.drawable.ic_import)
+                .setFabImageTintColor(getColor(R.color.text_primary))
                 .setLabel(getString(R.string.zip_import))
                 .create()
         )
@@ -268,21 +291,5 @@ class MainActivity : AppCompatActivity() {
             }
             .setNegativeButton(getString(R.string.later), null)
             .show()
-    }
-
-    fun toggleLayout() {
-        val transition = AutoTransition()
-        transition.duration = 300
-        TransitionManager.beginDelayedTransition(recyclerView, transition)
-
-        isGridView = !isGridView
-
-        recyclerView.layoutManager = if (isGridView) {
-            GridLayoutManager(this, 2)
-        } else {
-            LinearLayoutManager(this)
-        }
-
-        adapter.updateLayout(isGridView)
     }
 }

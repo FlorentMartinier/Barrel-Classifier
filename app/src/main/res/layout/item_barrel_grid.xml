@@ -19,6 +19,7 @@
             android:id="@+id/imgBarrel"
             android:layout_width="match_parent"
             android:layout_height="120dp"
+            android:contentDescription="@string/barrel_image"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_barrel_placeholder" />
 
@@ -55,7 +56,7 @@
                 android:background="@drawable/bg_volume_badge"
                 android:paddingHorizontal="6dp"
                 android:paddingVertical="2dp"
-                android:textSize="10sp"
+                android:textSize="11sp"
                 android:textStyle="bold"
                 android:textColor="@color/accent_whisky" />
 

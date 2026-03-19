@@ -145,6 +145,9 @@
     <string name="zip_import_success">Import réussi !</string>
     <string name="zip_import_error">Erreur lors de l\'import !</string>
     <string name="imported_file_incompatible">Le fichier importé n\'est pas compatible</string>
+    <string name="barrel_image">Image du fut</string>
+    <string name="camera_icon">Icone de l\'appareil photo</string>
+    <string name="barrel_button_description">Bouton pour gérer l\'ajout de fut</string>
     <string-array name="type_fut_array">
         <item>Vieillissement</item>
         <item>Marquage</item>

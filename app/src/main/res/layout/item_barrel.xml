@@ -26,6 +26,7 @@
                 android:id="@+id/imgBarrel"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:contentDescription="@string/barrel_image"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_barrel_placeholder" />
 
@@ -41,6 +42,7 @@
                 <ImageView
                     android:layout_width="36dp"
                     android:layout_height="36dp"
+                    android:contentDescription="@string/camera_icon"
                     android:src="@drawable/ic_camera"
                     app:tint="@android:color/white" />
 
@@ -60,6 +62,7 @@
                 android:layout_gravity="top|end"
                 android:layout_margin="12dp"
                 android:background="@drawable/bg_icon_circle"
+                android:contentDescription="@string/barrel_button_description"
                 android:elevation="4dp"
                 android:padding="8dp"
                 android:scaleType="centerInside"
@@ -211,6 +214,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:baselineAligned="false"
                     android:orientation="horizontal"
                     android:weightSum="2">
 

@@ -6,6 +6,7 @@
     android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
@@ -16,23 +17,42 @@
             android:layout_height="?attr/actionBarSize"
             android:paddingHorizontal="16dp">
 
-            <TextView
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggleGroupView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="Mes Fûts"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <ImageButton
-                android:id="@+id/btnSwitchLayout"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_grid_view"
-                app:tint="@color/text_primary" />
+                app:checkedButton="@id/btnList"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnList"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="0dp"
+                    app:icon="@drawable/ic_list_view"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconTint="@color/selector_view_type"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.SmallComponent" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnGrid"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="0dp"
+                    app:icon="@drawable/ic_grid_view"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconTint="@color/selector_view_type"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.SmallComponent" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
         </RelativeLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -82,8 +102,10 @@
         android:layout_gravity="bottom|end"
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:sdMainFabClosedBackgroundColor="@color/accent_whisky"
+        app:sdMainFabClosedIconColor="@color/text_primary"
         app:sdMainFabClosedSrc="@drawable/ic_add"
         app:sdMainFabOpenedBackgroundColor="@color/accent_whisky"
+        app:sdMainFabOpenedIconColor="@color/text_primary"
         app:sdMainFabOpenedSrc="@drawable/ic_close" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
