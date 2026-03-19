@@ -15,7 +15,7 @@
       </SelectionState>
       <SelectionState runConfigName="Barrel_Manager.app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-02-23T11:22:44.110576Z">
+        <DropdownSelection timestamp="2026-03-12T11:45:23.938892600Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\flore\.android\avd\Medium_Phone.avd" />

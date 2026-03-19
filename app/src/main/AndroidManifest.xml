@@ -25,6 +25,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.BarrelDetailActivity"
+            android:exported="true">
+        </activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"

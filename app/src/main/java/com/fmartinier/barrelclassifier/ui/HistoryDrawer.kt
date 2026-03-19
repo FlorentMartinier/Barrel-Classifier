@@ -1,33 +1,31 @@
 package com.fmartinier.barrelclassifier.ui
 
-import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.text.Spannable
 import android.text.SpannableStringBuilder
-import android.text.TextUtils
 import android.text.style.ImageSpan
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewTreeObserver
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentManager
 import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.enums.EHistoryType
 import com.fmartinier.barrelclassifier.data.model.Alert
 import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.data.model.History
+import com.fmartinier.barrelclassifier.service.BarrelService
 import com.fmartinier.barrelclassifier.service.HistoryService
 import com.fmartinier.barrelclassifier.service.ImageService
-import com.fmartinier.barrelclassifier.ui.BarrelAdapter.BarrelViewHolder
-import com.fmartinier.barrelclassifier.utils.BarrelUtils.Companion.STANDARD_BARREL_VOLUME
+import com.fmartinier.barrelclassifier.ui.model.BarrelViewHolder
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.calculate228lEquivalentAge
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.calculateNbDaysBetweenDates
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.formatDate
@@ -41,21 +39,22 @@ import java.io.File
 
 class HistoryDrawer(
     val context: Context,
-    private val refresh: () -> Unit,
-    private val onAddHistory: (Barrel, Long?) -> Unit,
-    private val onTakeHistoryPicture: (History) -> Unit,
-    private val onImportHistoryPicture: (History) -> Unit,
+    val refresh: () -> Unit,
+    val onTakeHistoryPicture: (History) -> Unit,
+    val onImportHistoryPicture: (History) -> Unit,
+    val fragmentManager: FragmentManager
 ) {
 
     val dbHelper = DatabaseHelper.getInstance(context)
     val historyService = HistoryService(context, dbHelper)
     val imageService = ImageService()
+    val barrelService = BarrelService(context, dbHelper)
 
     fun displayAllForBarrel(
         holder: BarrelViewHolder,
         barrel: Barrel
     ) {
-        holder.layoutHistory.removeAllViews()
+        holder.layoutHistory?.removeAllViews()
 
         if (barrel.histories.isEmpty()) {
             val emptyText = TextView(context)
@@ -63,7 +62,7 @@ class HistoryDrawer(
             emptyText.setTextColor(Color.GRAY)
             emptyText.setPadding(16, 8, 16, 8)
             emptyText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15.0f)
-            holder.layoutHistory.addView(emptyText)
+            holder.layoutHistory?.addView(emptyText)
             return
         }
 
@@ -129,7 +128,7 @@ class HistoryDrawer(
                 popup.setOnMenuItemClickListener { item ->
                     when (item.itemId) {
                         R.id.action_edit -> {
-                            onAddHistory(barrel, history.id)
+                            barrelService.openAddHistoryDialog(barrel, history.id, fragmentManager)
                             true
                         }
 
@@ -173,7 +172,7 @@ class HistoryDrawer(
                 img.visibility = View.GONE
             }
 
-            holder.layoutHistory.addView(view)
+            holder.layoutHistory?.addView(view)
 
             // Affichage des actions effectuées
             val alerts = history.alerts
@@ -197,7 +196,7 @@ class HistoryDrawer(
     }
 
     private fun manageDurationEquivalence(nbDays: Int, barrelVolume: Double, txtDurationEquivalent: TextView) {
-        if (barrelVolume >= STANDARD_BARREL_VOLUME) {
+        if (barrelVolume >= 180) {
             txtDurationEquivalent.visibility = View.GONE
             return
         }

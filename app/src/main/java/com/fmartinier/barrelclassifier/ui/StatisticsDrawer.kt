@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat
 import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.model.Barrel
 import com.fmartinier.barrelclassifier.data.model.History
-import com.fmartinier.barrelclassifier.ui.BarrelAdapter.BarrelViewHolder
+import com.fmartinier.barrelclassifier.ui.model.BarrelViewHolder
 import com.fmartinier.barrelclassifier.ui.model.CustomMarkerView
 import com.fmartinier.barrelclassifier.utils.DateUtils
 import com.fmartinier.barrelclassifier.utils.DateUtils.Companion.calculateNbDaysHistory
@@ -73,7 +73,7 @@ class StatisticsDrawer(
 
     fun displayAllForBarrel(holder: BarrelViewHolder, barrel: Barrel) {
         val view = holder.layoutStats
-        layoutRecordDuration = view.findViewById<LinearLayout>(R.id.layoutRecordDuration)
+        layoutRecordDuration = view!!.findViewById<LinearLayout>(R.id.layoutRecordDuration)
         layoutTotalDuration = view.findViewById<LinearLayout>(R.id.layoutTotalDuration)
         layoutPieChartTypes = view.findViewById<LinearLayout>(R.id.layoutPieChartTypes)
         layoutProgressStrength = view.findViewById<LinearLayout>(R.id.layoutProgressStrength)

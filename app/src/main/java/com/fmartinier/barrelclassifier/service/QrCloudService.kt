@@ -1,14 +1,24 @@
 package com.fmartinier.barrelclassifier.service
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.widget.ProgressBar
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.FileProvider
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.set
 import com.fmartinier.barrelclassifier.R
+import com.fmartinier.barrelclassifier.data.model.Barrel
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.http.FileContent
 import com.google.api.services.drive.Drive
+import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.File
 import com.google.api.services.drive.model.Permission
 import com.google.zxing.BarcodeFormat
@@ -18,6 +28,8 @@ import kotlinx.coroutines.withContext
 import java.io.FileOutputStream
 
 class QrCloudService(private val context: Context) {
+
+    private var progressDialog: AlertDialog? = null
 
     // 1. Upload le fichier et retourne l'URL publique
     suspend fun uploadPdfToDrive(
@@ -91,5 +103,88 @@ class QrCloudService(private val context: Context) {
             e.printStackTrace()
             return null
         }
+    }
+
+    suspend fun processCloudQR(
+        account: GoogleSignInAccount,
+        barrel: Barrel,
+        activity: Activity
+    ) {
+        val credential = GoogleAccountCredential.usingOAuth2(
+            activity, listOf(DriveScopes.DRIVE_FILE)
+        ).setSelectedAccount(account.account)
+
+        val pdfFile = PdfService(activity).export(barrel)
+
+        val publicUrl = uploadPdfToDrive(credential, pdfFile)
+
+        withContext(Dispatchers.Main) {
+            if (publicUrl != null) {
+                val qrBitmap = generateQRCode(publicUrl)
+                hideLoadingDialog()
+                shareQrCodeDirectly(qrBitmap, activity)
+            } else {
+                hideLoadingDialog()
+                Toast.makeText(
+                    activity,
+                    activity.getString(R.string.error_upload), Toast.LENGTH_SHORT
+                )
+                    .show()
+            }
+        }
+    }
+
+    private fun shareQrCodeDirectly(qrBitmap: Bitmap, activity: Activity) {
+        val file = saveBitmapToCache(qrBitmap)
+
+        if (file != null) {
+            val uri = FileProvider.getUriForFile(
+                activity,
+                "${context.packageName}.fileprovider",
+                file
+            )
+
+            val viewIntent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, "image/png")
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                // Optionnel : force l'affichage du sélecteur d'applis si plusieurs visionneuses existent
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+
+            try {
+                AnalyticsService.logQrShared()
+                activity.startActivity(viewIntent)
+            } catch (_: Exception) {
+                Toast.makeText(
+                    activity,
+                    activity.getString(R.string.no_image_viewer_error),
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
+            }
+        }
+    }
+
+    fun showLoadingDialog(activity: Activity) {
+        val builder = MaterialAlertDialogBuilder(activity)
+        val padding = 50
+
+        val progressBar = ProgressBar(activity).apply {
+            setPadding(padding, padding, padding, padding)
+        }
+
+        builder.apply {
+            setTitle(activity.getString(R.string.google_drive_import))
+            setView(progressBar)
+            setCancelable(false) // Empêche de fermer en cliquant à côté
+        }
+
+        progressDialog = builder.create()
+        progressDialog?.show()
+    }
+
+    private fun hideLoadingDialog() {
+        progressDialog?.dismiss()
+        progressDialog = null
     }
 }

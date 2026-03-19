@@ -5,6 +5,37 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:paddingHorizontal="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="Mes Fûts"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/btnSwitchLayout"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_grid_view"
+                app:tint="@color/text_primary" />
+        </RelativeLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
     <!-- Liste des fûts -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
