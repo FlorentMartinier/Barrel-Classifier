@@ -118,7 +118,6 @@ class MainActivity : AppCompatActivity() {
         toggleGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
             if (isChecked) {
                 val transition = AutoTransition()
-                transition.duration = 300
                 TransitionManager.beginDelayedTransition(recyclerView, transition)
                 recyclerView.layoutManager = when (checkedId) {
                     R.id.btnGrid -> {
@@ -147,7 +146,6 @@ class MainActivity : AppCompatActivity() {
 
         adapter = BarrelAdapter(
             context = this,
-            barrels = emptyList(),
             isGrid = false,
             barrelFullViewBinder = barrelFullViewBinder,
             onBarrelClick = { intent, option ->
@@ -210,9 +208,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun loadBarrels() {
         val barrels = barrelDao.findAllWithHistories()
-        if (adapter.barrels != barrels) {
-            adapter.updateData(barrels)
-        }
+        adapter.updateData(barrels)
 
         if (barrels.isEmpty()) {
             emptyStateLayout.visibility = View.VISIBLE

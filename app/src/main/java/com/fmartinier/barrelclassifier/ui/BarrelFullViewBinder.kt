@@ -11,7 +11,6 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
@@ -32,7 +31,6 @@ import com.fmartinier.barrelclassifier.utils.DateUtils
 import com.fmartinier.barrelclassifier.utils.FileUtils
 import com.fmartinier.barrelclassifier.utils.TextViewUtils
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.Scope
 import com.google.android.material.chip.Chip
@@ -62,7 +60,10 @@ class BarrelFullViewBinder(
         fragmentManager = this@BarrelFullViewBinder.fragmentManager
     )
     private val statisticsDrawer = StatisticsDrawer(activity)
-    private val googleSignInClient: GoogleSignInClient
+    private val googleSignInClient = GoogleSignIn.getClient(activity, GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestEmail()
+        .requestScopes(Scope(DriveScopes.DRIVE_FILE))
+        .build())
     private var barrelDao = BarrelDao.getInstance(dbHelper)
     private var historyDao = HistoryDao.getInstance(dbHelper)
     private var qrCloudService: QrCloudService = QrCloudService(activity.applicationContext)
@@ -72,104 +73,86 @@ class BarrelFullViewBinder(
     private var barrelForIntent: Barrel? = null
     private var historyForPhoto: History? = null
 
-    private var barrelCameraLauncher: ActivityResultLauncher<Intent>
-    private var historyCameraLauncher: ActivityResultLauncher<Intent>
-    private var pickHistoryImageLauncher: ActivityResultLauncher<String>
-    private var pickBarrelImageLauncher: ActivityResultLauncher<String>
-    private var importQrLauncher: ActivityResultLauncher<Intent>
-
-    init {
-        val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestEmail()
-            .requestScopes(Scope(DriveScopes.DRIVE_FILE))
-            .build()
-        googleSignInClient = GoogleSignIn.getClient(activity, options)
-
-        barrelCameraLauncher =
-            activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                if (it.resultCode == RESULT_OK) {
-                    currentBarrelPhotoPath?.let { path ->
-                        barrelForIntent?.let { barrel ->
-                            val oldImagePath = barrel.imagePath
-                            barrelDao.updateImage(barrel.id, path)
-                            imageService.deleteImageIfExist(oldImagePath)
-                            refresh()
-                        }
+    private val barrelCameraLauncher =
+        activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == RESULT_OK) {
+                currentBarrelPhotoPath?.let { path ->
+                    barrelForIntent?.let { barrel ->
+                        val oldImagePath = barrel.imagePath
+                        barrelDao.updateImage(barrel.id, path)
+                        imageService.deleteImageIfExist(oldImagePath)
+                        refresh()
                     }
                 }
             }
-
-        historyCameraLauncher =
-            activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                if (it.resultCode == RESULT_OK) {
-                    currentHistoryPhotoPath?.let { path ->
-                        historyForPhoto?.let { history ->
-                            val oldImagePath = history.imagePath
-                            historyDao.updateImage(history.id, path)
-                            imageService.deleteImageIfExist(oldImagePath)
-                            refresh()
-                        }
-                    }
-                }
-            }
-
-        pickHistoryImageLauncher =
-            activity.registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-                uri?.let {
-                    val path = imageService.copyImageToInternalStorage(it, activity)
-                    currentHistoryPhotoPath = path
+        }
+    private val historyCameraLauncher =
+        activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == RESULT_OK) {
+                currentHistoryPhotoPath?.let { path ->
                     historyForPhoto?.let { history ->
                         val oldImagePath = history.imagePath
                         historyDao.updateImage(history.id, path)
                         imageService.deleteImageIfExist(oldImagePath)
+                        refresh()
                     }
                 }
-                refresh()
             }
-
-        pickBarrelImageLauncher = activity.registerForActivityResult(
-            ActivityResultContracts.GetContent()
-        ) { uri ->
+        }
+    private val pickHistoryImageLauncher =
+        activity.registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             uri?.let {
                 val path = imageService.copyImageToInternalStorage(it, activity)
-                currentBarrelPhotoPath = path
-                barrelForIntent?.let { barrel ->
-                    val oldImagePath = barrel.imagePath
-                    barrelDao.updateImage(barrel.id, path)
+                currentHistoryPhotoPath = path
+                historyForPhoto?.let { history ->
+                    val oldImagePath = history.imagePath
+                    historyDao.updateImage(history.id, path)
                     imageService.deleteImageIfExist(oldImagePath)
                 }
             }
             refresh()
         }
+    private val pickBarrelImageLauncher = activity.registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            val path = imageService.copyImageToInternalStorage(it, activity)
+            currentBarrelPhotoPath = path
+            barrelForIntent?.let { barrel ->
+                val oldImagePath = barrel.imagePath
+                barrelDao.updateImage(barrel.id, path)
+                imageService.deleteImageIfExist(oldImagePath)
+            }
+        }
+        refresh()
+    }
+    private val importQrLauncher = activity.registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        try {
 
-        importQrLauncher = activity.registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            try {
-
-                val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-                val account = task.result
-                if (account != null) {
-                    barrelForIntent?.let { barrel ->
-                        qrCloudService.showLoadingDialog(activity)
-                        activity.lifecycleScope.launch(Dispatchers.IO) {
-                            qrCloudService.processCloudQR(account, barrel, activity)
-                        }
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            val account = task.result
+            if (account != null) {
+                barrelForIntent?.let { barrel ->
+                    qrCloudService.showLoadingDialog(activity)
+                    activity.lifecycleScope.launch(Dispatchers.IO) {
+                        qrCloudService.processCloudQR(account, barrel, activity)
                     }
-                } else {
-                    Toast.makeText(
-                        activity,
-                        activity.getString(R.string.error_google_connexion),
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
-            } catch (e: com.google.android.gms.common.api.ApiException) {
+            } else {
                 Toast.makeText(
                     activity,
-                    activity.getString(R.string.error_google_authent, e.statusCode.toString()),
-                    Toast.LENGTH_LONG
+                    activity.getString(R.string.error_google_connexion),
+                    Toast.LENGTH_SHORT
                 ).show()
             }
+        } catch (e: com.google.android.gms.common.api.ApiException) {
+            Toast.makeText(
+                activity,
+                activity.getString(R.string.error_google_authent, e.statusCode.toString()),
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
@@ -259,14 +242,12 @@ class BarrelFullViewBinder(
             )
         }
 
-        // Stats & History
-        historyDrawer.displayAllForBarrel(holder, barrel)
-        statisticsDrawer.displayAllForBarrel(holder, barrel)
-
         holder.layoutToggleHistory?.setOnClickListener {
+            historyDrawer.displayAllForBarrel(holder, barrel)
             toggleSection(holder.layoutHistory!!, holder.imgChevronHistory!!, holder.isHistoryExpanded) { holder.isHistoryExpanded = it }
         }
         holder.layoutToggleStats?.setOnClickListener {
+            statisticsDrawer.displayAllForBarrel(holder, barrel)
             toggleSection(holder.layoutStats!!, holder.imgChevronStats!!, holder.isStatsExpanded) { holder.isStatsExpanded = it }
         }
 

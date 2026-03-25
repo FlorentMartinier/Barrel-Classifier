@@ -1,5 +1,6 @@
 package com.fmartinier.barrelclassifier.data.model
 
+import androidx.recyclerview.widget.DiffUtil
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 
@@ -36,5 +37,16 @@ data class Barrel(
         } else {
             null
         }
+    }
+}
+
+// 1. On définit comment comparer deux fûts
+class BarrelDiffCallback : DiffUtil.ItemCallback<Barrel>() {
+    override fun areItemsTheSame(oldItem: Barrel, newItem: Barrel): Boolean {
+        return oldItem.id == newItem.id
+    }
+
+    override fun areContentsTheSame(oldItem: Barrel, newItem: Barrel): Boolean {
+        return oldItem == newItem
     }
 }
