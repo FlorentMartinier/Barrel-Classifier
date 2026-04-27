@@ -18,10 +18,10 @@ Retrouvez Barrel Manager sur le Google Play Store pour commencer à gérer votre
 ## ✨ Fonctionnalités clés
 
 * **Gestion de Chai :** Suivez plusieurs fûts simultanément avec une vue Grille ou Liste détaillée.
-* **Support des Fûts Hybrides :** Pensée pour les nouvelles tendances comme les fûts **Ten 30** ou **Badmotivator**, permettant de simuler le vieillissement d'un fût de 200L dans de petits contenants.
 * **Historique Complet :** Enregistrez chaque événement (remplissage, ouillage, dégustation, prise de photo).
 * **Statistiques Avancées :** Visualisez l'évolution de vos spiritueux via des graphiques (Taux d'alcool, Part des Anges, extraction des tanins).
 * **Export PDF & Cloud :** Exportez vos fiches de fûts en PDF ou synchronisez vos données via QR Code.
+* * **Support des Fûts Hybrides (A venir) :** Pensée pour les nouvelles tendances comme les fûts **Ten 30** ou **Badmotivator**, permettant de simuler le vieillissement d'un fût de 200L dans de petits contenants.
 
 ---
 
@@ -30,8 +30,7 @@ Retrouvez Barrel Manager sur le Google Play Store pour commencer à gérer votre
 Le projet est en constante évolution, avec un focus particulier sur la performance et l'expérience utilisateur :
 
 * **Langage :** Kotlin
-* **Architecture :** MVVM / Clean Architecture
-* **UI :** XML (Migration progressive vers **Jetpack Compose**)
+* **UI :** XML (Migration souhaitée vers **Jetpack Compose**)
 * **Base de données :** SQLite (Room)
 * **Images :** Coil (Coroutines Image Loader)
 * **Graphiques :** MPAndroidChart
