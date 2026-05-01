@@ -12,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isGone
 import androidx.fragment.app.DialogFragment
 import com.fmartinier.barrelclassifier.R
@@ -139,7 +140,7 @@ class AddHistoryDialog : DialogFragment() {
             .setView(view)
             .setPositiveButton(getString(positiveButtonText), null) // IMPORTANT
             .setNegativeButton(getString(R.string.cancel), null)
-            .setBackground(requireContext(), R.color.dialog_bg)
+            .setBackground(AppCompatResources.getDrawable(requireContext(), R.color.dialog_bg))
             .create()
 
         dialog.setCanceledOnTouchOutside(false)

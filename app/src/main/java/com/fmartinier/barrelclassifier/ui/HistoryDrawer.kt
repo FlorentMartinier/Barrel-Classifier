@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import com.fmartinier.barrelclassifier.R
@@ -252,7 +253,7 @@ class HistoryDrawer(
 
     private fun confirmDeleteHistory(history: History) {
         MaterialAlertDialogBuilder(context)
-            .setBackground(context, R.color.dialog_bg)
+            .setBackground(AppCompatResources.getDrawable(context, R.color.dialog_bg))
             .setTitle(context.resources.getString(R.string.remove_history))
             .setMessage(context.resources.getString(R.string.remove_history_validation))
             .setPositiveButton(context.resources.getString(R.string.remove)) { _, _ ->

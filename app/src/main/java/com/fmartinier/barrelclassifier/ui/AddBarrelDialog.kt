@@ -1,228 +1,91 @@
 package com.fmartinier.barrelclassifier.ui
 
-import android.app.Dialog
-import android.content.Context
-import android.content.res.ColorStateList
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
-import androidx.core.view.isGone
+import android.view.ViewGroup
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.lifecycleScope
-import com.fmartinier.barrelclassifier.R
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.dao.BarrelDao
-import com.fmartinier.barrelclassifier.data.model.Barrel
-import com.fmartinier.barrelclassifier.service.AnalyticsService
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.shape.MaterialShapeDrawable
-import com.google.android.material.shape.ShapeAppearanceModel
-import com.google.android.material.textfield.MaterialAutoCompleteTextView
+import com.fmartinier.barrelclassifier.ui.compose.AddBarrelDialogScreen
+import com.fmartinier.barrelclassifier.ui.compose.AddBarrelEvent
+import com.fmartinier.barrelclassifier.ui.compose.AddBarrelViewModel
+import com.fmartinier.barrelclassifier.ui.compose.AddBarrelViewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class AddBarrelDialog : DialogFragment() {
 
-    private lateinit var edtBarrelName: EditText
-    private lateinit var edtVolume: EditText
-    private lateinit var edtBrand: MaterialAutoCompleteTextView
-    private lateinit var edtWoodType: MaterialAutoCompleteTextView
-    private lateinit var toggle: TextView
-    private lateinit var advancedLayout: LinearLayout
-    private lateinit var edtHeatType: MaterialAutoCompleteTextView
-    private lateinit var edtHumidity: EditText
-    private lateinit var edtTemperature: EditText
-    private lateinit var edtDescription: EditText
-    private lateinit var barrel: Barrel
     private var barrelId: Long? = null
     private var modificationMode = false
 
     private lateinit var db: DatabaseHelper
-    private lateinit var barrelDao: BarrelDao
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
         db = DatabaseHelper.getInstance(requireContext())
-        barrelDao = BarrelDao.getInstance(db)
 
-        val view = layoutInflater.inflate(R.layout.dialog_add_barrel, null)
-
-        edtBarrelName = view.findViewById(R.id.edtBarrelName)
-        edtVolume = view.findViewById(R.id.edtVolume)
-        edtBrand = view.findViewById<MaterialAutoCompleteTextView>(R.id.autoCompleteBrand)
-        edtWoodType = view.findViewById<MaterialAutoCompleteTextView>(R.id.autoCompleteWood)
-        toggle = view.findViewById<TextView>(R.id.txtToggleAdvanced)
-        advancedLayout = view.findViewById<LinearLayout>(R.id.layoutAdvanced)
-        edtHeatType = view.findViewById<MaterialAutoCompleteTextView>(R.id.edtHeatType)
-        edtHumidity = view.findViewById(R.id.edtHumidity)
-        edtTemperature = view.findViewById(R.id.edtTemperature)
-        edtDescription = view.findViewById(R.id.edtBarrelDescription)
-
-        val brandAdapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_dropdown_item_1line,
-            BARREL_BRANDS
-        )
-        val woodTypeAdapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_dropdown_item_1line,
-            resources.getStringArray(R.array.wood_types_array)
-        )
-        val heatingTypeAdapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_dropdown_item_1line,
-            resources.getStringArray(R.array.heating_types_array)
-        )
-
-        edtBrand.setAdapter(brandAdapter)
-        edtWoodType.setAdapter(woodTypeAdapter)
-        edtHeatType.setAdapter(heatingTypeAdapter)
-
-        edtBrand.setOnClickListener {
-            edtBrand.showDropDown()
-        }
-
-        edtWoodType.setOnClickListener {
-            edtWoodType.showDropDown()
-        }
-
-        edtHeatType.setOnClickListener {
-            edtHeatType.showDropDown()
-        }
-
-        toggle.setOnClickListener {
-            if (advancedLayout.isGone) {
-                advancedLayout.visibility = View.VISIBLE
-                toggle.text = getString(R.string.advanced_option_up)
-            } else {
-                advancedLayout.visibility = View.GONE
-                toggle.text = getString(R.string.advanced_option_down)
-            }
-        }
-
-        // Pré-remplissage
+        // Check if we're in modification mode
         arguments
             ?.takeIf { it.containsKey(ARG_BARREL_ID) }
             ?.getLong(ARG_BARREL_ID)
             ?.let {
                 modificationMode = true
                 barrelId = it
-                barrel = barrelDao.findById(it)
-                edtBarrelName.setText(barrel.name)
-                edtVolume.setText(barrel.volume.toString())
-                edtBrand.setText(barrel.brand)
-                edtWoodType.setText(barrel.woodType)
-                edtHeatType.setText(barrel.heatType)
-                edtHumidity.setText(barrel.storageHygrometer)
-                edtTemperature.setText(barrel.storageTemperature)
-                edtDescription.setText(barrel.description)
             }
 
-        val dialogTitle = if (modificationMode) R.string.modify_barrel else R.string.add_barrel
-        val positiveButtonTitle = if (modificationMode) R.string.modify else R.string.add
-        val dialog = MaterialAlertDialogBuilder(requireActivity())
-            .setTitle(getString(dialogTitle))
-            .setView(view)
-            .setPositiveButton(getString(positiveButtonTitle), null)
-            .setNegativeButton(getString(R.string.cancel), null)
-            .setBackground(requireContext(), R.color.dialog_bg)
-            .create()
-
-        dialog.setCanceledOnTouchOutside(false)
-        return dialog
+        //setStyle(STYLE_NO_TITLE, R.style.AlertDialog)
     }
 
     override fun onStart() {
         super.onStart()
+        // Make dialog window background transparent to avoid the white rectangle behind the Compose content
+        dialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
+    }
 
-        val dialog = dialog as AlertDialog
-        val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-
-        positiveButton.setOnClickListener {
-
-            // 🔍 Récupération des valeurs
-            val name = edtBarrelName.text.toString().trim()
-            val volumeText = edtVolume.text.toString().trim()
-            val brand = edtBrand.text.toString().trim()
-            val woodType = edtWoodType.text.toString().trim()
-
-            // Options avancées
-            val heatType = edtHeatType.text?.toString()?.trim()
-            val humidity = edtHumidity.text?.toString()?.trim()
-            val temperature = edtTemperature.text?.toString()?.trim()
-            val description = edtDescription.text?.toString()?.trim()
-
-            // ❌ Validation
-            when {
-                name.isEmpty() -> {
-                    showToast(getString(R.string.barrel_name) + " " + getString(R.string.required))
-                }
-
-                volumeText.isEmpty() -> {
-                    showToast(getString(R.string.barrel_volume) + " " + getString(R.string.required))
-                }
-
-                brand.isEmpty() -> {
-                    showToast(getString(R.string.brand) + " " + getString(R.string.required))
-                }
-
-                woodType.isEmpty() -> {
-                    showToast(getString(R.string.wood_type) + " " + getString(R.string.required))
-                }
-
-                else -> {
-                    // ✅ Tout est valide → insertion
-                    val barrel = Barrel(
-                        id = this.barrelId ?: 0,
-                        name = name,
-                        volume = volumeText.toInt(),
-                        brand = brand,
-                        woodType = woodType,
-                        imagePath = null,
-                        heatType = heatType,
-                        storageHygrometer = humidity,
-                        storageTemperature = temperature,
-                        description = description,
-                        histories = emptyList()
-                    )
-
-                    lifecycleScope.launch {
-                        withContext(Dispatchers.IO) {
-                            if (modificationMode) {
-                                barrelDao.update(barrel)
-                            } else {
-                                AnalyticsService.logBarrelAdded(barrel.woodType, barrel.volume.toString())
-                                barrelDao.insert(barrel)
-                            }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                MaterialTheme {
+                    AddBarrelDialogWithViewModel(
+                        barrelId = barrelId,
+                        dbHelper = db,
+                        onDismiss = { dismiss() },
+                        onSuccess = {
+                            parentFragmentManager.setFragmentResult(
+                                "add_barrel_result",
+                                Bundle.EMPTY
+                            )
+                            dismiss()
                         }
-
-                        parentFragmentManager.setFragmentResult(
-                            "add_barrel_result",
-                            Bundle.EMPTY
-                        )
-                        dismiss() // 👈 fermeture MANUELLE
-                    }
+                    )
                 }
             }
         }
     }
 
-    private fun showToast(message: String) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-    }
-
     companion object {
         const val TAG = "AddBarrelDialog"
         private const val ARG_BARREL_ID = "barrel_id"
-
-        private val BARREL_BRANDS =
-            arrayOf("Allary", "Navarre", "Seguin Moreau", "Taransaud", "Radoux", "Damy").sorted()
 
         fun newInstance(barrelId: Long? = null): AddBarrelDialog {
             return AddBarrelDialog().apply {
@@ -236,19 +99,79 @@ class AddBarrelDialog : DialogFragment() {
     }
 }
 
-fun MaterialAlertDialogBuilder.setBackground(
-    context: Context,
-    ressource: Int
-): MaterialAlertDialogBuilder {
-    val shapeAppearanceModel = ShapeAppearanceModel.builder(
-        context,
-        R.style.RoundedDialog,
-        0
-    ).build()
+@Composable
+fun AddBarrelDialogWithViewModel(
+    barrelId: Long?,
+    dbHelper: DatabaseHelper,
+    onDismiss: () -> Unit,
+    onSuccess: () -> Unit
+) {
+    val factory = AddBarrelViewModelFactory(dbHelper)
+    val viewModel: AddBarrelViewModel = viewModel(factory = factory)
+    val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
-    val background = MaterialShapeDrawable(shapeAppearanceModel).apply {
-        fillColor =
-            ColorStateList.valueOf(ContextCompat.getColor(context, ressource))
+    // Initialize ViewModel with barrel data if in modification mode
+    LaunchedEffect(barrelId) {
+        if (barrelId != null) {
+            val barrel = withContext(Dispatchers.IO) {
+                try {
+                    dbHelper.readableDatabase.use { db ->
+                        // Get barrel from database using BarrelDao
+                        val dao = BarrelDao.getInstance(dbHelper)
+                        dao.findById(barrelId)
+                    }
+                } catch (_: Exception) {
+                    null
+                }
+            }
+            viewModel.initializeWithBarrel(barrel)
+        }
     }
-    return setBackground(background)
+
+    // Handle events from ViewModel
+    LaunchedEffect(Unit) {
+        // This would be better with a shared flow, but for simplicity we'll use callbacks
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        AddBarrelDialogScreen(
+            uiState = uiState,
+            onBarrelNameChange = viewModel::updateBarrelName,
+            onVolumeChange = viewModel::updateVolume,
+            onBrandChange = viewModel::updateBrand,
+            onWoodTypeChange = viewModel::updateWoodType,
+            onHeatTypeChange = viewModel::updateHeatType,
+            onHumidityChange = viewModel::updateHumidity,
+            onTemperatureChange = viewModel::updateTemperature,
+            onDescriptionChange = viewModel::updateDescription,
+            onToggleAdvanced = viewModel::toggleAdvancedOptions,
+            onSave = {
+                viewModel.validateAndSave { event ->
+                    when (event) {
+                        is AddBarrelEvent.ShowError -> {
+                            scope.launch {
+                                snackbarHostState.showSnackbar(event.message)
+                            }
+                        }
+                        is AddBarrelEvent.ShowSuccess -> {
+                            scope.launch {
+                                snackbarHostState.showSnackbar(event.message)
+                                onSuccess()
+                            }
+                        }
+                        is AddBarrelEvent.Dismiss -> {
+                            onDismiss()
+                        }
+                    }
+                }
+            },
+            onDismiss = onDismiss,
+            brandList = listOf("Allary", "Navarre", "Seguin Moreau", "Taransaud", "Radoux", "Damy"),
+            woodTypeList = listOf("Chêne Français", "Chêne Américain", "Chêne Européen", "Acacia", "Châtaignier", "Cerisier", "Mûrier"),
+            heatingTypeList = listOf("Légère", "Moyenne", "Moyenne Plus", "Forte", "Forte Plus", "Vapeur"),
+            snackbarHostState = snackbarHostState
+        )
+    }
 }
