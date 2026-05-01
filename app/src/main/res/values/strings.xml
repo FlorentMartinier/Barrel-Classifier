@@ -148,6 +148,13 @@
     <string name="barrel_image">Image du fut</string>
     <string name="camera_icon">Icone de l\'appareil photo</string>
     <string name="barrel_button_description">Bouton pour gérer l\'ajout de fut</string>
+    <string name="barrel_name_required">Le nom du fût est requis</string>
+    <string name="volume_required">Le volume est requis</string>
+    <string name="brand_required">La marque est requise</string>
+    <string name="wood_type_required">Le type de bois est requis</string>
+    <string name="barrel_modified_success">Fût modifié avec succès</string>
+    <string name="barrel_added_success">Fût ajouté avec succès</string>
+    <string name="barrel_save_error">Erreur lors de la sauvegarde du fût</string>
     <string-array name="type_fut_array">
         <item>Vieillissement</item>
         <item>Marquage</item>

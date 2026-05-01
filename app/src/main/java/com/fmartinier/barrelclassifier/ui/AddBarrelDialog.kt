@@ -1,5 +1,6 @@
 package com.fmartinier.barrelclassifier.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,8 +17,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.dao.BarrelDao
 import com.fmartinier.barrelclassifier.ui.compose.AddBarrelDialogScreen
@@ -49,7 +53,7 @@ class AddBarrelDialog : DialogFragment() {
                 barrelId = it
             }
 
-        //setStyle(STYLE_NO_TITLE, R.style.AlertDialog)
+        setStyle(STYLE_NO_TITLE, R.style.Theme_BarrelClassifier)
     }
 
     override fun onStart() {
@@ -99,6 +103,7 @@ class AddBarrelDialog : DialogFragment() {
     }
 }
 
+@SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 fun AddBarrelDialogWithViewModel(
     barrelId: Long?,
@@ -106,6 +111,7 @@ fun AddBarrelDialogWithViewModel(
     onDismiss: () -> Unit,
     onSuccess: () -> Unit
 ) {
+    val context = LocalContext.current
     val factory = AddBarrelViewModelFactory(dbHelper)
     val viewModel: AddBarrelViewModel = viewModel(factory = factory)
     val uiState by viewModel.uiState.collectAsState()
@@ -130,10 +136,6 @@ fun AddBarrelDialogWithViewModel(
         }
     }
 
-    // Handle events from ViewModel
-    LaunchedEffect(Unit) {
-        // This would be better with a shared flow, but for simplicity we'll use callbacks
-    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         AddBarrelDialogScreen(
@@ -152,12 +154,12 @@ fun AddBarrelDialogWithViewModel(
                     when (event) {
                         is AddBarrelEvent.ShowError -> {
                             scope.launch {
-                                snackbarHostState.showSnackbar(event.message)
+                                snackbarHostState.showSnackbar(context.getString(event.messageId))
                             }
                         }
                         is AddBarrelEvent.ShowSuccess -> {
                             scope.launch {
-                                snackbarHostState.showSnackbar(event.message)
+                                snackbarHostState.showSnackbar(context.getString(event.messageId))
                                 onSuccess()
                             }
                         }
@@ -169,8 +171,8 @@ fun AddBarrelDialogWithViewModel(
             },
             onDismiss = onDismiss,
             brandList = listOf("Allary", "Navarre", "Seguin Moreau", "Taransaud", "Radoux", "Damy"),
-            woodTypeList = listOf("Chêne Français", "Chêne Américain", "Chêne Européen", "Acacia", "Châtaignier", "Cerisier", "Mûrier"),
-            heatingTypeList = listOf("Légère", "Moyenne", "Moyenne Plus", "Forte", "Forte Plus", "Vapeur"),
+            woodTypeList = stringArrayResource(id = R.array.wood_types_array).toList(),
+            heatingTypeList = stringArrayResource(id = R.array.heating_types_array).toList(),
             snackbarHostState = snackbarHostState
         )
     }

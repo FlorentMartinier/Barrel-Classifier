@@ -2,6 +2,7 @@ package com.fmartinier.barrelclassifier.ui.compose
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fmartinier.barrelclassifier.R
 import com.fmartinier.barrelclassifier.data.DatabaseHelper
 import com.fmartinier.barrelclassifier.data.dao.BarrelDao
 import com.fmartinier.barrelclassifier.service.AnalyticsService
@@ -29,8 +30,8 @@ data class AddBarrelUiState(
 )
 
 sealed class AddBarrelEvent {
-    data class ShowError(val message: String) : AddBarrelEvent()
-    data class ShowSuccess(val message: String) : AddBarrelEvent()
+    data class ShowError(val messageId: Int) : AddBarrelEvent()
+    data class ShowSuccess(val messageId: Int) : AddBarrelEvent()
     object Dismiss : AddBarrelEvent()
 }
 
@@ -107,10 +108,10 @@ class AddBarrelViewModel(
 
         // Validation
         val validationError = when {
-            state.barrelName.isEmpty() -> "Le nom du fût est requis"
-            state.volume.isEmpty() -> "La contenance est requise"
-            state.brand.isEmpty() -> "La marque est requise"
-            state.woodType.isEmpty() -> "Le type de bois est requis"
+            state.barrelName.isEmpty() -> R.string.barrel_name_required
+            state.volume.isEmpty() -> R.string.volume_required
+            state.brand.isEmpty() -> R.string.brand_required
+            state.woodType.isEmpty() -> R.string.wood_type_required
             else -> null
         }
 
@@ -148,18 +149,18 @@ class AddBarrelViewModel(
                     }
                 }
 
-                val successMessage = if (isModificationMode) "Fût modifié avec succès" else "Fût ajouté avec succès"
+                val successMessage = if (isModificationMode)
+                    R.string.barrel_modified_success
+                else
+                    R.string.barrel_added_success
                 onResult(AddBarrelEvent.ShowSuccess(successMessage))
 
             } catch (e: Exception) {
-                onResult(AddBarrelEvent.ShowError("Erreur lors de la sauvegarde: ${e.message}"))
+                e.printStackTrace()
+                onResult(AddBarrelEvent.ShowError(R.string.barrel_save_error))
             } finally {
                 _uiState.value = _uiState.value.copy(isLoading = false)
             }
         }
-    }
-
-    fun clearMessages() {
-        _uiState.value = _uiState.value.copy(errorMessage = null, successMessage = null)
     }
 }

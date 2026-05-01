@@ -148,6 +148,13 @@
     <string name="barrel_image">Barrel image</string>
     <string name="camera_icon">Camera icon</string>
     <string name="barrel_button_description">Button to manage barrel addition</string>
+    <string name="barrel_name_required">Barrel name is required</string>
+    <string name="volume_required">Volume is required</string>
+    <string name="brand_required">Brand is required</string>
+    <string name="wood_type_required">Wood type is required</string>
+    <string name="barrel_modified_success">Barrel modified successfully</string>
+    <string name="barrel_added_success">Barrel added successfully</string>
+    <string name="barrel_save_error">Error while saving the barrel</string>
     <string-array name="type_fut_array">
         <item>Aging</item>
         <item>Seasonning</item>
