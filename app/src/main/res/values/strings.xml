@@ -155,6 +155,7 @@
     <string name="barrel_modified_success">Fût modifié avec succès</string>
     <string name="barrel_added_success">Fût ajouté avec succès</string>
     <string name="barrel_save_error">Erreur lors de la sauvegarde du fût</string>
+    <string name="saving">Sauvegarde en cours…</string>
     <string-array name="type_fut_array">
         <item>Vieillissement</item>
         <item>Marquage</item>

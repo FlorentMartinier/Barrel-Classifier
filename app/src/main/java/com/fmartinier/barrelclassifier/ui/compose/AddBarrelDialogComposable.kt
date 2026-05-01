@@ -10,11 +10,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -63,7 +65,8 @@ fun AddBarrelDialogScreen(
             Text(
                 text = stringResource(
                     if (uiState.barrelId != null) R.string.modify_barrel else R.string.add_barrel
-                )
+                ),
+                color = colorResource(id = R.color.text_secondary)
             )
         },
         text = {
@@ -76,12 +79,24 @@ fun AddBarrelDialogScreen(
                     // Barrel Name
                     Text(
                         text = stringResource(R.string.barrel_name),
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier.padding(top = 8.dp),
+                        color = colorResource(id = R.color.text_secondary)
                     )
                     OutlinedTextField(
                         value = uiState.barrelName,
                         onValueChange = onBarrelNameChange,
-                        placeholder = { Text(stringResource(R.string.ex_barrel_name)) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = colorResource(R.color.accent_whisky),
+                            focusedTextColor = colorResource(R.color.text_tertiary),
+                            unfocusedTextColor = colorResource(R.color.text_tertiary),
+                            cursorColor = colorResource(R.color.accent_whisky),
+                        ),
+                        placeholder = {
+                            Text(
+                                text = stringResource(R.string.ex_barrel_name),
+                                color = colorResource(id = R.color.text_tertiary)
+                            )
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 4.dp),
@@ -92,12 +107,24 @@ fun AddBarrelDialogScreen(
                     // Volume
                     Text(
                         text = stringResource(R.string.barrel_volume),
-                        modifier = Modifier.padding(top = 12.dp)
+                        modifier = Modifier.padding(top = 12.dp),
+                        color = colorResource(id = R.color.text_secondary)
                     )
                     OutlinedTextField(
                         value = uiState.volume,
                         onValueChange = onVolumeChange,
-                        placeholder = { Text(stringResource(R.string.ex_barrel_volume)) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = colorResource(R.color.accent_whisky),
+                            focusedTextColor = colorResource(R.color.text_tertiary),
+                            unfocusedTextColor = colorResource(R.color.text_tertiary),
+                            cursorColor = colorResource(R.color.accent_whisky),
+                        ),
+                        placeholder = {
+                            Text(
+                                text = stringResource(R.string.ex_barrel_volume),
+                                color = colorResource(id = R.color.text_tertiary)
+                            )
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 4.dp),
@@ -108,7 +135,8 @@ fun AddBarrelDialogScreen(
                     // Brand
                     Text(
                         text = stringResource(R.string.brand),
-                        modifier = Modifier.padding(top = 12.dp)
+                        modifier = Modifier.padding(top = 12.dp),
+                        color = colorResource(id = R.color.text_secondary)
                     )
                     ExposedDropdownMenuBox(
                         expanded = expandedBrand,
@@ -120,7 +148,18 @@ fun AddBarrelDialogScreen(
                         OutlinedTextField(
                             value = uiState.brand,
                             onValueChange = onBrandChange,
-                            placeholder = { Text(stringResource(R.string.ex_brand)) },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = colorResource(R.color.accent_whisky),
+                                focusedTextColor = colorResource(R.color.text_tertiary),
+                                unfocusedTextColor = colorResource(R.color.text_tertiary),
+                                cursorColor = colorResource(R.color.accent_whisky),
+                            ),
+                            placeholder = {
+                                Text(
+                                    text = stringResource(R.string.ex_brand),
+                                    color = colorResource(id = R.color.text_tertiary)
+                                )
+                            },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedBrand) },
                             modifier = Modifier
                                 .menuAnchor()
@@ -146,7 +185,8 @@ fun AddBarrelDialogScreen(
                     // Wood Type
                     Text(
                         text = stringResource(R.string.wood_type),
-                        modifier = Modifier.padding(top = 12.dp)
+                        modifier = Modifier.padding(top = 12.dp),
+                        color = colorResource(id = R.color.text_secondary)
                     )
                     ExposedDropdownMenuBox(
                         expanded = expandedWoodType,
@@ -158,7 +198,18 @@ fun AddBarrelDialogScreen(
                         OutlinedTextField(
                             value = uiState.woodType,
                             onValueChange = onWoodTypeChange,
-                            placeholder = { Text(stringResource(R.string.ex_wood_type)) },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = colorResource(R.color.accent_whisky),
+                                focusedTextColor = colorResource(R.color.text_tertiary),
+                                unfocusedTextColor = colorResource(R.color.text_tertiary),
+                                cursorColor = colorResource(R.color.accent_whisky),
+                            ),
+                            placeholder = {
+                                Text(
+                                    text = stringResource(R.string.ex_wood_type),
+                                    color = colorResource(id = R.color.text_tertiary)
+                                )
+                            },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedWoodType) },
                             modifier = Modifier
                                 .menuAnchor()
@@ -184,7 +235,10 @@ fun AddBarrelDialogScreen(
                     // Advanced Options Toggle Button
                     TextButton(
                         onClick = onToggleAdvanced,
-                        modifier = Modifier.padding(top = 12.dp)
+                        modifier = Modifier.padding(top = 12.dp),
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = colorResource(id = R.color.accent_whisky)
+                        ),
                     ) {
                         Text(
                             text = stringResource(
@@ -199,7 +253,8 @@ fun AddBarrelDialogScreen(
                             // Heat Type
                             Text(
                                 text = stringResource(R.string.heating_type),
-                                modifier = Modifier.padding(top = 12.dp)
+                                modifier = Modifier.padding(top = 12.dp),
+                                color = colorResource(id = R.color.text_secondary)
                             )
                             ExposedDropdownMenuBox(
                                 expanded = expandedHeatType,
@@ -211,7 +266,18 @@ fun AddBarrelDialogScreen(
                                 OutlinedTextField(
                                     value = uiState.heatType,
                                     onValueChange = onHeatTypeChange,
-                                    placeholder = { Text(stringResource(R.string.heating_type_exemple)) },
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = colorResource(R.color.accent_whisky),
+                                        focusedTextColor = colorResource(R.color.text_tertiary),
+                                        unfocusedTextColor = colorResource(R.color.text_tertiary),
+                                        cursorColor = colorResource(R.color.accent_whisky),
+                                    ),
+                                    placeholder = {
+                                        Text(
+                                            text = stringResource(R.string.heating_type_exemple),
+                                            color = colorResource(id = R.color.text_tertiary)
+                                        )
+                                    },
                                     trailingIcon = {
                                         ExposedDropdownMenuDefaults.TrailingIcon(
                                             expanded = expandedHeatType
@@ -241,12 +307,24 @@ fun AddBarrelDialogScreen(
                             // Humidity
                             Text(
                                 text = stringResource(R.string.storage_hygrometer),
-                                modifier = Modifier.padding(top = 12.dp)
+                                modifier = Modifier.padding(top = 12.dp),
+                                color = colorResource(id = R.color.text_secondary)
                             )
                             OutlinedTextField(
                                 value = uiState.humidity,
                                 onValueChange = onHumidityChange,
-                                placeholder = { Text(stringResource(R.string.storage_hygrometer_exemple)) },
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = colorResource(R.color.accent_whisky),
+                                    focusedTextColor = colorResource(R.color.text_tertiary),
+                                    unfocusedTextColor = colorResource(R.color.text_tertiary),
+                                    cursorColor = colorResource(R.color.accent_whisky),
+                                ),
+                                placeholder = {
+                                    Text(
+                                        text = stringResource(R.string.storage_hygrometer_exemple),
+                                        color = colorResource(id = R.color.text_tertiary)
+                                    )
+                                },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(top = 4.dp),
@@ -257,12 +335,24 @@ fun AddBarrelDialogScreen(
                             // Temperature
                             Text(
                                 text = stringResource(R.string.storage_temperature),
-                                modifier = Modifier.padding(top = 12.dp)
+                                modifier = Modifier.padding(top = 12.dp),
+                                color = colorResource(id = R.color.text_secondary)
                             )
                             OutlinedTextField(
                                 value = uiState.temperature,
                                 onValueChange = onTemperatureChange,
-                                placeholder = { Text(stringResource(R.string.storage_temperature_ex)) },
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = colorResource(R.color.accent_whisky),
+                                    focusedTextColor = colorResource(R.color.text_tertiary),
+                                    unfocusedTextColor = colorResource(R.color.text_tertiary),
+                                    cursorColor = colorResource(R.color.accent_whisky),
+                                ),
+                                placeholder = {
+                                    Text(
+                                        text = stringResource(R.string.storage_temperature_ex),
+                                        color = colorResource(id = R.color.text_tertiary)
+                                    )
+                                },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(top = 4.dp),
@@ -273,12 +363,24 @@ fun AddBarrelDialogScreen(
                             // Description
                             Text(
                                 text = stringResource(R.string.detailed_description),
-                                modifier = Modifier.padding(top = 12.dp)
+                                modifier = Modifier.padding(top = 12.dp),
+                                color = colorResource(id = R.color.text_secondary)
                             )
                             OutlinedTextField(
                                 value = uiState.description,
                                 onValueChange = onDescriptionChange,
-                                placeholder = { Text(stringResource(R.string.detailed_description)) },
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = colorResource(R.color.accent_whisky),
+                                    focusedTextColor = colorResource(R.color.text_tertiary),
+                                    unfocusedTextColor = colorResource(R.color.text_tertiary),
+                                    cursorColor = colorResource(R.color.accent_whisky),
+                                ),
+                                placeholder = {
+                                    Text(
+                                        text = stringResource(R.string.detailed_description),
+                                        color = colorResource(id = R.color.text_tertiary)
+                                    )
+                                },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(top = 4.dp),
@@ -302,17 +404,28 @@ fun AddBarrelDialogScreen(
         confirmButton = {
             Button(
                 onClick = onSave,
-                enabled = !uiState.isLoading
+                enabled = !uiState.isLoading,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = colorResource(id = R.color.accent_whisky)
+                )
             ) {
                 Text(
-                    if (uiState.isLoading) "Sauvegarde..." else stringResource(
-                        if (uiState.barrelId != null) R.string.modify else R.string.add
-                    )
+                    if (uiState.isLoading)
+                        stringResource(R.string.saving)
+                    else
+                        stringResource(
+                            if (uiState.barrelId != null) R.string.modify else R.string.add
+                        )
                 )
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(
+                onClick = onDismiss,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = colorResource(id = R.color.accent_whisky)
+                ),
+            ) {
                 Text(stringResource(R.string.cancel))
             }
         }
